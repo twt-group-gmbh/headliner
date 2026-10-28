@@ -54,10 +54,9 @@ Tests split into two suites by what they need to boot:
 
 ## Project decisions
 
-- Version lives in `ext_emconf.php` AND `composer.json` (`extra.typo3/cms.version`, needed to avoid the TYPO3 14.3
-  `ext_emconf.php` deprecation) - keep both in sync on release; `ext_emconf.php` stays for TER.
+- No `ext_emconf.php` (deprecated in TYPO3 14): the version lives only in `composer.json` (`extra.typo3/cms.version`).
 - Releases: tag `vX.Y.Z` on a green `main` commit; `.github/workflows/release.yml` creates the GitHub release from the
-  CHANGELOG section (`Build/Scripts/release-notes.sh`) after checking the tag against `composer.json`/`ext_emconf.php`.
+  CHANGELOG section (`Build/Scripts/release-notes.sh`) after checking the tag against `composer.json`.
   The same workflow has a `ter` job (Tailor `ter:publish`, comment = `release-notes.sh --plain`) that is a no-op until the
   repo secret `TYPO3_API_TOKEN` exists and skips versions already in TER. On a tag push it first calls `ci.yml`
   (`workflow_call`) on the tagged commit and publishes only if it is green; a manual run for an existing tag skips CI.
@@ -66,4 +65,4 @@ Tests split into two suites by what they need to boot:
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via
   `DefaultTcaSchema`); use an auto-creating type (`check`, `input`, `number`, `text`, `datetime` - NOT `passthrough`).
 
-Supported: **PHP 8.3+ / TYPO3 14.3** (`composer.json`, `ext_emconf.php`).
+Supported: **PHP 8.3+ / TYPO3 14.3** (`composer.json`).

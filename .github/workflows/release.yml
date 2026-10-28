@@ -51,10 +51,9 @@ jobs:
         run: |
           version="${TAG#v}"
           composer_version="$(jq -r '.extra["typo3/cms"].version' composer.json)"
-          emconf_version="$(grep -oP "'version' => '\K[^']+" ext_emconf.php)"
-          echo "tag: ${version} | composer.json: ${composer_version} | ext_emconf.php: ${emconf_version}"
-          if [ "${version}" != "${composer_version}" ] || [ "${version}" != "${emconf_version}" ]; then
-            echo "::error::Tag ${TAG} does not match the version in composer.json / ext_emconf.php"
+          echo "tag: ${version} | composer.json: ${composer_version}"
+          if [ "${version}" != "${composer_version}" ]; then
+            echo "::error::Tag ${TAG} does not match the version in composer.json"
             exit 1
           fi
 
