@@ -1,0 +1,21 @@
+# Normalize line endings.
+* text=auto
+
+# Exclude development/infrastructure paths from the Composer dist tarball
+# (`composer install --prefer-dist`). Keeps the published package lean: only
+# Classes/, Configuration/, Resources/, Documentation/, composer.json and the
+# ext_* files ship to integrators.
+/.Build/                export-ignore
+/.ddev/                 export-ignore
+/.github/               export-ignore
+/.idea/                 export-ignore
+/Build/                 export-ignore
+/Tests/                 export-ignore
+/var/                   export-ignore
+/.editorconfig          export-ignore
+/.gitattributes         export-ignore
+/.gitignore             export-ignore
+/CLAUDE.md              export-ignore
+/CONTRIBUTING.md        export-ignore
+/.php-cs-fixer.cache    export-ignore
+/.php-cs-fixer.dist.php  export-ignore

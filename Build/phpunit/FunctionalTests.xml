@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/11.0/phpunit.xsd"
+         bootstrap="../../.Build/vendor/typo3/testing-framework/Resources/Core/Build/FunctionalTestsBootstrap.php"
+         cacheResult="false"
+         colors="true"
+         failOnWarning="true"
+         failOnRisky="true"
+         beStrictAboutTestsThatDoNotTestAnything="false">
+    <testsuites>
+        <testsuite name="functional">
+            <directory>../../Tests/Functional/</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <const name="TYPO3_TESTING_FUNCTIONAL_REMOVE_ERROR_HANDLER" value="true"/>
+        <ini name="display_errors" value="1"/>
+    </php>
+</phpunit>

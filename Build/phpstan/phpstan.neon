@@ -1,0 +1,16 @@
+# PHPStan config. The TYPO3 (saschaegerer/phpstan-typo3) and PHPUnit extensions are wired in
+# automatically by phpstan/extension-installer, so no `includes` are needed here.
+parameters:
+    level: 8
+    paths:
+        - ../../Classes
+        - ../../Tests
+    # The TYPO3 testing-framework base classes live under .Build and are picked up via autoload.
+    bootstrapFiles:
+        - ../../.Build/vendor/autoload.php
+    # Several methods here have looser native param/return types than their PHPDoc claims,
+    # by design: the PHPDoc documents the type callers are expected to pass, while a runtime
+    # check (is_string(), array_key_exists(), ...) defends against callers that don't. With
+    # this on (the default), PHPStan trusts the PHPDoc over the check and flags the check as
+    # dead code, which it isn't at runtime - only statically unreachable given the annotation.
+    treatPhpDocTypesAsCertain: false

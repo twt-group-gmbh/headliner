@@ -1,0 +1,28 @@
+#!/bin/bash
+## Description: Run the PHPUnit suites (unit | functional | all)
+## Usage: test [unit|functional|all]
+## Example: "ddev test", "ddev test unit", "ddev test functional"
+
+set -e
+cd /var/www/html
+
+SUITE="${1:-all}"
+PHPUNIT=".Build/bin/phpunit"
+
+run_unit() {
+    echo "=== Unit tests ==="
+    "${PHPUNIT}" -c Build/phpunit/UnitTests.xml
+}
+run_functional() {
+    echo "=== Functional tests ==="
+    # Booting TYPO3 can exceed the default CLI memory_limit. DB creds come from
+    # .ddev/.env.web; ImageMagick lives at /usr/bin/ in the web container.
+    php -d memory_limit=1G "${PHPUNIT}" -c Build/phpunit/FunctionalTests.xml
+}
+
+case "${SUITE}" in
+    unit) run_unit ;;
+    functional|func) run_functional ;;
+    all) run_unit; run_functional ;;
+    *) echo "Unknown suite '${SUITE}' (expected: unit | functional | all)"; exit 1 ;;
+esac

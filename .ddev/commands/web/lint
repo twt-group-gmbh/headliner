@@ -1,0 +1,13 @@
+#!/bin/bash
+## Description: Run static analysis and the coding-style check (PHPStan + CS-Fixer dry-run)
+## Usage: lint
+## Example: "ddev lint"
+
+set -e
+cd /var/www/html
+
+echo "=== PHPStan ==="
+.Build/bin/phpstan analyse -c Build/phpstan/phpstan.neon
+
+echo "=== PHP-CS-Fixer (dry-run) ==="
+.Build/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run --diff

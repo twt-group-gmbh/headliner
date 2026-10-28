@@ -1,0 +1,8 @@
+#!/bin/bash
+## Description: Install Composer dependencies into .Build/ (run after a fresh clone)
+## Usage: setup
+## Example: "ddev setup"
+
+set -e
+cd /var/www/html
+composer install --no-interaction
