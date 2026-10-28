@@ -1,0 +1,9 @@
+#!/bin/bash
+## Description: (Re)build the default demo at https://headliner.ddev.site/ from .Build/
+## Usage: demo
+## Example: "ddev demo"
+
+set -e
+cd /var/www/html
+[ -f .Build/bin/typo3 ] || composer install --no-interaction
+bash Build/Scripts/setup-demo-instance.sh

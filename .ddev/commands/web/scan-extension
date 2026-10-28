@@ -1,0 +1,14 @@
+#!/bin/bash
+## Description: Run TYPO3's Extension Scanner (Install Tool "Scan Extension Files") on the extension
+## Usage: scan-extension [--strict]
+## Example: "ddev scan-extension"
+
+# Scans only Classes/, Configuration/ and ext_*.php with the TYPO3 from .Build/vendor
+# (the version composer installed).
+# --strict also fails on "weak" matches (method names only, often false positives).
+
+cd /var/www/html || exit 1
+
+[ -d .Build/vendor/typo3/cms-install ] || composer install --no-interaction
+
+php Build/Scripts/extension-scan.php --vendor=/var/www/html/.Build/vendor "$@"

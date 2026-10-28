@@ -1,0 +1,24 @@
+name: headliner
+type: typo3
+docroot: .Build/public
+php_version: "8.3"
+webserver_type: nginx-fpm
+xdebug_enabled: false
+database:
+    type: mariadb
+    version: "11.8"
+use_dns_when_possible: true
+composer_version: "2"
+timezone: Europe/Berlin
+web_environment:
+    - TYPO3_CONTEXT=Development
+default_container_timeout: "300"
+hooks:
+    post-start:
+        # Fresh clone: install dependencies and build a ready-to-use TYPO3 (admin password is printed).
+        - exec: |
+            cd /var/www/html
+            [ -f .Build/bin/typo3 ] || composer install --no-interaction
+            [ -f config/system/settings.php ] || bash Build/Scripts/setup-demo-instance.sh
+
+# Weitere Optionen: https://docs.ddev.com/en/stable/users/configuration/config/
