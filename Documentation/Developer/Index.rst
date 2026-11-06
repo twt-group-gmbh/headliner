@@ -56,7 +56,7 @@ where its limits are.
   A mark for a record of another page is a label, so a forged mark cannot make the box change something else. The rights
   of the backend user for the table and the field are checked in the box (`EditAccess`) and again by the DataHandler.
 - *The request attributes `headliner.inspect…`* exist only inside the PHP process that renders the sub-request: no header or
-  parameter from outside sets them, so visitors never get marks.
+  parameter from outside sets them, so a request from outside cannot ask for the marks.
 
 **The routes:** `headliner_structure` (GET) and `headliner_rte_tag` (POST) need a backend login and the request token of the
 core (a request without or with a wrong token gets `401`). The first also needs the right to see the page and the
@@ -64,12 +64,8 @@ languages it asks for; the second changes a rich text only if the site setting `
 and field are a rich text, the backend user may edit them, the tag is one the editor offers and the text at that place is the
 one the box showed.
 
-**Limits:**
-
-- A heading that an editor writes can still be *misleading* (its text is what the editor wrote). It cannot do more than that in the box.
-- The marks are only added for the page module's request. If a site caches a fragment of the page itself (`stdWrap.cache`,
-  or a cached plugin output) during that request, marks could end up in the cache and reach visitors: they name records and
-  fields, not their content. The page cache is switched off for the request.
+**Limit:** A heading that an editor writes can still be *misleading* (its text is what the editor wrote). It cannot do more than
+that in the box.
 
 ..  _developer-javascript:
 
