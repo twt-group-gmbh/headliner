@@ -109,6 +109,9 @@ First release.
   (0 to 6), into the tag of the header (`header_tag`). It keeps tags that were chosen already, leaves the layout and the
   subheader alone (the Semantilizer has no field for it), and can run again. See the chapter "Migration" of the
   documentation.
+- Documentation: the chapter "Child records without Content Blocks" shows the wrapper `headliner:headline.children` with a
+  content element made with the means of the core (TCA of the field and of the child table, Fluid template with
+  `{record}`).
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 
