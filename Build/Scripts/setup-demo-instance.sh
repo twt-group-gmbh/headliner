@@ -61,10 +61,10 @@ else
     sed -i 's#^dependencies:$#dependencies:\n  - twtgroup/headliner#' "${SITE_CONFIG}"
 fi
 mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
-    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, bodytext, crdate, tstamp) VALUES
-        (1, 'text', 0, 512, 0, 'Our services', 2, 'h2', '<p>Tag H2, layout 2.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (1, 'text', 0, 768, 0, 'Details', 2, 'h4', '<p>Tag H4 with the look of layout 2: the last heading was an H2, so a level is skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (1, 'text', 0, 1024, 0, 'Looks like a heading, is none', 2, 'div', '<p>Tag div chosen: styled like layout 2, but no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, crdate, tstamp) VALUES
+        (1, 'header', 0, 512, 0, 'Our services', 2, 'h2', 'What we do', 'h3', 3, '', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 768, 0, 'Details', 2, 'h4', '', 'h3', 0, '<p>Tag H4 with the look of layout 2: the last heading was an H2, so a level is skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 1024, 0, 'Looks like a heading, is none', 2, 'div', '', 'h3', 0, '<p>Tag div chosen: styled like layout 2, but no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 " 2>/dev/null
 
 echo "› finalising extensions and caches"

@@ -72,6 +72,22 @@ final class HeaderTagTest extends TestCase
     public function derivesTheSubheaderTagFromTheHeaderTag(string $tag, string $expected): void
     {
         self::assertSame($expected, HeaderTag::forSubheader($tag));
+        self::assertSame($expected, HeaderTag::forSubheader($tag, ''));
+        self::assertSame($expected, HeaderTag::forSubheader($tag, null));
+    }
+
+    #[Test]
+    public function usesTheChosenSubheaderTagInsteadOfTheDerivedOne(): void
+    {
+        self::assertSame('h5', HeaderTag::forSubheader('h1', 'h5'));
+        self::assertSame('div', HeaderTag::forSubheader('h2', 'div'));
+        self::assertSame('h2', HeaderTag::forSubheader('h2', 'h2'));
+    }
+
+    #[Test]
+    public function ignoresASubheaderTagThatIsNotAllowed(): void
+    {
+        self::assertSame('h3', HeaderTag::forSubheader('h2', 'span'));
     }
 
     /**

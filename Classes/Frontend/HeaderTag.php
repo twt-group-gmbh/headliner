@@ -12,6 +12,8 @@ final class HeaderTag
 {
     public const FIELD = 'header_tag';
 
+    public const SUBHEADER_FIELD = 'subheader_tag';
+
     public const ALLOWED = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div'];
 
     private const FALLBACK = 'h2';
@@ -42,10 +44,15 @@ final class HeaderTag
     }
 
     /**
-     * The subheader is one level below its header; below h6, or in a div, it is a div as well.
+     * The tag of the subheader: the one the editor chose, otherwise one level below its header
+     * (below h6, or in a div, it is a div as well).
      */
-    public static function forSubheader(string $headerTag): string
+    public static function forSubheader(string $headerTag, mixed $subheaderTag = null): string
     {
+        $chosen = self::resolve($subheaderTag);
+        if ($chosen !== null) {
+            return $chosen;
+        }
         $level = (int) substr($headerTag, 1);
 
         return str_starts_with($headerTag, 'h') && $level >= 1 && $level < 6 ? 'h' . ($level + 1) : 'div';

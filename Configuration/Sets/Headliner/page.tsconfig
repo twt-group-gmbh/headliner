@@ -1,0 +1,6 @@
+# Site setting "headliner.subheader.enabled" switched off (it is substituted as an empty string):
+# hide the subheader fields in the backend
+["{$headliner.subheader.enabled}" == ""]
+    TCEFORM.tt_content.subheader_tag.disabled = 1
+    TCEFORM.tt_content.subheader_layout.disabled = 1
+[END]

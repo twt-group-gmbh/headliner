@@ -4,6 +4,8 @@
         <header/>
         <body>
             <trans-unit id="tt_content.header_tag"><source>Tag</source></trans-unit>
+            <trans-unit id="tt_content.subheader_tag"><source>Subheader tag</source></trans-unit>
+            <trans-unit id="tt_content.subheader_layout"><source>Subheader type</source></trans-unit>
             <trans-unit id="tt_content.header_tag.h1"><source>H1</source></trans-unit>
             <trans-unit id="tt_content.header_tag.h2"><source>H2</source></trans-unit>
             <trans-unit id="tt_content.header_tag.h3"><source>H3</source></trans-unit>

@@ -27,13 +27,14 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div');
         $this->registerArgument('layout', 'string', 'The layout of the header (header_layout), only used for the CSS class');
         $this->registerArgument('default', 'string', 'Layout to take the tag from if no tag is set (older content)');
-        $this->registerArgument('subheader', 'bool', 'Render a subheader: one level below the header', false, false);
+        $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header', false, false);
+        $this->registerArgument('subheaderTag', 'string', 'The tag chosen for the subheader; without it the subheader is one level below the header');
     }
 
     public function render(): string
     {
         $tag = HeaderTag::forContent($this->arguments['tag'], $this->arguments['layout'], $this->arguments['default']);
-        $this->tag->setTagName($this->arguments['subheader'] ? HeaderTag::forSubheader($tag) : $tag);
+        $this->tag->setTagName($this->arguments['subheader'] ? HeaderTag::forSubheader($tag, $this->arguments['subheaderTag']) : $tag);
 
         $classes = array_filter([
             trim((string) $this->tag->getAttribute('class')),

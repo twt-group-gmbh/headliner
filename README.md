@@ -12,7 +12,9 @@ content and other extensions are included without any configuration. Only standa
 
 Content elements get the field **Tag** (H1-H6 or div, default H2). It decides the HTML tag of the header, so the
 heading hierarchy can be fixed without touching the look: the layout (**Type**) only sets the CSS class
-`ce-headline-layout-N`. The subheader is rendered one level below the header.
+`ce-headline-layout-N`. The fields **Subheader tag** and **Subheader type** do the same for the subheader and offer
+the same choices; the layout "Hidden" hides the subheader. Without them (see below), the subheader is rendered one level
+below the header.
 
 ## Installation
 
@@ -33,6 +35,12 @@ via the Extension Manager.
 Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
 header partial of `fluid_styled_content`. Content without a Tag keeps the old behaviour (layout 1-6 = H1-H6), so
 existing pages do not change until an editor chooses a tag.
+
+### Site setting
+
+| Setting                      | Default | Description |
+|------------------------------|---------|-------------|
+| `headliner.subheader.enabled` | on      | Show the fields *Subheader tag* and *Subheader type*. If switched off for a site, they are hidden in the backend and the subheader follows the tag and layout of the header. |
 
 ## Requirements
 
