@@ -252,6 +252,34 @@ final class StructureBoxTest extends AbstractFrontendTestCase
     }
 
     #[Test]
+    public function aListenerThatThrowsDoesNotBreakTheBox(): void
+    {
+        $logger = new class extends \Psr\Log\AbstractLogger {
+            /** @var list<array{level: mixed, message: string, context: array<mixed>}> */
+            public array $records = [];
+
+            public function log($level, \Stringable|string $message, array $context = []): void
+            {
+                $this->records[] = ['level' => $level, 'message' => (string) $message, 'context' => $context];
+            }
+        };
+        $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            // what a listener that does half of its work and then fails leaves behind must not be shown either
+            $event->addIssue('myext.half', null, 'Half done');
+            throw new \RuntimeException('The listener is broken', 1730900000);
+        }), $logger)->render($this->backendRequest(), 1, [0], '');
+
+        // the box is drawn with what the built-in rules found (the fixture has no h1)
+        self::assertStringContainsString('class="headliner card', $html);
+        self::assertStringContainsString('The page has no H1.', $html);
+        self::assertStringNotContainsString('Half done', $html);
+        // and the failure is logged, with the exception, for the developer of the listener
+        self::assertCount(1, $logger->records);
+        self::assertSame('error', $logger->records[0]['level']);
+        self::assertInstanceOf(\RuntimeException::class, $logger->records[0]['context']['exception']);
+    }
+
+    #[Test]
     public function aListenerCanTakeABuiltInRuleAway(): void
     {
         $withRule = $this->structureBox()->render($this->backendRequest(), 1, [0], '');

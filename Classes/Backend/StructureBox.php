@@ -6,6 +6,7 @@ namespace Twtgroup\Headliner\Backend;
 
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
@@ -60,6 +61,7 @@ final readonly class StructureBox
         private RteHeadingEditor $rteEditor,
         private TagField $tagField,
         private EventDispatcherInterface $eventDispatcher,
+        private LoggerInterface $logger,
     ) {}
 
     /**
@@ -547,9 +549,21 @@ final readonly class StructureBox
      */
     private function checkedByListeners(array $headings, array $issues, int $pageId, int $languageId): array
     {
-        // the dispatcher hands the same object back, with what the listeners did to it
+        // A listener is code of the project, not of this extension: if it fails, the box is drawn with what the built-in rules
+        // found (not with what a listener did before it failed), and the failure is logged for its developer.
         $event = new ModifyHeadingIssuesEvent($headings, $issues, $pageId, $languageId);
-        $this->eventDispatcher->dispatch($event);
+        try {
+            // the dispatcher hands the same object back, with what the listeners did to it
+            $this->eventDispatcher->dispatch($event);
+        } catch (\Throwable $exception) {
+            // @extensionScannerIgnoreLine the PSR-3 logger, not a method of the core
+            $this->logger->error(
+                'A listener of ModifyHeadingIssuesEvent failed, the box shows the issues of the built-in rules: ' . $exception->getMessage(),
+                ['exception' => $exception, 'pageId' => $pageId, 'languageId' => $languageId]
+            );
+
+            return $issues;
+        }
         $valid = array_values(array_filter(
             $event->getIssues(),
             static fn(mixed $issue): bool => $issue instanceof Issue && self::isUsable($issue, count($headings))

@@ -8,6 +8,8 @@ use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
@@ -102,7 +104,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
      * The box of the page module, with the real fetcher and the real request handler of the core, only wrapped for the
      * testing framework.
      */
-    protected function structureBox(?string $pageHtml = null, ?EventDispatcherInterface $dispatcher = null): StructureBox
+    protected function structureBox(?string $pageHtml = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null): StructureBox
     {
         // with a page html the page is not rendered: the box gets what the ViewHelpers would have put there
         $handler = $pageHtml !== null
@@ -128,6 +130,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             $this->rteEditor(),
             new TagField($this->get(TcaSchemaFactory::class)),
             $dispatcher ?? $this->get(EventDispatcherInterface::class),
+            $logger ?? new NullLogger(),
         );
     }
 

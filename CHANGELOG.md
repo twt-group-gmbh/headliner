@@ -29,7 +29,8 @@ First release.
 - Event `ModifyHeadingIssuesEvent` (PSR-14): a project adds rules of its own to the box or takes built-in ones away
   (`addIssue()`, `removeIssues()`, `setIssues()`). An issue has a name, the heading it belongs to (or none, for the page as a
   whole) and a label (text or `LLL:` reference, printed as text). What a listener returns is checked: an issue without a
-  name or with an index that is no heading is ignored. See the documentation, Developer.
+  name or with an index that is no heading is ignored, and a listener that throws does not break the box: it shows the
+  issues of the built-in rules and logs the exception. See the documentation, Developer.
 - Page module, loading: the page module shows the box as a placeholder right away and loads the structure afterwards
   from an AJAX route of the backend (`StructureController`), so rendering the frontend does not delay the page module.
   This also happens while the box is collapsed, so its summary shows the problems. A page that cannot be checked shows

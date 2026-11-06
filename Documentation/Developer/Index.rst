@@ -81,8 +81,10 @@ can:
         }
     }
 
-What comes back is checked: an issue without a name, or with an index that is not a heading of the page, is ignored. The
-listener runs every time somebody opens the page in the page module, so keep it quick: the headings are extracted already,
+What comes back is checked: an issue without a name, or with an index that is not a heading of the page, is ignored. If a
+listener throws an exception, the box is drawn with the issues of the built-in rules, without what the listeners did, and the
+exception is written to the log (level error, with the exception in the context), so a broken listener does not take the box
+down. The listener runs every time somebody opens the page in the page module, so keep it quick: the headings are extracted already,
 do not render or fetch anything in it. A listener does not change what visitors see, only the box.
 
 ..  _developer-javascript:

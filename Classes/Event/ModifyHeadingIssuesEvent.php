@@ -19,7 +19,8 @@ use Twtgroup\Headliner\Structure\Issue;
  * counts the issue in its summary. An index that is not in the list is ignored.
  *
  * The event is dispatched while the page module loads the box, so a listener must be quick: it gets the headings that
- * were extracted already and should not render or fetch anything.
+ * were extracted already and should not render or fetch anything. If a listener throws, the box ignores everything the
+ * listeners did and shows the issues of the built-in rules; the exception is logged (level error).
  */
 final class ModifyHeadingIssuesEvent
 {
