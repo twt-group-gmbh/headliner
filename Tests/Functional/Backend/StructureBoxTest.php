@@ -7,6 +7,7 @@ namespace Twtgroup\Headliner\Tests\Functional\Backend;
 use PHPUnit\Framework\Attributes\Test;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
+use Twtgroup\Headliner\Tests\Functional\Fixtures\RecordingLogger;
 use Twtgroup\Headliner\Tests\Functional\AbstractFrontendTestCase;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
@@ -254,15 +255,7 @@ final class StructureBoxTest extends AbstractFrontendTestCase
     #[Test]
     public function aListenerThatThrowsDoesNotBreakTheBox(): void
     {
-        $logger = new class extends \Psr\Log\AbstractLogger {
-            /** @var list<array{level: mixed, message: string, context: array<mixed>}> */
-            public array $records = [];
-
-            public function log($level, \Stringable|string $message, array $context = []): void
-            {
-                $this->records[] = ['level' => $level, 'message' => (string) $message, 'context' => $context];
-            }
-        };
+        $logger = new RecordingLogger();
         $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
             // what a listener that does half of its work and then fails leaves behind must not be shown either
             $event->addIssue('myext.half', null, 'Half done');
@@ -277,6 +270,36 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         self::assertCount(1, $logger->records);
         self::assertSame('error', $logger->records[0]['level']);
         self::assertInstanceOf(\RuntimeException::class, $logger->records[0]['context']['exception']);
+    }
+
+    #[Test]
+    public function aSlowListenerIsLoggedAsAWarning(): void
+    {
+        $logger = new RecordingLogger();
+
+        $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            usleep(600000);
+        }), $logger)->render($this->backendRequest(), 1, [0], '');
+
+        // nothing is cut short: the box is drawn, the log tells the developer why it was slow
+        self::assertStringContainsString('class="headliner card', $html);
+        self::assertCount(1, $logger->records);
+        self::assertSame('warning', $logger->records[0]['level']);
+        self::assertStringContainsString('ModifyHeadingIssuesEvent', $logger->records[0]['message']);
+        self::assertGreaterThanOrEqual(500, $logger->records[0]['context']['milliseconds']);
+        self::assertSame(1, $logger->records[0]['context']['pageId']);
+    }
+
+    #[Test]
+    public function aQuickListenerIsNotLogged(): void
+    {
+        $logger = new RecordingLogger();
+
+        $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            $event->addIssue('myext.quick', null, 'Quick');
+        }), $logger)->render($this->backendRequest(), 1, [0], '');
+
+        self::assertSame([], $logger->records);
     }
 
     #[Test]

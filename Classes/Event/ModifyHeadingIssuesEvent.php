@@ -20,7 +20,8 @@ use Twtgroup\Headliner\Structure\Issue;
  *
  * The event is dispatched while the page module loads the box, so a listener must be quick: it gets the headings that
  * were extracted already and should not render or fetch anything. If a listener throws, the box ignores everything the
- * listeners did and shows the issues of the built-in rules; the exception is logged (level error).
+ * listeners did and shows the issues of the built-in rules; the exception is logged (level error). A listener cannot be
+ * stopped while it runs: if they take 500 ms or more together, the box waits for them and logs a warning.
  */
 final class ModifyHeadingIssuesEvent
 {

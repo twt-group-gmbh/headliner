@@ -164,7 +164,8 @@ Tests split into two suites by what they need to boot:
 - Own rules: after `HeadingValidator`, `StructureBox` dispatches `ModifyHeadingIssuesEvent` (`checkedByListeners()`); a listener
   adds or removes issues. `Issue::$type` is a name (a string: the built-in rules use the values of `IssueType`, a listener its own),
   `label` the text (plain or `LLL:`, null = the box's own `issue.<name>` key). What a listener gives back is checked (a name, an
-  index that is a heading), a listener that throws is caught (the box shows the built-in issues, the exception is logged) and the
+  index that is a heading), a listener that throws is caught (the box shows the built-in issues, the exception is logged), slow listeners (500 ms
+  together) are logged as a warning (they cannot be stopped) and the
   label is printed as a Fluid variable, so it is escaped.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.

@@ -46,6 +46,12 @@ final readonly class StructureBox
     /** The hues of the groups, one after the other: apart from each other, and not the colours of the levels */
     private const GROUP_HUES = [285, 215, 160, 95, 40, 350];
 
+    /**
+     * What the listeners of ModifyHeadingIssuesEvent may take together before a warning is logged. They only get the headings
+     * that were extracted already: what they do takes microseconds, with a query some tens of milliseconds.
+     */
+    private const SLOW_LISTENER_MILLISECONDS = 500;
+
     /** Standard pages; folders, links, spacers etc. render no content. */
     private const DOKTYPE_STANDARD = 1;
 
@@ -552,6 +558,7 @@ final readonly class StructureBox
         // A listener is code of the project, not of this extension: if it fails, the box is drawn with what the built-in rules
         // found (not with what a listener did before it failed), and the failure is logged for its developer.
         $event = new ModifyHeadingIssuesEvent($headings, $issues, $pageId, $languageId);
+        $start = hrtime(true);
         try {
             // the dispatcher hands the same object back, with what the listeners did to it
             $this->eventDispatcher->dispatch($event);
@@ -563,6 +570,16 @@ final readonly class StructureBox
             );
 
             return $issues;
+        }
+        // A listener cannot be stopped while it runs (PHP has no way to do that in a web request), but one that is slow is
+        // told to its developer: the box waits for it.
+        $milliseconds = (int) round((hrtime(true) - $start) / 1_000_000);
+        if ($milliseconds >= self::SLOW_LISTENER_MILLISECONDS) {
+            // @extensionScannerIgnoreLine the PSR-3 logger, not a method of the core
+            $this->logger->warning(
+                'The listeners of ModifyHeadingIssuesEvent took ' . $milliseconds . ' ms, the page module waited for them',
+                ['milliseconds' => $milliseconds, 'pageId' => $pageId, 'languageId' => $languageId]
+            );
         }
         $valid = array_values(array_filter(
             $event->getIssues(),
