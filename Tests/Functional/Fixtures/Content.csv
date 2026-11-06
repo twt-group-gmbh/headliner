@@ -1,9 +1,15 @@
+"fe_groups"
+,"uid","pid","title"
+,1,0,"Members"
 "pages"
-,"uid","pid","title","slug","doktype","is_siteroot","sys_language_uid","hidden","starttime","endtime"
-,1,0,"Root","/",1,1,0,0,0,0
-,2,1,"Not published yet","/not-published",1,0,0,1,0,0
-,3,1,"Starts in 2100","/starts-later",1,0,0,0,4102444800,0
-,4,1,"Ended in 2001","/ended",1,0,0,0,0,1000000000
+,"uid","pid","title","slug","doktype","is_siteroot","sys_language_uid","hidden","starttime","endtime","fe_group"
+,1,0,"Root","/",1,1,0,0,0,0,""
+,2,1,"Not published yet","/not-published",1,0,0,1,0,0,""
+,3,1,"Starts in 2100","/starts-later",1,0,0,0,4102444800,0,""
+,4,1,"Ended in 2001","/ended",1,0,0,0,0,1000000000,""
+,5,1,"Members only","/members",1,0,0,0,0,0,"1"
+,6,1,"Any login","/login-only",1,0,0,0,0,0,"-2"
+,7,1,"Not logged in only","/guests",1,0,0,0,0,0,"-1"
 "tt_content"
 ,"uid","pid","CType","colPos","sorting","header","header_layout","header_tag","subheader","subheader_tag","subheader_layout","bodytext"
 ,1,1,"text",0,100,"Chosen tag",2,"h4","","h3",0,"text"
@@ -15,3 +21,6 @@
 ,7,2,"text",0,100,"On a hidden page",2,"h3","","h3",0,"text"
 ,8,3,"text",0,100,"Starts later",2,"h2","","h3",0,"text"
 ,9,4,"text",0,100,"Has ended",2,"h2","","h3",0,"text"
+,10,5,"text",0,100,"For members",2,"h2","","h3",0,"text"
+,11,6,"text",0,100,"For any login",2,"h2","","h3",0,"text"
+,12,7,"text",0,100,"For guests",2,"h2","","h3",0,"text"

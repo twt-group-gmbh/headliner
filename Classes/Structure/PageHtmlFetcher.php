@@ -34,9 +34,10 @@ final readonly class PageHtmlFetcher
 
     /**
      * @param int|null $simulatedTime Render the page at this time (for a page with a start or end time); see InspectRequest
+     * @param list<int>|null $simulatedGroups Render the page as a user of these frontend user groups (for a page with a group)
      * @return string|null The HTML, NULL if the page could not be rendered
      */
-    public function fetch(UriInterface $uri, ?int $simulatedTime = null): ?string
+    public function fetch(UriInterface $uri, ?int $simulatedTime = null, ?array $simulatedGroups = null): ?string
     {
         // - $GLOBALS['BE_USER'] becomes null (the sub-request carries no backend cookie), which breaks session based
         //   flash messages afterwards;
@@ -67,7 +68,8 @@ final readonly class PageHtmlFetcher
                 ->withUri($uri)
                 ->withMethod('GET')
                 ->withAttribute(InspectRequest::ATTRIBUTE, true)
-                ->withAttribute(InspectRequest::TIME_ATTRIBUTE, $simulatedTime);
+                ->withAttribute(InspectRequest::TIME_ATTRIBUTE, $simulatedTime)
+                ->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, $simulatedGroups);
             $response = $this->requestHandler->handle($request);
 
             return $response->getStatusCode() === 200 ? (string) $response->getBody() : null;

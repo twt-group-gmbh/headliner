@@ -19,6 +19,9 @@
             <trans-unit id="publicationNotYet"><source>The page is not published yet (from %s). The structure shows how it will look from then on.</source></trans-unit>
             <trans-unit id="publicationExpired"><source>The page is no longer published (until %s). The structure shows how it looked shortly before it ended.</source></trans-unit>
             <trans-unit id="publicationNever"><source>The page can never be shown: its end time is not after its start time.</source></trans-unit>
+            <trans-unit id="accessGroups"><source>The page is only visible to frontend users of the groups %s. The structure shows how it looks for them.</source></trans-unit>
+            <trans-unit id="accessLogin"><source>The page is only visible to logged-in frontend users. The structure shows how it looks for them.</source></trans-unit>
+            <trans-unit id="accessNever"><source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source></trans-unit>
             <trans-unit id="empty"><source>(empty heading)</source></trans-unit>
             <trans-unit id="noHeadings"><source>The page has no headings.</source></trans-unit>
             <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source></trans-unit>

@@ -99,6 +99,11 @@ What is checked, and what is not
     :guilabel:`The page is no longer published (until ...)`, and shows how the page looks then. If the end time is not
     after the start time, there is no such moment and the box says that the page can never be shown. Content elements
     with their own times are judged at the same moment, so one that starts later is missing in the preview.
-*   Pages with a **frontend user group** and workspace versions are not simulated. The box then says that the frontend
-    could not be loaded.
+*   A page for **frontend user groups** is rendered as a logged-in user who is a member of the groups of the page and of
+    its parents that extend to their subpages. The box says :guilabel:`The page is only visible to frontend users of
+    the groups ...` (or :guilabel:`... to logged-in frontend users` if the page is for any login). A page that is only
+    for visitors who are not logged in ("hide at login") is rendered as a visitor. If the groups of the page and of its
+    parents exclude each other, the box says that the page can never be shown. Content elements with their own groups
+    are judged for the same user.
+*   **Workspace versions** are not simulated. The box then shows the live version.
 *   Only standard pages are checked.

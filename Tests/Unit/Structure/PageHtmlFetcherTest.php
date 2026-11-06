@@ -187,4 +187,25 @@ final class PageHtmlFetcherTest extends TestCase
         self::assertSame(111, $GLOBALS['SIM_EXEC_TIME']);
         self::assertArrayNotHasKey('SIM_ACCESS_TIME', $GLOBALS);
     }
+
+    #[Test]
+    public function passesTheSimulatedGroupsOnToTheFrontend(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), null, [0, -2, 3]);
+
+        self::assertSame([0, -2, 3], $handler->receivedRequest()->getAttribute(InspectRequest::GROUPS_ATTRIBUTE));
+        self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::TIME_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function sendsNoGroupsUnlessSomeAreGiven(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
+
+        self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::GROUPS_ATTRIBUTE));
+    }
 }

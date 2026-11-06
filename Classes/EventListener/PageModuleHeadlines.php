@@ -18,7 +18,9 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Backend\AccessState;
 use Twtgroup\Headliner\Backend\EditAccess;
+use Twtgroup\Headliner\Backend\FrontendGroupAccess;
 use Twtgroup\Headliner\Backend\PublicationState;
 use Twtgroup\Headliner\Backend\PublicationTime;
 use Twtgroup\Headliner\Backend\SelectedLanguages;
@@ -142,6 +144,13 @@ final readonly class PageModuleHeadlines
         return $rows;
     }
 
+    private function getGroupTitle(int $groupId): string
+    {
+        $group = BackendUtility::getRecord('fe_groups', $groupId, 'title');
+
+        return is_array($group) && (string) $group['title'] !== '' ? (string) $group['title'] : '#' . $groupId;
+    }
+
     /**
      * Whether the box is collapsed, saved by the JavaScript in the settings of the backend user. Read here, so the
      * box is rendered closed right away instead of closing after the page has loaded.
@@ -193,6 +202,8 @@ final readonly class PageModuleHeadlines
             'publication' => PublicationState::Published->value,
             'publicationFrom' => '',
             'publicationUntil' => '',
+            'access' => AccessState::Open->value,
+            'accessGroups' => '',
             'hasHeadings' => false,
             'headings' => [],
             'pageIssues' => [],
@@ -213,8 +224,9 @@ final readonly class PageModuleHeadlines
         }
 
         // A page with a start or end time is rendered at a time when it is published
+        $rootLine = array_values(BackendUtility::BEgetRootLine($pageId));
         $publication = PublicationTime::forRootLine(
-            array_values(BackendUtility::BEgetRootLine($pageId)),
+            $rootLine,
             $pageId,
             (int) $GLOBALS['EXEC_TIME'],
             $translation[0] ?? null
@@ -226,7 +238,19 @@ final readonly class PageModuleHeadlines
             return $section;
         }
 
-        $html = $this->fetcher->fetch($site->getRouter()->generateUri($pageId, ['_language' => $languageId]), $publication->simulatedTime);
+        // A page for frontend user groups is rendered as a member of them
+        $access = FrontendGroupAccess::forRootLine($rootLine, $pageId, $translation[0] ?? null);
+        $section['access'] = $access->state->value;
+        $section['accessGroups'] = implode(', ', array_map($this->getGroupTitle(...), $access->groupIds));
+        if ($access->state === AccessState::Never) {
+            return $section;
+        }
+
+        $html = $this->fetcher->fetch(
+            $site->getRouter()->generateUri($pageId, ['_language' => $languageId]),
+            $publication->simulatedTime,
+            $access->simulatedGroups
+        );
         if ($html === null) {
             return $section;
         }

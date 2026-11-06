@@ -16,7 +16,8 @@ How the structure is checked
     `PageRenderer`; the fetcher puts them back.
 #.  The request carries the request attribute `headliner.inspect`. The frontend middleware `InspectRequest` then switches
     the page cache off for it includes hidden pages in the visibility of the request and, with the attribute `headliner.inspect.time`, renders it at that
-    time (the date aspect and `SIM_ACCESS_TIME`, as the preview of the core does) (it has to run before the page is
+    time (the date aspect and `SIM_ACCESS_TIME`, as the preview of the core does), and, with `headliner.inspect.groups`, as a member of those
+    frontend user groups (the aspect `frontend.user`, so it has to run after the frontend user is authenticated) (it has to run before the page is
     resolved, which is where a hidden page is turned down), and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
     attribute exists only inside the process, so a request from outside cannot set it.
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element

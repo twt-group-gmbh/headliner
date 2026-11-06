@@ -97,6 +97,8 @@ Tests split into two suites by what they need to boot:
   With the attribute `headliner.inspect.time` it also simulates that time (date aspect plus the globals `SIM_EXEC_TIME` and
   `SIM_ACCESS_TIME`, which the start/end time restrictions read), computed by `PublicationTime` from the root line. The
   fetcher puts those globals back.
+  With `headliner.inspect.groups` (from `FrontendGroupAccess`) it renders the page as a member of the page's frontend user
+  groups by replacing the aspect `frontend.user`, so it has to run after `typo3/cms-frontend/authentication`.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

@@ -44,6 +44,16 @@
                                 <f:if condition="{section.publication} == 'expired'">
                                     <div class="alert alert-info"><f:translate key="{l}publicationExpired" arguments="{0: section.publicationUntil}" /></div>
                                 </f:if>
+                                <f:if condition="{section.access} == 'restricted'">
+                                    <f:if condition="{section.accessGroups}">
+                                        <f:then>
+                                            <div class="alert alert-info"><f:translate key="{l}accessGroups" arguments="{0: section.accessGroups}" /></div>
+                                        </f:then>
+                                        <f:else>
+                                            <div class="alert alert-info"><f:translate key="{l}accessLogin" /></div>
+                                        </f:else>
+                                    </f:if>
+                                </f:if>
                                 <f:if condition="{section.hasHeadings}">
                                     <f:then>
                                         <f:for each="{section.pageIssues}" as="issue">
@@ -114,7 +124,14 @@
                                         <div class="alert alert-warning"><f:translate key="{l}publicationNever" /></div>
                                     </f:then>
                                     <f:else>
-                                        <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
+                                        <f:if condition="{section.access} == 'never'">
+                                            <f:then>
+                                                <div class="alert alert-warning"><f:translate key="{l}accessNever" /></div>
+                                            </f:then>
+                                            <f:else>
+                                                <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
+                                            </f:else>
+                                        </f:if>
                                     </f:else>
                                 </f:if>
                             </f:else>

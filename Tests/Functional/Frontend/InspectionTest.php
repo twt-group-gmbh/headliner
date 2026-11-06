@@ -139,4 +139,77 @@ final class InspectionTest extends AbstractFrontendTestCase
 
         self::assertStringContainsString('Has ended</h2>', $this->render($request));
     }
+
+    /**
+     * @param list<int>|null $groups
+     */
+    private function statusOf(string $path, ?array $groups = null, bool $marked = true): int
+    {
+        $request = new InternalRequest('https://website.local' . $path);
+        if ($marked) {
+            $request = $request->withAttribute(InspectRequest::ATTRIBUTE, true);
+        }
+        if ($groups !== null) {
+            $request = $request->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, $groups);
+        }
+
+        return $this->executeFrontendSubRequest($request)->getStatusCode();
+    }
+
+    #[Test]
+    public function aVisitorCannotSeeAPageForGroupsButOneForGuestsIsOpen(): void
+    {
+        $this->writeSite();
+
+        self::assertNotSame(200, $this->statusOf('/members', marked: false));
+        self::assertNotSame(200, $this->statusOf('/login-only', marked: false));
+        self::assertSame(200, $this->statusOf('/guests', marked: false));
+    }
+
+    #[Test]
+    public function aMarkedRequestWithoutGroupsGetsNothingOfAPageForGroups(): void
+    {
+        $this->writeSite();
+
+        self::assertNotSame(200, $this->statusOf('/members'));
+        self::assertNotSame(200, $this->statusOf('/login-only'));
+    }
+
+    #[Test]
+    public function aMarkedRequestIsRenderedAsAMemberOfTheGroup(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/members'))
+            ->withAttribute(InspectRequest::ATTRIBUTE, true)
+            ->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, [0, -2, 1]);
+
+        self::assertStringContainsString('For members</h2>', $this->render($request));
+    }
+
+    #[Test]
+    public function aMarkedRequestAsAnyLoggedInUserSeesAPageForAnyLogin(): void
+    {
+        $this->writeSite();
+
+        self::assertSame(200, $this->statusOf('/login-only', [0, -2]));
+        // but not a page for a group the user is not in
+        self::assertNotSame(200, $this->statusOf('/members', [0, -2]));
+    }
+
+    #[Test]
+    public function aLoggedInUserDoesNotSeeAPageThatHidesAtLogin(): void
+    {
+        $this->writeSite();
+
+        self::assertNotSame(200, $this->statusOf('/guests', [0, -2, 1]));
+    }
+
+    #[Test]
+    public function theNextVisitorStillGetsNothingOfAPageForGroups(): void
+    {
+        $this->writeSite();
+        $this->statusOf('/members', [0, -2, 1]);
+
+        self::assertNotSame(200, $this->statusOf('/members', marked: false));
+    }
 }

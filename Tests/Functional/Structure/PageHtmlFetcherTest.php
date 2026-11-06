@@ -10,7 +10,10 @@ use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
 use Twtgroup\Headliner\Tests\Functional\AbstractFrontendTestCase;
 use Twtgroup\Headliner\Tests\Functional\Fixtures\TestingContextRequestHandler;
+use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Http\RequestHandler;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Http\Uri;
 
 /**
@@ -82,5 +85,22 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
         // the simulated time must not stay behind in the backend request
         self::assertArrayNotHasKey('SIM_EXEC_TIME', $GLOBALS);
         self::assertArrayNotHasKey('SIM_ACCESS_TIME', $GLOBALS);
+    }
+
+    #[Test]
+    public function rendersAPageForMembersAsAMemberAndPutsTheUserBack(): void
+    {
+        $this->writeSite();
+        $uri = new Uri('https://website.local/members');
+        $context = GeneralUtility::makeInstance(Context::class);
+        $context->setAspect('frontend.user', new UserAspect(null, [0, -1]));
+
+        self::assertNull($this->fetcher()->fetch($uri));
+        $html = $this->fetcher()->fetch($uri, null, [0, -2, 1]);
+
+        self::assertNotNull($html);
+        self::assertStringContainsString('For members</h2>', $html);
+        // the backend request must not be left as a frontend user
+        self::assertSame([0, -1], $context->getPropertyFromAspect('frontend.user', 'groupIds'));
     }
 }

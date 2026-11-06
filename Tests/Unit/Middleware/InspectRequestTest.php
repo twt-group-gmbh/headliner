@@ -9,6 +9,7 @@ use PHPUnit\Framework\TestCase;
 use Twtgroup\Headliner\Middleware\InspectRequest;
 use Twtgroup\Headliner\Tests\Unit\Structure\Fixtures\RecordingRequestHandler;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Context\VisibilityAspect;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -24,6 +25,7 @@ final class InspectRequestTest extends TestCase
         $GLOBALS['EXEC_TIME'] ??= time();
         $this->context = new Context();
         $this->context->setAspect('visibility', VisibilityAspect::create());
+        $this->context->setAspect('frontend.user', new UserAspect(null, [0, -1]));
     }
 
     private function handler(): RecordingRequestHandler
@@ -144,5 +146,47 @@ final class InspectRequestTest extends TestCase
         (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::TIME_ATTRIBUTE, 1_800_000_090), $this->handler());
 
         self::assertSame($before, $this->context->getPropertyFromAspect('date', 'timestamp'));
+    }
+
+    #[Test]
+    public function aMarkedRequestWithGroupsRendersThePageForMembersOfThem(): void
+    {
+        (new InspectRequest($this->context))->process(
+            (new ServerRequest())
+                ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                ->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, [0, -2, 3]),
+            $this->handler()
+        );
+
+        self::assertSame([0, -2, 3], $this->context->getPropertyFromAspect('frontend.user', 'groupIds'));
+    }
+
+    #[Test]
+    public function withoutGroupsTheVisitorStaysAVisitor(): void
+    {
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::ATTRIBUTE, true), $this->handler());
+
+        self::assertSame([0, -1], $this->context->getPropertyFromAspect('frontend.user', 'groupIds'));
+    }
+
+    #[Test]
+    public function groupsWithoutTheMarkAreIgnored(): void
+    {
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, [0, -2, 3]), $this->handler());
+
+        self::assertSame([0, -1], $this->context->getPropertyFromAspect('frontend.user', 'groupIds'));
+    }
+
+    #[Test]
+    public function groupsThatAreNotWholeNumbersAreIgnored(): void
+    {
+        (new InspectRequest($this->context))->process(
+            (new ServerRequest())
+                ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                ->withAttribute(InspectRequest::GROUPS_ATTRIBUTE, [0, 'x', 3]),
+            $this->handler()
+        );
+
+        self::assertSame([0, -1], $this->context->getPropertyFromAspect('frontend.user', 'groupIds'));
     }
 }
