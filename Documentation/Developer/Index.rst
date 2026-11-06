@@ -88,6 +88,52 @@ down. A listener that is slow cannot be stopped (PHP cannot interrupt it in a we
 listeners take 500 milliseconds or more together, a warning with the time is written to the log. The listener runs every time somebody opens the page in the page module, so keep it quick: the headings are extracted already,
 do not render or fetch anything in it. A listener does not change what visitors see, only the box.
 
+..  _developer-rules-logging:
+
+Logging
+-------
+
+The box writes two things to the log, with the logger `Twtgroup.Headliner.Backend.StructureBox`: an `error` if a listener
+throws an exception, and a `warning` if the listeners take 500 milliseconds or more together. TYPO3 writes everything from
+`warning` up to a file in :file:`var/log/` by default, also in the context Production. Nothing else is logged on a normal
+call of the box.
+
+The log configuration of TYPO3 decides what happens to it. The most specific configuration replaces the general one, so a
+project can set it for the extension (the key `Twtgroup`, `Headliner`) in :file:`config/system/additional.php`:
+
+..  code-block:: php
+    :caption: config/system/additional.php
+
+    use Psr\Log\LogLevel;
+    use TYPO3\CMS\Core\Log\Writer\FileWriter;
+
+    // only errors (a listener that throws), no warnings about slow listeners
+    $GLOBALS['TYPO3_CONF_VARS']['LOG']['Twtgroup']['Headliner']['writerConfiguration'] = [
+        LogLevel::ERROR => [FileWriter::class => []],
+    ];
+
+..  code-block:: php
+    :caption: config/system/additional.php
+
+    // nothing at all: a level with a writer that is switched off
+    $GLOBALS['TYPO3_CONF_VARS']['LOG']['Twtgroup']['Headliner']['writerConfiguration'] = [
+        LogLevel::WARNING => [FileWriter::class => ['disabled' => true]],
+    ];
+
+..  code-block:: php
+    :caption: config/system/additional.php
+
+    // also in the table sys_log, where the Log module of the backend shows it
+    $GLOBALS['TYPO3_CONF_VARS']['LOG']['Twtgroup']['Headliner']['writerConfiguration'] = [
+        LogLevel::WARNING => [
+            FileWriter::class => [],
+            \TYPO3\CMS\Core\Log\Writer\DatabaseWriter::class => [],
+        ],
+    ];
+
+An empty array does nothing: TYPO3 then takes the general configuration. A listener that is slow all the time writes one
+line for every call of the box, which is a sign to make the listener faster.
+
 ..  _developer-javascript:
 
 JavaScript
