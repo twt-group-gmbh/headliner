@@ -92,6 +92,8 @@ ddev test all && ddev lint
 
 Backend login: `https://headliner.ddev.site/typo3/`, user `admin`, password `Password.1` (local demo only).
 
+How to work on the extension, what a change needs and how to write a commit message: see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## License
 
 This extension is released under the [GNU General Public License 2.0 (or later)](LICENSE).
