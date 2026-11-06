@@ -260,9 +260,10 @@ This was seen with the content element :guilabel:`Regular Text Element` (`text`)
 does not override, for example :guilabel:`Header` (`header`) and :guilabel:`Bullet List` (`bullets`), use the partial of
 `fluid_styled_content`, so the fields work and the box can change their tags.
 
-Some of Camino's own element types do not render a heading at all, so the box has nothing to list for them. The :guilabel:`Text Teaser`
-(`camino_textteaser`) renders `<p class="headline">` with the layout :guilabel:`Default`, and an `h1` to `h6` only with the
-layout 1 to 6. The :guilabel:`Text Media Teaser Grid` (`camino_textmedia_teaser_grid`) renders its header as a `p` whatever
+Some of Camino's own element types do not render a heading unless the layout asks for one, so the box has nothing to list
+for them. The :guilabel:`Text Teaser` (`camino_textteaser`) and the three heroes (`camino_hero`, `camino_hero_small`,
+`camino_hero_text_only`) render `<p class="headline">` with the layout :guilabel:`Default`, and an `h1` to `h6` only with
+the layout 1 to 6. Their subheader is always a `p`. The :guilabel:`Text Media Teaser Grid` (`camino_textmedia_teaser_grid`) renders its header as a `p` whatever
 the layout is, and the headers of its entries as `<header>`. The box lists headings (`h1` to `h6`), so these do not
 appear in it.
 
