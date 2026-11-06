@@ -14,7 +14,7 @@ First release.
 - Page module: the structure is shown in a collapsible box (the state is saved in the settings of the backend user and rendered right away, so the box does
   not jump when the page is changed) with a summary
   (structure OK / number of problems). The tag of a header
-  can be changed in place with a select styled as a coloured pill; it is saved through the core's DataHandler (with the rights of the
+  can be changed in place with a select styled as a pill whose colour tells the level (one scale from strong H1 to light H6, a div is neutral and dashed); it is saved through the core's DataHandler (with the rights of the
   backend user) and the structure is checked again. A subheader is marked with an arrow and says whose subheader it is. A heading from the text of a content element
   (for example RTE content) is marked the same way ("From the text of ...") and opens that content element, found by the
   frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as

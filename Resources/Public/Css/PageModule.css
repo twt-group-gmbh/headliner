@@ -241,20 +241,21 @@
     opacity: .5;
 }
 
-.headliner__tag [data-current='h1'] {
-    --headliner-tag-bg: var(--typo3-state-primary-bg);
-    --headliner-tag-border: var(--typo3-state-primary-border-color);
-    --headliner-tag-color: var(--typo3-state-primary-color);
+/* The colour tells the level: one scale from strong (h1) to light (h6), the state colour "primary" mixed with the
+   background of the component. A div (no heading) is neutral and dashed. */
+.headliner__tag [data-current^='h'] {
+    --headliner-tag-bg: color-mix(in srgb, var(--typo3-state-primary-bg) var(--headliner-level-strength), var(--typo3-component-bg));
+    --headliner-tag-border: color-mix(in srgb, var(--typo3-state-primary-border-color) var(--headliner-level-border), var(--typo3-component-border-color));
+    --headliner-tag-color: var(--headliner-level-color, var(--typo3-component-color));
 }
 
-.headliner__tag [data-current='h2'],
-.headliner__tag [data-current='h3'] {
-    --headliner-tag-bg: var(--typo3-state-info-bg);
-    --headliner-tag-border: var(--typo3-state-info-border-color);
-    --headliner-tag-color: var(--typo3-state-info-color);
-}
+.headliner__tag [data-current='h1'] { --headliner-level-strength: 100%; --headliner-level-border: 100%; --headliner-level-color: var(--typo3-state-primary-color); }
+.headliner__tag [data-current='h2'] { --headliner-level-strength: 78%; --headliner-level-border: 90%; --headliner-level-color: var(--typo3-state-primary-color); }
+.headliner__tag [data-current='h3'] { --headliner-level-strength: 58%; --headliner-level-border: 78%; --headliner-level-color: var(--typo3-state-primary-color); }
+.headliner__tag [data-current='h4'] { --headliner-level-strength: 40%; --headliner-level-border: 62%; }
+.headliner__tag [data-current='h5'] { --headliner-level-strength: 26%; --headliner-level-border: 46%; }
+.headliner__tag [data-current='h6'] { --headliner-level-strength: 14%; --headliner-level-border: 32%; }
 
-/* h4-h6 keep the neutral look; a div (no heading) is dashed */
 .headliner__tag [data-current='div'] {
     border-style: dashed;
     opacity: .85;
