@@ -16,8 +16,13 @@ First release.
   (structure OK / number of problems). The tag of a header
   can be changed in place with a select styled as a pill whose colour tells the level (a scale from violet H1 over blue and teal to green H6, a div is neutral and dashed); the select has the size of the plain label; it is saved through the core's DataHandler (with the rights of the
   backend user) and the structure is checked again. A subheader is marked with an arrow and says whose subheader it is. A heading from the text of a content element
-  (for example RTE content) is marked the same way ("From the text of ...") and opens that content element, found by the
-  frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as
+  (for example RTE content) is marked the same way ("From the text of ..."), opens that content element and has a select
+  too if the new site setting `headliner.editRteHeadings` is on (default off, because it changes the text of the element), which offers the headings the editor of the text offers (`heading.options` of the RTE configuration, so H2 and H3
+  in the default preset; without options H1-H6; the heading's own tag is always in the list): the tag is changed in the stored text (`bodytext`) at the place of the heading, through the DataHandler and
+  its rights, by the AJAX route `headliner_rte_tag`. The heading is found by its place among the headings of the text and
+  must have the same level and text there, so nothing is changed at a wrong place if the text was edited meanwhile or the
+  heading comes from somewhere else; then it is only a label. The content element is
+  found by the frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as
   "not a heading". The text of a header opens the edit form of its content element in the side panel, like the edit
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
   (`data-headliner-edit`); that happens only for the request of the page module (a mark that only exists inside the PHP process, no page cache), never

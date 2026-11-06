@@ -46,10 +46,22 @@ final readonly class EditAccess
      */
     public function canEditTag(array $contentRecord, string $field): bool
     {
+        // the tag fields are "exclude" fields
+        return $this->canEditField($contentRecord, $field, true);
+    }
+
+    /**
+     * @param array<string, mixed> $contentRecord
+     * @param bool $excludeField Whether the field is an "exclude" field, which needs its own permission
+     */
+    public function canEditField(array $contentRecord, string $field, bool $excludeField): bool
+    {
         if (!$this->canOpen($contentRecord)) {
             return false;
         }
 
-        return $this->backendUser?->isAdmin() === true || $this->backendUser?->check('non_exclude_fields', 'tt_content:' . $field) === true;
+        return $this->backendUser?->isAdmin() === true
+            || !$excludeField
+            || $this->backendUser?->check('non_exclude_fields', 'tt_content:' . $field) === true;
     }
 }

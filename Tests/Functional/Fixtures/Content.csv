@@ -13,6 +13,7 @@
 ,5,1,"Members only","/members",1,0,0,0,0,0,"1"
 ,6,1,"Any login","/login-only",1,0,0,0,0,0,"-2"
 ,7,1,"Not logged in only","/guests",1,0,0,0,0,0,"-1"
+,8,1,"With RTE","/rte",1,0,0,0,0,0,""
 "tt_content"
 ,"uid","pid","CType","colPos","sorting","header","header_layout","header_tag","subheader","subheader_tag","bodytext","t3ver_oid","t3ver_wsid","t3ver_state"
 ,1,1,"text",0,100,"Chosen tag",2,"h4","","h3","text",0,0,0
@@ -27,3 +28,4 @@
 ,11,6,"text",0,100,"For any login",2,"h2","","h3","text",0,0,0
 ,12,7,"text",0,100,"For guests",2,"h2","","h3","text",0,0,0
 ,20,1,"text",0,100,"Chosen tag (draft)",2,"h5","","h3","text",1,1,0
+,21,8,"text",0,100,"Intro",2,"h2","","h3","<h2>Visit us</h2><p>Street</p><h3>Opening <strong>hours</strong></h3><p>Mon-Fri</p>",0,0,0

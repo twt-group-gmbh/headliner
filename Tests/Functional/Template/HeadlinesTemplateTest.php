@@ -46,7 +46,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
         $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(templateRootPaths: ['EXT:headliner/Resources/Private/Templates']));
         $view->assignMultiple([
             'collapsed' => false,
-            'tags' => [],
+            'rteUrl' => '/typo3/ajax/headliner/rte-tag',
             'workspace' => '',
             'multiple' => true,
             'columns' => 1,
@@ -119,7 +119,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
     private static function heading(bool $canEditTag, bool $tagInherited): array
     {
         return [
-            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'editUid' => 5,
+            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'rte' => null, 'tagOptions' => ['h1', 'h2', 'div'], 'editUid' => 5,
             'canOpen' => true, 'canEditTag' => $canEditTag, 'outside' => false, 'subheader' => false, 'fromText' => false,
             'parentText' => '', 'tagInherited' => $tagInherited,
         ];

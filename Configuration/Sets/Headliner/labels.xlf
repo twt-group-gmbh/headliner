@@ -24,6 +24,15 @@
 					only the H1 counts. Without a match, or if empty (the default), the whole page is checked.
 				</source>
 			</trans-unit>
+			<trans-unit id="settings.headliner.editRteHeadings">
+				<source>Change headings in rich text</source>
+			</trans-unit>
+			<trans-unit id="settings.description.headliner.editRteHeadings">
+				<source>
+					Allow the tag of a heading in the rich text of a content element to be changed in the box. The tag is changed in the stored text, at the place of the heading, and only to the
+					headings the editor of the text offers. Off by default: the headings are only shown.
+				</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

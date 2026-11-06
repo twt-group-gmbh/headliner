@@ -10,3 +10,7 @@ settings:
     type: string
     default: ''
     category: headliner
+  headliner.editRteHeadings:
+    type: bool
+    default: false
+    category: headliner

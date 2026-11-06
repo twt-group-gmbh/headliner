@@ -10,7 +10,9 @@ points out problems: a missing or repeated H1, skipped levels (an H2 followed by
 With the page module's language comparison the box has one section per selected language, side by side like the columns of the page module; if they do not fit, the box scrolls sideways.
 The structure is shown in a box that can be collapsed (the state is remembered per backend user). A subheader is
 marked with an arrow and named after its header. Headings from the text of a content element, such as RTE content, are
-marked the same way and open that element; they cannot be changed in the box. For headers of content elements the tag can be changed right there with a select
+marked the same way and open that element. If the site setting `headliner.editRteHeadings` is on (off by default), their tag can be changed with a select too, which offers the headings the editor of the text offers (`heading.options` of the RTE preset, H2 and H3 in the default preset): it is changed in the text of the
+element, at the place of the heading, and saved with the rights of the backend user. This works where the heading is
+found in the stored text at the place the order of the headings says, with the same text; otherwise it is only a label. For headers of content elements the tag can be changed right there with a select
 (H1-H6 or div): it is saved with the rights of the backend user and the structure is checked again. Clicking the text of a header opens the edit form of its content element in the side panel, as the edit button of
 the page module does. Headings from
 other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
@@ -72,6 +74,7 @@ existing pages do not change until an editor chooses a tag.
 | Setting                      | Default | Description |
 |------------------------------|---------|-------------|
 | `headliner.subheader.enabled` | on      | Show the field *Subheader tag*. If switched off for a site, it is hidden in the backend and the subheader follows the tag of the header. |
+| `headliner.editRteHeadings`   | off     | Allow the tag of a heading in the rich text of a content element to be changed in the box (only to the headings the RTE offers). The text of the element is changed, so it is off by default. |
 | `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
 
 ## Requirements

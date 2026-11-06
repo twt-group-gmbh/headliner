@@ -29,6 +29,13 @@ How the structure is checked
     each is rendered in (the frame `id="c12"`). It marks the headings that are not in the elements of the site setting
     `headliner.contentSelector` as outside; `symfony/css-selector` turns the CSS selector into the XPath the DOM needs.
 #.  `HeadingValidator` finds the problems.
+#.  A heading from the text is matched with its place in the field `bodytext` by `RteHeadings`: the n-th heading of the
+    text, in the order the frontend renders them (the box counts the headings of an element, `data-headliner-rte="uid:n"`).
+    The select sends the place, the new tag and the text it showed to the AJAX route `headliner_rte_tag`
+    (`RteHeadingController`); `RteHeadingEditor` checks the rights, that the tag is one the editor offers (`heading.options` of
+    the RTE configuration from `Richtext::getConfiguration()`, in the select and again on saving) and that the text at that place is the same, changes
+    only the tag (`<hN>` and `</hN>`, the attributes stay) and saves the field through the DataHandler. If the text is not
+    the same, nothing is changed.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.
 

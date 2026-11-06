@@ -94,6 +94,12 @@ Tests split into two suites by what they need to boot:
   elements of the site setting `headliner.contentSelector` (empty by default: the whole page) as `outside`; `HeadingValidator` skips their levels except h1 (an h1 outside counts for
   missing and multiple h1, even if it cannot be edited), the box shows them very pale (not if they have a problem). No match, an empty or an invalid selector: the whole page (never show nothing). `symfony/css-selector`
   (a requirement) turns the selector into XPath.
+- Headings from the text of a content element (RTE) can have a tag select, but only with the site setting
+  `headliner.editRteHeadings` (default off, it changes the editors' text), checked in the box and again in
+  `RteHeadingEditor`. The heading is matched with its place in `bodytext` by `RteHeadings` (the n-th heading of the text,
+  same level and text), the tag must be one of `heading.options` of the RTE configuration (`Richtext::getConfiguration()`),
+  and the field is saved through the DataHandler (never by writing to the database). Nothing is changed if the heading is
+  not found where the order says.
 - What a backend user may do in the box is decided by `EditAccess`, with the rules of the page module's own edit buttons
   (`GridColumnItem::isEditable()`); the fields `header_tag` and `subheader_tag` are "exclude" fields, so they also need
   the field permission. Never show the select or the link on the basis of the markup alone.

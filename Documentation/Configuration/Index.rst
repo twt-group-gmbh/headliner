@@ -50,6 +50,22 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
     headliner:
       contentSelector: 'main'
 
+..  _configuration-editrteheadings:
+
+..  confval:: headliner.editRteHeadings
+    :name: headliner-editrteheadings
+    :type: bool
+    :Default: false
+
+    Allow the tag of a heading in the rich text of a content element (for example :guilabel:`Regular Text Element`) to
+    be changed in the box. Off by default: such a heading is only shown, with the badge :guilabel:`From the text of
+    "..."`.
+
+    If it is switched on, the select offers the headings the editor of the text offers (`heading.options` of its RTE
+    configuration, H2 and H3 in the default preset). The tag is changed in the stored text of the element, at the place
+    of the heading, and saved through the DataHandler, with the rights of the backend user. This changes the content of
+    the editors, which is why the setting is off by default.
+
 ..  _configuration-extension:
 
 Extension configuration

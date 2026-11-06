@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\Tests\Functional;
 
 use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
+use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
+use TYPO3\CMS\Core\Configuration\Richtext;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\NormalizedParams;
@@ -16,6 +18,7 @@ use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Backend\RteHeadingEditor;
 use Twtgroup\Headliner\Backend\StructureBox;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
@@ -29,7 +32,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
  */
 abstract class AbstractFrontendTestCase extends FunctionalTestCase
 {
-    protected array $coreExtensionsToLoad = ['fluid_styled_content', 'workspaces'];
+    protected array $coreExtensionsToLoad = ['fluid_styled_content', 'workspaces', 'rte_ckeditor'];
 
     protected array $testExtensionsToLoad = ['twtgroup/headliner'];
 
@@ -103,7 +106,14 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             $this->get(ViewFactoryInterface::class),
             $this->get(LocalizationRepository::class),
             $this->get(TcaSchemaFactory::class),
+            $this->get(UriBuilder::class),
+            $this->rteEditor(),
         );
+    }
+
+    protected function rteEditor(): RteHeadingEditor
+    {
+        return new RteHeadingEditor($this->get(TcaSchemaFactory::class), $this->get(Richtext::class), $this->get(SiteFinder::class));
     }
 
     /** A request as the backend gives it to the AJAX route of the box */

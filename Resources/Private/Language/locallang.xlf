@@ -24,6 +24,9 @@
 			<trans-unit id="tagInherited">
 				<source>The tag comes from the original of the default language and is changed there.</source>
 			</trans-unit>
+			<trans-unit id="rteFailed">
+				<source>The heading could not be changed. The text may have been changed in the meantime; the structure is loaded again.</source>
+			</trans-unit>
 			<trans-unit id="noHeading">
 				<source>Not a heading</source>
 			</trans-unit>

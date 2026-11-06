@@ -1,5 +1,6 @@
 import AjaxDataHandler from '@typo3/backend/ajax-data-handler.js';
 import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
+import Notification from '@typo3/backend/notification.js';
 import Persistent from '@typo3/backend/storage/persistent.js';
 
 const SELECTOR = 'details.headliner';
@@ -88,6 +89,28 @@ document.addEventListener('typo3:page-layout:hidden-content-count-changed', relo
 // a record was changed with the core's DataHandler (drag and drop of an element)
 document.addEventListener('typo3:datahandler:process', reloadSoon);
 
+// Changes the tag of a heading in the rich text through the route of the extension (the text is changed at the place
+// the box names and saved through the DataHandler), then loads the box again, which shows what is in the text now.
+// Resolves to whether the box was loaded again.
+async function changeTagInText(select) {
+  const box = select.closest(SELECTOR);
+  const [uid, ordinal] = select.dataset.headlinerRte.split(':');
+  try {
+    await new AjaxRequest(box.dataset.headlinerRteUrl).post({
+      uid,
+      ordinal,
+      tag: select.value,
+      text: select.dataset.headlinerText,
+    });
+  } catch {
+    // refused, or the text was changed since the box was drawn: say so, and show what is there now
+    Notification.warning(box.dataset.headlinerRteError, '', 8);
+    await load();
+    return false;
+  }
+  return load();
+}
+
 // Changes the tag of a header through the core's DataHandler, then loads the box again so the structure and its
 // problems are checked again.
 document.addEventListener('change', (event) => {
@@ -96,12 +119,19 @@ document.addEventListener('change', (event) => {
     return;
   }
 
-  const [table, uid, field] = select.dataset.headlinerEdit.split(':');
   select.disabled = true;
   const restore = () => {
     select.value = select.dataset.current;
     select.disabled = false;
   };
+
+  // a heading from the rich text of a content element: its tag is changed in the text itself
+  if (select.dataset.headlinerRte) {
+    changeTagInText(select).then((loaded) => loaded || restore()).catch(restore);
+    return;
+  }
+
+  const [table, uid, field] = select.dataset.headlinerEdit.split(':');
 
   AjaxDataHandler.process({ data: { [table]: { [uid]: { [field]: select.value } } } })
     .then((result) => {

@@ -1,6 +1,6 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers" data-namespace-typo3-fluid="true">
 <f:variable name="l" value="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:" />
-<details class="headliner card card-size-large"{f:if(condition: collapsed, else: ' open')}>
+<details class="headliner card card-size-large" data-headliner-rte-url="{rteUrl}" data-headliner-rte-error="{f:translate(key: '{l}rteFailed')}"{f:if(condition: collapsed, else: ' open')}>
     <summary class="card-header" title="{f:translate(key: '{l}toggle')}">
         <h2 class="card-title"><f:translate key="{l}title" /></h2>
         <f:if condition="{anyLoaded}">
@@ -85,9 +85,9 @@
                                         <span class="headliner__tag">
                                             <f:if condition="{heading.canEditTag}">
                                                 <f:then>
-                                                    <select class="form-select form-select-sm headliner__select" data-headliner-edit="{heading.edit}" data-current="{heading.tag}"
+                                                    <select class="form-select form-select-sm headliner__select" data-headliner-edit="{heading.edit}" data-headliner-rte="{heading.rte}" data-headliner-text="{heading.text}" data-current="{heading.tag}"
                                                             title="{f:translate(key: '{l}editTag')}">
-                                                        <f:for each="{tags}" as="tag">
+                                                        <f:for each="{heading.tagOptions}" as="tag">
                                                             <option value="{tag}"{f:if(condition: '{tag} == {heading.tag}', then: ' selected="selected"')}>{tag -> f:format.case(mode: 'upper')}</option>
                                                         </f:for>
                                                     </select>

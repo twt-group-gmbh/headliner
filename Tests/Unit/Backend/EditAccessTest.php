@@ -111,4 +111,22 @@ final class EditAccessTest extends TestCase
         self::assertFalse($access->canOpen(self::CONTENT));
         self::assertFalse($access->canEditTag(self::CONTENT, 'header_tag'));
     }
+
+    #[Test]
+    public function aFieldThatIsNoExcludeFieldNeedsNoFieldPermission(): void
+    {
+        // the text of a content element: an editor who may edit the element may change it
+        $access = new EditAccess($this->user(checks: ['tables_modify:tt_content' => true]), ['uid' => 2]);
+
+        self::assertTrue($access->canEditField(self::CONTENT, 'bodytext', false));
+        self::assertFalse($access->canEditField(self::CONTENT, 'header_tag', true));
+    }
+
+    #[Test]
+    public function aFieldNeedsTheRightToOpenTheElementFirst(): void
+    {
+        $access = new EditAccess($this->user(checks: []), ['uid' => 2]);
+
+        self::assertFalse($access->canEditField(self::CONTENT, 'bodytext', false));
+    }
 }

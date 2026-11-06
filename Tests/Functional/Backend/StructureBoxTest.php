@@ -65,7 +65,7 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         self::assertStringContainsString('The page has no H1.', $html);
         // the edit forms return to the page module, not to the AJAX route that has drawn the box
         self::assertStringContainsString('returnUrl=/typo3/module/web/layout?id%3D1', $html);
-        self::assertStringNotContainsString('ajax/headliner', $html);
+        self::assertStringNotContainsString('headliner/structure', $html);
     }
 
     #[Test]
@@ -79,5 +79,46 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         );
 
         self::assertSame('', $html);
+    }
+
+    #[Test]
+    public function aHeadingFromTheTextCanBeChangedInTheBoxWhereTheFieldSaysItIs(): void
+    {
+        $this->writeSite(['headliner' => ['editRteHeadings' => true]]);
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '/typo3/module/web/layout?id=8');
+
+        // the headings of the text: place 0 and 1 in the text of element 21, without div as a choice
+        self::assertStringContainsString('data-headliner-rte="21:0"', $html);
+        self::assertStringContainsString('data-headliner-rte="21:1"', $html);
+        self::assertStringContainsString('data-headliner-text="Opening hours"', $html);
+        // the select of the header offers every tag, the two selects of the text only what the editor offers (h2, h3)
+        self::assertSame(1, substr_count($html, '<option value="div"'));
+        self::assertSame(1, substr_count($html, '<option value="h4"'));
+        self::assertSame(3, substr_count($html, '<option value="h3"'));
+        // the header of the element has its own tag field, not the text
+        self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+    }
+
+    #[Test]
+    public function aHeadingFromTheTextIsOnlyALabelForAUserWhoMayNotEditTheElement(): void
+    {
+        $this->setUpBackendUser(2);
+        $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->create('default');
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringNotContainsString('data-headliner-rte="21:', $html);
+        self::assertStringNotContainsString('<select', $html);
+    }
+
+    #[Test]
+    public function aHeadingFromTheTextIsOnlyALabelWhileTheSiteSettingIsOff(): void
+    {
+        // the setting is off by default
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringNotContainsString('data-headliner-rte="21:', $html);
+        // only the select of the header of the element is left
+        self::assertSame(1, substr_count($html, '<select'));
     }
 }
