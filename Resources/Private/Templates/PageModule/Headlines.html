@@ -5,7 +5,14 @@
         <h2 class="card-title"><f:translate key="{l}title" /></h2>
         <f:if condition="{anyLoaded}">
             <f:if condition="{issueCount}">
-                <f:then><span class="badge badge-warning"><f:translate key="{l}summary.issues" arguments="{0: issueCount}" /></span></f:then>
+                <f:then>
+                    <span class="badge badge-warning">
+                        <f:if condition="{issueCount} == 1">
+                            <f:then><f:translate key="{l}summary.issue" /></f:then>
+                            <f:else><f:translate key="{l}summary.issues" arguments="{0: issueCount}" /></f:else>
+                        </f:if>
+                    </span>
+                </f:then>
                 <f:else><span class="badge badge-success"><f:translate key="{l}summary.ok" /></span></f:else>
             </f:if>
         </f:if>
@@ -24,7 +31,14 @@
                         <f:if condition="{section.loaded}">
                             <f:if condition="{section.hasHeadings}">
                                 <f:if condition="{section.issueCount}">
-                                    <f:then><span class="badge badge-warning"><f:translate key="{l}summary.issues" arguments="{0: section.issueCount}" /></span></f:then>
+                                    <f:then>
+                                        <span class="badge badge-warning">
+                                            <f:if condition="{section.issueCount} == 1">
+                                                <f:then><f:translate key="{l}summary.issue" /></f:then>
+                                                <f:else><f:translate key="{l}summary.issues" arguments="{0: section.issueCount}" /></f:else>
+                                            </f:if>
+                                        </span>
+                                    </f:then>
                                     <f:else><span class="badge badge-success"><f:translate key="{l}summary.ok" /></span></f:else>
                                 </f:if>
                             </f:if>

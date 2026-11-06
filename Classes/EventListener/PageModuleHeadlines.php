@@ -21,6 +21,7 @@ use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use Twtgroup\Headliner\Backend\AccessState;
 use Twtgroup\Headliner\Backend\EditAccess;
 use Twtgroup\Headliner\Backend\FrontendGroupAccess;
+use Twtgroup\Headliner\Backend\LocalizedDate;
 use Twtgroup\Headliner\Backend\PublicationState;
 use Twtgroup\Headliner\Backend\PublicationTime;
 use Twtgroup\Headliner\Backend\SelectedLanguages;
@@ -256,8 +257,9 @@ final readonly class PageModuleHeadlines
             $translationRecord
         );
         $section['publication'] = $publication->state->value;
-        $section['publicationFrom'] = $publication->start > 0 ? date('Y-m-d H:i', $publication->start) : '';
-        $section['publicationUntil'] = $publication->end > 0 ? date('Y-m-d H:i', $publication->end) : '';
+        $locale = ($GLOBALS['LANG'] ?? null)?->getLocale();
+        $section['publicationFrom'] = $publication->start > 0 ? LocalizedDate::format($publication->start, $locale) : '';
+        $section['publicationUntil'] = $publication->end > 0 ? LocalizedDate::format($publication->end, $locale) : '';
         if ($publication->state === PublicationState::Never) {
             return $section;
         }

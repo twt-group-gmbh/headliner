@@ -51,6 +51,8 @@ First release.
   page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
   content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the
   permission for the field (`header_tag`, `subheader_tag` are "exclude" fields). Otherwise the tag is shown as a label.
+- Page module, language: the summary uses the correct singular and plural ("1 issue", "2 issues") and the dates in the
+  notes about start and end time are shown in the format of the language of the backend user, not as ISO dates.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
 - Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default H2) decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The

@@ -9,8 +9,11 @@
 			<trans-unit id="summary.ok">
 				<source>Structure OK</source>
 			</trans-unit>
+			<trans-unit id="summary.issue">
+				<source>1 issue</source>
+			</trans-unit>
 			<trans-unit id="summary.issues">
-				<source>%d issue(s)</source>
+				<source>%d issues</source>
 			</trans-unit>
 			<trans-unit id="editTag">
 				<source>Change the tag of this header</source>

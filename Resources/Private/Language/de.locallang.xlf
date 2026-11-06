@@ -11,9 +11,13 @@
 				<source>Structure OK</source>
 				<target>Struktur in Ordnung</target>
 			</trans-unit>
+			<trans-unit id="summary.issue">
+				<source>1 issue</source>
+				<target>1 Hinweis</target>
+			</trans-unit>
 			<trans-unit id="summary.issues">
-				<source>%d issue(s)</source>
-				<target>%d Hinweis(e)</target>
+				<source>%d issues</source>
+				<target>%d Hinweise</target>
 			</trans-unit>
 			<trans-unit id="editTag">
 				<source>Change the tag of this header</source>
