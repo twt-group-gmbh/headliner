@@ -21,6 +21,21 @@ taken over.
     remove the Semantilizer, install headliner, run the wizard. The wizard does not need the Semantilizer: it reads the
     column `header_type`, which stays in the database.
 
+..  warning::
+
+    Removing the Semantilizer does not delete its column `header_type`, but a destructive schema update does. Until the
+    wizard has run, that column is the only place where the heading types are stored. In this order:
+
+    #.  Make a **backup of the database**.
+    #.  Make sure nothing runs a destructive schema update: `typo3 database:updateschema` without an argument (or with
+        `safe`) only adds and changes fields, while `destructive`, `"*"`, `field.drop` or `table.drop`, and the entries
+        to remove unused fields in :guilabel:`Analyze Database Structure`, delete the column. Look at the deployment
+        script, too.
+    #.  Remove the Semantilizer, install headliner and run the wizard (below).
+    #.  Check the result, and only then delete the unused column `header_type`, if you want to.
+
+    The values cannot be taken over once the column is gone: they can then only be restored from the backup.
+
 The upgrade wizard :guilabel:`Headliner: take the heading types of the Semantilizer (z7_semantilizer) into the tags of
 headliner` does that:
 
