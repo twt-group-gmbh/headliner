@@ -151,7 +151,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
 
         // the group of the element shows what belongs together, so the badges only say what the heading is
         self::assertMatchesRegularExpression('#<span class="badge badge-secondary">\s*Subheader\s*</span>#', $html);
-        self::assertMatchesRegularExpression('#<span class="badge badge-secondary">\s*RTE text\s*</span>#', $html);
+        self::assertMatchesRegularExpression('#<span class="badge badge-secondary">\s*RTE\s*</span>#', $html);
         self::assertStringNotContainsString('Subheader of', $html);
         self::assertStringNotContainsString('From the text', $html);
     }
@@ -161,7 +161,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
     {
         $html = $this->render(0, 'default', [self::heading(false, false)]);
 
-        self::assertStringNotContainsString('RTE text', $html);
+        self::assertDoesNotMatchRegularExpression('#<span class="badge badge-secondary">\s*RTE\s*</span>#', $html);
         self::assertDoesNotMatchRegularExpression('#<span class="badge badge-secondary">\s*Subheader#', $html);
     }
 }

@@ -58,7 +58,7 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
     :Default: false
 
     Allow the tag of a heading in the rich text of a content element (for example :guilabel:`Regular Text Element`) to
-    be changed in the box. Off by default: such a heading is only shown, with the badge :guilabel:`RTE text`.
+    be changed in the box. Off by default: such a heading is only shown, with the badge :guilabel:`RTE`.
 
     If it is switched on, the select offers the headings the editor of the text offers (`heading.options` of its RTE
     configuration, H2 and H3 in the default preset). The tag is changed in the stored text of the element, at the place

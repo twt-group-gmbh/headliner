@@ -16,7 +16,7 @@ First release.
   (structure OK / number of problems). The tag of a header
   can be changed in place with a select styled as a pill whose colour tells the level (a scale from violet H1 over blue and teal to green H6, a div is neutral and dashed); the select has the size of the plain label; it is saved through the core's DataHandler (with the rights of the
   backend user) and the structure is checked again. A subheader has the badge "Subheader". A heading from the text of a content element
-  (for example RTE content) has the badge "RTE text", opens that content element and has a select
+  (for example RTE content) has the badge "RTE", opens that content element and has a select
   too if the new site setting `headliner.editRteHeadings` is on (default off, because it changes the text of the element), which offers the headings the editor of the text offers (`heading.options` of the RTE configuration, so H2 and H3
   in the default preset; without options H1-H6; the heading's own tag is always in the list): the tag is changed in the stored text (`bodytext`) at the place of the heading, through the DataHandler and
   its rights, by the AJAX route `headliner_rte_tag`. The heading is found by its place among the headings of the text and

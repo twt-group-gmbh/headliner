@@ -18,7 +18,7 @@ headings of the page as a hierarchy. Every heading has a pill with its tag; its 
 *   A **subheader** has the badge :guilabel:`Subheader`. It belongs to the content element of its header, which the
     group (see below) shows.
 *   A heading from the **text** of a content element (for example RTE content) has the badge
-    :guilabel:`RTE text`. If the site setting :ref:`headliner.editRteHeadings <configuration-editrteheadings>` is on (it is off by default), its tag can be changed in the box too, to the headings the editor of the text offers (the option
+    :guilabel:`RTE`. If the site setting :ref:`headliner.editRteHeadings <configuration-editrteheadings>` is on (it is off by default), its tag can be changed in the box too, to the headings the editor of the text offers (the option
     `heading.options` of the RTE configuration, H2 and H3 in the default preset): the tag is changed in the
     stored text of the element, at the place of the heading. This works if the heading is found there at the place the
     order of the headings says, with the same level and text. If it is not (the text was changed meanwhile, or the
