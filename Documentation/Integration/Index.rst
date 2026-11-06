@@ -94,6 +94,24 @@ A subheader is rendered the same way, with `subheader`:
 Content Blocks and records in a content element
 ===============================================
 
+Headliner ships two Basics for Content Blocks, so a block gets the header and the subheader with their tags by naming them:
+
+..  code-block:: yaml
+    :caption: ContentBlocks/ContentElements/cards/config.yaml
+
+    name: vendor/cards
+    fields:
+      - identifier: Twtgroup/Headline
+        type: Basic
+      - identifier: Twtgroup/Subheadline
+        type: Basic
+
+`Twtgroup/Headline` is a palette with `header`, `header_tag` and `header_layout`, `Twtgroup/Subheadline` one with
+`subheader` and `subheader_tag`. Use them instead of the single fields: Content Blocks only knows the fields of the base
+TCA when it compiles a block, not the ones an extension adds in its TCA overrides, so a block that names `header_tag` with
+`useExistingField: true` alone fails with "missing the required type". The Basics say `type: Select` once. Content
+Blocks is not a requirement of headliner: without it nothing reads the files.
+
 A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
 records of tables of their own. Wrap what is rendered for each record in `headliner:headline.children`:
 

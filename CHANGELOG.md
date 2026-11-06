@@ -101,6 +101,10 @@ First release.
   is needed, and the rich text of a card is grouped and can be changed like the text of a content element. The rich text can
   be a field of any table, if it is a rich text for the type of its record. A text is changed through the DataHandler
   with the rights of the backend user for that table and field.
+- Content Blocks: the Basics `Twtgroup/Headline` (`header`, `header_tag`, `header_layout`) and `Twtgroup/Subheadline`
+  (`subheader`, `subheader_tag`) in `ContentBlocks/Basics/`. A block names them with `type: Basic` and needs nothing else for
+  the tag fields (Content Blocks does not know the fields that an extension adds in its TCA overrides, so a block that uses
+  `header_tag` alone fails to compile without a `type`). Content Blocks stays no requirement.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

@@ -42,7 +42,7 @@ the field (see below), the subheader is rendered one level below the header.
 
 ## Compatibility
 
-It works with Content Blocks, too: the headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for headings in their rich text, if you wrap a record in `headliner:headline.children` (see the documentation).
+It works with Content Blocks, too (the Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header and subheader with their tags): the headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for headings in their rich text, if you wrap a record in `headliner:headline.children` (see the documentation).
 
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used

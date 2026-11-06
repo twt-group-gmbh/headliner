@@ -1,0 +1,27 @@
+# The header of a content element with its tag, for a Content Block:
+#
+#   fields:
+#     - identifier: Twtgroup/Headline
+#       type: Basic
+#
+# Content Blocks only knows the fields of the base TCA when it compiles a block, not the ones an extension adds in its TCA
+# overrides, so the tag field needs its "type" here. Everything else (choices, default, label) comes from the TCA of headliner.
+identifier: Twtgroup/Headline
+fields:
+  -
+    identifier: headline_palette
+    type: Palette
+    label: core.form.palettes:header
+    fields:
+      -
+        identifier: header
+        useExistingField: true
+      -
+        type: Linebreak
+      -
+        identifier: header_tag
+        useExistingField: true
+        type: Select
+      -
+        identifier: header_layout
+        useExistingField: true

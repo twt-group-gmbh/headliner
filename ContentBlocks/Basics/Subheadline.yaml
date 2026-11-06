@@ -1,0 +1,21 @@
+# The subheader of a content element with its tag, for a Content Block:
+#
+#   fields:
+#     - identifier: Twtgroup/Subheadline
+#       type: Basic
+#
+# See Headline.yaml for why the tag field has a "type".
+identifier: Twtgroup/Subheadline
+fields:
+  -
+    identifier: subheadline_palette
+    type: Palette
+    label: core.form.palettes:header
+    fields:
+      -
+        identifier: subheader
+        useExistingField: true
+      -
+        identifier: subheader_tag
+        useExistingField: true
+        type: Select
