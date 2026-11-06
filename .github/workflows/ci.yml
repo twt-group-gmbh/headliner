@@ -73,6 +73,8 @@ jobs:
           key: composer-${{ matrix.php }}-${{ matrix.typo3 }}-${{ hashFiles('composer.json') }}
       - run: composer update --with="typo3/cms-core:${{ matrix.typo3 }}" --prefer-dist --no-progress --no-interaction
       - run: .Build/bin/phpunit -c Build/phpunit/UnitTests.xml
+      - name: Extension Scanner (strong matches fail, see Build/Scripts/extension-scan.php)
+        run: php Build/Scripts/extension-scan.php
 
   javascript:
     name: javascript (Vitest)

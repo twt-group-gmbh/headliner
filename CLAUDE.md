@@ -41,6 +41,7 @@ ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/
                         # `ddev npm run lint:xlf-fix` fixes the XLIFF formatting
 ddev flush              # flush all TYPO3 caches, including the compiled container (after a branch switch)
 ddev scan-extension [--strict]    # TYPO3 Extension Scanner (Install Tool "Scan Extension Files") on CLI
+                        # (CI runs it in the unit job, for every TYPO3 version of the matrix)
 ddev docs               # render Documentation/ with the TYPO3 docs toolchain (Docker); fix every warning
 ```
 
