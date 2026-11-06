@@ -1,35 +1,89 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
-    <file source-language="en" datatype="plaintext" original="EXT:headliner/Resources/Private/Language/locallang.xlf" date="2026-11-06T00:00:00Z" product-name="headliner">
-        <header/>
-        <body>
-            <trans-unit id="title"><source>Heading structure</source></trans-unit>
-            <trans-unit id="summary.ok"><source>Structure OK</source></trans-unit>
-            <trans-unit id="summary.issues"><source>%d issue(s)</source></trans-unit>
-            <trans-unit id="editTag"><source>Change the tag of this header</source></trans-unit>
-            <trans-unit id="subheader"><source>Subheader</source></trans-unit>
-            <trans-unit id="noHeading"><source>Not a heading</source></trans-unit>
-            <trans-unit id="toggle"><source>Show or hide the heading structure</source></trans-unit>
-            <trans-unit id="editElement"><source>Edit this content element</source></trans-unit>
-            <trans-unit id="subheaderOf"><source>Subheader of “%s”</source></trans-unit>
-            <trans-unit id="fromTextOf"><source>From the text of “%s”</source></trans-unit>
-            <trans-unit id="fromText"><source>From the text of this element</source></trans-unit>
-            <trans-unit id="untranslated"><source>The page is not translated into this language.</source></trans-unit>
-            <trans-unit id="hiddenPage"><source>The page is hidden. The structure shows how it will look when the page is published.</source></trans-unit>
-            <trans-unit id="publicationNotYet"><source>The page is not published yet (from %s). The structure shows how it will look from then on.</source></trans-unit>
-            <trans-unit id="publicationExpired"><source>The page is no longer published (until %s). The structure shows how it looked shortly before it ended.</source></trans-unit>
-            <trans-unit id="publicationNever"><source>The page can never be shown: its end time is not after its start time.</source></trans-unit>
-            <trans-unit id="accessGroups"><source>The page is only visible to frontend users of the groups %s. The structure shows how it looks for them.</source></trans-unit>
-            <trans-unit id="accessLogin"><source>The page is only visible to logged-in frontend users. The structure shows how it looks for them.</source></trans-unit>
-            <trans-unit id="accessNever"><source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source></trans-unit>
-            <trans-unit id="workspace"><source>You work in the workspace "%s". The structure shows the versions of this workspace.</source></trans-unit>
-            <trans-unit id="empty"><source>(empty heading)</source></trans-unit>
-            <trans-unit id="noHeadings"><source>The page has no headings.</source></trans-unit>
-            <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source></trans-unit>
-            <trans-unit id="issue.missingH1"><source>The page has no H1.</source></trans-unit>
-            <trans-unit id="issue.multipleH1"><source>More than one H1</source></trans-unit>
-            <trans-unit id="issue.skippedLevel"><source>Skipped heading level</source></trans-unit>
-            <trans-unit id="issue.emptyHeading"><source>Empty heading</source></trans-unit>
-        </body>
-    </file>
+	<file source-language="en" datatype="plaintext" original="EXT:headliner/Resources/Private/Language/locallang.xlf" date="2026-11-06T00:00:00Z" product-name="headliner">
+		<header />
+		<body>
+			<trans-unit id="title">
+				<source>Heading structure</source>
+			</trans-unit>
+			<trans-unit id="summary.ok">
+				<source>Structure OK</source>
+			</trans-unit>
+			<trans-unit id="summary.issues">
+				<source>%d issue(s)</source>
+			</trans-unit>
+			<trans-unit id="editTag">
+				<source>Change the tag of this header</source>
+			</trans-unit>
+			<trans-unit id="subheader">
+				<source>Subheader</source>
+			</trans-unit>
+			<trans-unit id="noHeading">
+				<source>Not a heading</source>
+			</trans-unit>
+			<trans-unit id="toggle">
+				<source>Show or hide the heading structure</source>
+			</trans-unit>
+			<trans-unit id="editElement">
+				<source>Edit this content element</source>
+			</trans-unit>
+			<trans-unit id="subheaderOf">
+				<source>Subheader of “%s”</source>
+			</trans-unit>
+			<trans-unit id="fromTextOf">
+				<source>From the text of “%s”</source>
+			</trans-unit>
+			<trans-unit id="fromText">
+				<source>From the text of this element</source>
+			</trans-unit>
+			<trans-unit id="untranslated">
+				<source>The page is not translated into this language.</source>
+			</trans-unit>
+			<trans-unit id="hiddenPage">
+				<source>The page is hidden. The structure shows how it will look when the page is published.</source>
+			</trans-unit>
+			<trans-unit id="publicationNotYet">
+				<source>The page is not published yet (from %s). The structure shows how it will look from then on.</source>
+			</trans-unit>
+			<trans-unit id="publicationExpired">
+				<source>The page is no longer published (until %s). The structure shows how it looked shortly before it ended.</source>
+			</trans-unit>
+			<trans-unit id="publicationNever">
+				<source>The page can never be shown: its end time is not after its start time.</source>
+			</trans-unit>
+			<trans-unit id="accessGroups">
+				<source>The page is only visible to frontend users of the groups %s. The structure shows how it looks for them.</source>
+			</trans-unit>
+			<trans-unit id="accessLogin">
+				<source>The page is only visible to logged-in frontend users. The structure shows how it looks for them.</source>
+			</trans-unit>
+			<trans-unit id="accessNever">
+				<source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source>
+			</trans-unit>
+			<trans-unit id="workspace">
+				<source>You work in the workspace "%s". The structure shows the versions of this workspace.</source>
+			</trans-unit>
+			<trans-unit id="empty">
+				<source>(empty heading)</source>
+			</trans-unit>
+			<trans-unit id="noHeadings">
+				<source>The page has no headings.</source>
+			</trans-unit>
+			<trans-unit id="notLoaded">
+				<source>The frontend of this page could not be loaded, so the headings cannot be shown.</source>
+			</trans-unit>
+			<trans-unit id="issue.missingH1">
+				<source>The page has no H1.</source>
+			</trans-unit>
+			<trans-unit id="issue.multipleH1">
+				<source>More than one H1</source>
+			</trans-unit>
+			<trans-unit id="issue.skippedLevel">
+				<source>Skipped heading level</source>
+			</trans-unit>
+			<trans-unit id="issue.emptyHeading">
+				<source>Empty heading</source>
+			</trans-unit>
+		</body>
+	</file>
 </xliff>

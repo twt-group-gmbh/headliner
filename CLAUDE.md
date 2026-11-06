@@ -35,7 +35,9 @@ Composer dependencies and builds a ready-to-use TYPO3 on the first start (post-s
 ddev setup              # composer install into .Build/
 ddev demo               # (re)build the demo at https://headliner.ddev.site/ (.Build/)
 ddev test [unit|functional|all]   # PHPUnit suites
-ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/Scripts/xlf-lint.php`); `ddev cgl-fix` auto-fixes
+ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/Scripts/xlf-lint.php`: valid XLIFF) + prettier
+                        # (formatting of the *.xlf); `ddev cgl-fix` auto-fixes PHP,
+                        # `ddev npm run lint:xlf-fix` fixes the XLIFF formatting
 ddev scan-extension [--strict]    # TYPO3 Extension Scanner (Install Tool "Scan Extension Files") on CLI
 ddev docs               # render Documentation/ with the TYPO3 docs toolchain (Docker); fix every warning
 ```

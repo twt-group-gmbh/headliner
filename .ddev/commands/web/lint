@@ -1,5 +1,5 @@
 #!/bin/bash
-## Description: Run static analysis, the coding-style check and the XLIFF lint (PHPStan + CS-Fixer dry-run + xlf-lint)
+## Description: Run static analysis, the coding-style check and the XLIFF checks (PHPStan + CS-Fixer dry-run + xlf-lint + prettier)
 ## Usage: lint
 ## Example: "ddev lint"
 
@@ -14,3 +14,7 @@ echo "=== PHP-CS-Fixer (dry-run) ==="
 
 echo "=== XLIFF files ==="
 php Build/Scripts/xlf-lint.php
+
+echo "=== XLIFF formatting (prettier; fix with: ddev npm run lint:xlf-fix) ==="
+[ -d node_modules ] || npm ci --no-audit --no-fund
+npm run lint:xlf

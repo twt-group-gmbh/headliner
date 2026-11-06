@@ -32,6 +32,12 @@ jobs:
       - run: .Build/bin/php-cs-fixer fix --dry-run --diff
       - run: .Build/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress
       - run: php Build/Scripts/xlf-lint.php
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint:xlf
 
   unit:
     name: unit (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})

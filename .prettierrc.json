@@ -1,0 +1,15 @@
+{
+	"xmlWhitespaceSensitivity": "ignore",
+	"xmlSelfClosingSpace": true,
+	"plugins": ["@prettier/plugin-xml"],
+	"overrides": [
+		{
+			"files": "*.xlf",
+			"options": {
+				"parser": "xml",
+				"bracketSameLine": false,
+				"printWidth": 200
+			}
+		}
+	]
+}
