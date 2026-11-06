@@ -109,6 +109,9 @@
                                         <f:if condition="{heading.subheader}">
                                             <span class="badge badge-secondary"><f:translate key="{l}subheader" /></span>
                                         </f:if>
+                                        <f:if condition="{heading.childLabel}">
+                                            <span class="badge badge-secondary">{heading.childLabel}</span>
+                                        </f:if>
                                         <f:if condition="{heading.fromText}">
                                             <span class="badge badge-secondary"><f:translate key="{l}rte" /></span>
                                         </f:if>

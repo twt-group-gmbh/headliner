@@ -58,6 +58,10 @@ final class HeadingExtractor
      */
     private function findContentElement(\DOMElement $node): ?int
     {
+        // A heading rendered with the ViewHelper names its element itself: a Content Block has no frame with an id
+        if (preg_match('/^[1-9]\d*$/', $node->getAttribute('data-headliner-element')) === 1) {
+            return (int) $node->getAttribute('data-headliner-element');
+        }
         for ($parent = $node->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode) {
             if (preg_match('/^c([1-9]\d*)$/', $parent->getAttribute('id'), $match) === 1) {
                 return (int) $match[1];

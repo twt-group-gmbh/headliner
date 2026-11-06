@@ -89,6 +89,32 @@ A subheader is rendered the same way, with `subheader`:
 `subheader`, `subheaderTag`
     Render a subheader instead of the header. Without `subheaderTag` it is one level below the header.
 
+..  _integration-content-blocks:
+
+Content Blocks and records in a content element
+===============================================
+
+A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
+records of tables of their own. The ViewHelper works with both:
+
+..  code-block:: html
+
+    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{data.header}</headliner:headline>
+
+    <f:for each="{data.cards}" as="card">
+        <headliner:headline tag="{card.tag}" edit="{card.mainType}:{card.uid}:tag">{card.title}</headliner:headline>
+    </f:for>
+
+- The ViewHelper takes the uid of the content element from `{data}` and writes it as `data-headliner-element` on every
+  heading, so the page module knows which element a heading is in without a frame `id="c12"` around it. The headings of
+  one element form a group, as with `fluid_styled_content`.
+- For a heading from a record of a collection, name that record with `edit` (`table:uid:field`). The tag is changed in
+  that field with the rights of the backend user for the table. The badge of the heading is the title of the table.
+- The field must be a **select whose values are tags and nothing else** (`h1` to `h6`, `div`). The select in the box
+  offers the values of the field. The box ignores a mark for any other field.
+- A heading in the rich text of a collection record has no mark, so it is listed, but it is no part of the group and
+  cannot be changed in the box.
+
 ..  _integration-visual-editor:
 
 visual_editor

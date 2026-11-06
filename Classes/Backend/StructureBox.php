@@ -54,6 +54,7 @@ final readonly class StructureBox
         private TcaSchemaFactory $tcaSchemaFactory,
         private UriBuilder $uriBuilder,
         private RteHeadingEditor $rteEditor,
+        private TagField $tagField,
     ) {}
 
     /**
@@ -142,15 +143,26 @@ final readonly class StructureBox
 
         foreach ($headings as $index => $heading) {
             $target = $heading->editTarget();
-            $isSubheader = $target !== null && $target['field'] === HeaderTag::SUBHEADER_FIELD;
+            // The mark is part of the rendered page, which an editor can write to: it counts only for a field that is
+            // one for a tag, never for another field of another table
+            if ($target !== null && !$this->tagField->is($target['table'], $target['field'])) {
+                $target = null;
+            }
+            $isElementTarget = $target !== null && $target['table'] === 'tt_content';
+            $isSubheader = $isElementTarget && $target['field'] === HeaderTag::SUBHEADER_FIELD;
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
             $fromText = $target === null && $heading->element !== null;
-            $elementUid = $target['uid'] ?? $this->getTranslatedUid($heading->element, $languageId);
+            // The content element: the record of the mark, or the one the heading says it is rendered in (the record
+            // of a collection, a card of a Content Block, is not the element)
+            $elementUid = $isElementTarget ? $target['uid'] : $this->getTranslatedUid($heading->element, $languageId);
             // In a workspace the version: it has the text the frontend rendered
             $contentRecord = $elementUid !== null ? BackendUtility::getRecordWSOL('tt_content', $elementUid) : null;
             $canOpen = $contentRecord !== null && $editAccess->canOpen($contentRecord);
             // l10n_mode "exclude" on the field: a translation has the value of its original, it cannot be changed there
-            $tagInherited = $contentRecord !== null && $target !== null && $this->tagComesFromOriginal($contentRecord, $target['field']);
+            // The record behind the tag of a heading that is not the element: a card of a collection
+            $childRecord = $target !== null && !$isElementTarget ? BackendUtility::getRecordWSOL($target['table'], $target['uid']) : null;
+            $tagRecord = $isElementTarget ? $contentRecord : $childRecord;
+            $tagInherited = $tagRecord !== null && $target !== null && $this->tagComesFromOriginal($target['table'], $tagRecord, $target['field']);
             $textOrdinal = null;
             if ($fromText) {
                 $textOrdinal = $textOrdinals[$heading->element] = ($textOrdinals[$heading->element] ?? -1) + 1;
@@ -167,19 +179,22 @@ final readonly class StructureBox
                     static fn($issue): string => $issue->type->value,
                     array_filter($issues, static fn($issue): bool => $issue->index === $index)
                 )),
-                'edit' => $heading->edit,
+                'edit' => $target !== null ? $heading->edit : null,
+                'childLabel' => $target !== null && !$isElementTarget ? $this->tableTitle($target['table']) : '',
                 'group' => $elementUid,
                 'groupPosition' => '',
                 'groupHue' => 0,
                 'rte' => $rte ? $elementUid . ':' . $textOrdinal : null,
                 // a heading in a text offers what the editor of the text offers (and its own tag, so the select shows it)
-                'tagOptions' => $rte ? $this->textTagOptions($textTags[$elementUid] ??= $this->rteEditor->allowedTags($contentRecord), $heading->level) : HeaderTag::ALLOWED,
+                'tagOptions' => $rte
+                    ? $this->textTagOptions($textTags[$elementUid] ??= $this->rteEditor->allowedTags($contentRecord), $heading->level)
+                    : ($target !== null ? $this->tagField->options($target['table'], $target['field']) : HeaderTag::ALLOWED),
                 // opens the content element: its own header, or the element the heading is rendered in
                 'editUid' => $elementUid,
                 'canOpen' => $canOpen,
                 // the tag can be changed only if it belongs to this element and the user may change that field
                 'outside' => $heading->outside,
-                'canEditTag' => $rte || ($canOpen && !$tagInherited && !$heading->outside && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field'])),
+                'canEditTag' => $rte || (!$tagInherited && !$heading->outside && $target !== null && $tagRecord !== null && $this->mayEditTag($editAccess, $target, $tagRecord, $canOpen)),
                 'tagInherited' => $tagInherited,
                 'subheader' => $isSubheader,
                 'fromText' => $fromText,
@@ -247,14 +262,43 @@ final readonly class StructureBox
     }
 
     /**
-     * @param array<string, mixed> $contentRecord
+     * Whether the backend user may change the tag field of the record behind a heading: of the content element (the
+     * rules of the page module for its buttons), or of the record of a collection, by the rights for that table.
+     *
+     * @param array{table: string, uid: int, field: string} $target
+     * @param array<string, mixed> $tagRecord
      */
-    private function tagComesFromOriginal(array $contentRecord, string $field): bool
+    private function mayEditTag(EditAccess $editAccess, array $target, array $tagRecord, bool $canOpenElement): bool
     {
-        if (!$this->tcaSchemaFactory->has('tt_content')) {
+        if ($target['table'] === 'tt_content') {
+            return $canOpenElement && $editAccess->canEditTag($tagRecord, $target['field']);
+        }
+        $schema = $this->tcaSchemaFactory->get($target['table']);
+
+        return $editAccess->canEditFieldOf($target['table'], $tagRecord, $target['field'], $schema->getField($target['field'])->supportsAccessControl());
+    }
+
+    /**
+     * The name of a table for the badge of a heading from a collection (the title of its TCA).
+     */
+    private function tableTitle(string $table): string
+    {
+        $title = $this->tcaSchemaFactory->has($table) ? $this->tcaSchemaFactory->get($table)->getTitle(
+            static fn(string $title): string => (($GLOBALS['LANG'] ?? null)?->sL($title) ?? '') ?: $title
+        ) : '';
+
+        return $title !== '' ? $title : $table;
+    }
+
+    /**
+     * @param array<string, mixed> $record A record of that table
+     */
+    private function tagComesFromOriginal(string $table, array $record, string $field): bool
+    {
+        if (!$this->tcaSchemaFactory->has($table)) {
             return false;
         }
-        $schema = $this->tcaSchemaFactory->get('tt_content');
+        $schema = $this->tcaSchemaFactory->get($table);
         if (!$schema->isLanguageAware() || !$schema->hasField($field)) {
             return false;
         }
@@ -262,7 +306,7 @@ final readonly class StructureBox
 
         return TranslationSync::inheritsFromOriginal(
             $schema->getField($field)->getTranslationBehaviour() === FieldTranslationBehaviour::Excluded,
-            $contentRecord,
+            $record,
             $pointer
         );
     }

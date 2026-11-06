@@ -48,16 +48,19 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
             HeaderTag::layoutClass($this->arguments['layout']),
         ]);
         $this->tag->addAttribute('class', implode(' ', $classes));
-        $edit = $this->arguments['edit'] ?? null;
-        if ($edit === null && $this->isInspectRequest()) {
-            // the record of the content element this is rendered for, as the templates of fluid_styled_content have it
-            $edit = EditMark::forContent(
-                $this->renderingContext?->getVariableProvider()->get('data'),
-                $this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD
-            );
-        }
-        if ($edit && $this->isInspectRequest()) {
-            $this->tag->addAttribute('data-headliner-edit', $edit);
+        if ($this->isInspectRequest()) {
+            // the content element this is rendered for, as the templates of fluid_styled_content have it ("data"; a
+            // Content Block has it as a record object)
+            $data = $this->renderingContext?->getVariableProvider()->get('data');
+            $edit = $this->arguments['edit'] ?? EditMark::forContent($data, $this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);
+            if ($edit) {
+                $this->tag->addAttribute('data-headliner-edit', $edit);
+            }
+            // a heading names its element itself: a Content Block has no frame with an id around its element
+            $element = EditMark::elementUid($data);
+            if ($element !== null) {
+                $this->tag->addAttribute('data-headliner-element', (string) $element);
+            }
         }
         $this->tag->ignoreEmptyAttributes(true);
         $this->tag->setContent((string) $this->renderChildren());

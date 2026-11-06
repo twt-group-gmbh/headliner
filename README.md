@@ -42,6 +42,8 @@ the field (see below), the subheader is rendered one level below the header.
 
 ## Compatibility
 
+It works with Content Blocks, too: the headings of a block are grouped, and a heading from a record of a collection (a card) can be changed with a select if its field is a select of tags (see the documentation).
+
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. headliner needs no ViewHelper in your own templates.

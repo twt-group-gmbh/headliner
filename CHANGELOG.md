@@ -87,6 +87,14 @@ First release.
 - ViewHelper `headliner:headline`: the argument `edit` is optional now. Without it the ViewHelper names the record behind
   the header itself, for the page module only, from the variable `data` of the content element, an array or a record object as a Content Block has it (in a translation the uid of
   the translation). Own templates need nothing but `tag` and `layout`.
+- Content Blocks and other records in a content element: the headings of a Content Block get the group and the badges
+  like other elements, and the heading of a record in a collection (a card) has a select too. The ViewHelper gives every
+  heading the attribute `data-headliner-element` with the uid of its content element (also where there is no frame with an
+  id around the element), and `edit` can name the record of another table (`{card.mainType}:{card.uid}:tag`). The badge of
+  such a heading is the title of the table. The tag is saved in the field of that record with the rights of the backend
+  user for the table, and the select offers the values of the field. The box only accepts a field that is a select with tags
+  and nothing else (h1 to h6, div): the mark is part of the rendered page, which an editor can write to, so it never
+  trusts a mark for another field or table.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

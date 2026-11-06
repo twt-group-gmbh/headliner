@@ -94,6 +94,12 @@ Tests split into two suites by what they need to boot:
   elements of the site setting `headliner.contentSelector` (empty by default: the whole page) as `outside`; `HeadingValidator` skips their levels except h1 (an h1 outside counts for
   missing and multiple h1, even if it cannot be edited), the box shows them very pale (not if they have a problem). No match, an empty or an invalid selector: the whole page (never show nothing). `symfony/css-selector`
   (a requirement) turns the selector into XPath.
+- A heading names its content element itself (`data-headliner-element`, written by the ViewHelper from `data`, an array or a
+  record object), so Content Blocks, which have no frame `id="cNN"`, get groups and badges. `edit` can name a record of
+  another table (a card of a collection). The mark is part of the rendered page and an editor can write to it (RTE), so
+  the box only believes it for a field that `TagField` says is a select of tags (h1-h6, div) - never for another field
+  or table - and checks the rights for that table (`EditAccess::canEditFieldOf`). The record of a collection is not the
+  element: it is saved in its own table, the edit link and the group are those of its content element.
 - Headings from the text of a content element (RTE) can have a tag select, but only with the site setting
   `headliner.editRteHeadings` (default off, it changes the editors' text), checked in the box and again in
   `RteHeadingEditor`. The heading is matched with its place in `bodytext` by `RteHeadings` (the n-th heading of the text,

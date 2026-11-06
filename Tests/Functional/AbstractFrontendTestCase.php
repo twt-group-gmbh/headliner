@@ -20,6 +20,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use Twtgroup\Headliner\Backend\RteHeadingEditor;
 use Twtgroup\Headliner\Backend\StructureBox;
+use Twtgroup\Headliner\Backend\TagField;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
@@ -108,6 +109,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             $this->get(TcaSchemaFactory::class),
             $this->get(UriBuilder::class),
             $this->rteEditor(),
+            new TagField($this->get(TcaSchemaFactory::class)),
         );
     }
 

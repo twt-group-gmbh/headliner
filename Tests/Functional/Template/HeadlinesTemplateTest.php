@@ -119,7 +119,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
     private static function heading(bool $canEditTag, bool $tagInherited, bool $subheader = false, bool $fromText = false): array
     {
         return [
-            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'group' => null, 'groupPosition' => '', 'groupHue' => 0, 'rte' => null, 'tagOptions' => ['h1', 'h2', 'div'], 'editUid' => 5,
+            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'childLabel' => '', 'group' => null, 'groupPosition' => '', 'groupHue' => 0, 'rte' => null, 'tagOptions' => ['h1', 'h2', 'div'], 'editUid' => 5,
             'canOpen' => true, 'canEditTag' => $canEditTag, 'outside' => false, 'subheader' => $subheader, 'fromText' => $fromText,
             'tagInherited' => $tagInherited,
         ];

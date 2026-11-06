@@ -22,13 +22,25 @@ final class EditMark
      */
     public static function forContent(mixed $data, string $field): ?string
     {
+        $uid = self::elementUid($data);
+
+        return $uid !== null ? self::TABLE . ':' . $uid . ':' . $field : null;
+    }
+
+    /**
+     * The uid of the content element the data is of (the translation in a translation), NULL if it is none.
+     *
+     * @param mixed $data See forContent()
+     */
+    public static function elementUid(mixed $data): ?int
+    {
         $uid = match (true) {
             is_array($data) => self::uidOfArray($data),
             $data instanceof RecordInterface => self::uidOfRecord($data),
             default => 0,
         };
 
-        return $uid > 0 ? self::TABLE . ':' . $uid . ':' . $field : null;
+        return $uid > 0 ? $uid : null;
     }
 
     /**

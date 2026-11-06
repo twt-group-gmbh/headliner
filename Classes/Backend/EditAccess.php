@@ -28,6 +28,17 @@ final readonly class EditAccess
      */
     public function canOpen(array $contentRecord): bool
     {
+        return $this->canEditRecord('tt_content', $contentRecord);
+    }
+
+    /**
+     * Whether the backend user may edit the record of a table that is shown on the page (a content element, or the
+     * record of a collection in one): the rules of the page module for its edit buttons.
+     *
+     * @param array<string, mixed> $record
+     */
+    public function canEditRecord(string $table, array $record): bool
+    {
         if ($this->backendUser === null) {
             return false;
         }
@@ -35,10 +46,10 @@ final readonly class EditAccess
             return true;
         }
 
-        return $this->backendUser->check('tables_modify', 'tt_content')
+        return $this->backendUser->check('tables_modify', $table)
             && !($this->pageRecord['editlock'] ?? false)
             && $this->backendUser->doesUserHaveAccess($this->pageRecord, Permission::CONTENT_EDIT)
-            && $this->backendUser->checkRecordEditAccess('tt_content', $contentRecord)->isAllowed;
+            && $this->backendUser->checkRecordEditAccess($table, $record)->isAllowed;
     }
 
     /**
@@ -56,12 +67,21 @@ final readonly class EditAccess
      */
     public function canEditField(array $contentRecord, string $field, bool $excludeField): bool
     {
-        if (!$this->canOpen($contentRecord)) {
+        return $this->canEditFieldOf('tt_content', $contentRecord, $field, $excludeField);
+    }
+
+    /**
+     * @param array<string, mixed> $record A record of that table
+     * @param bool $excludeField Whether the field is an "exclude" field, which needs its own permission
+     */
+    public function canEditFieldOf(string $table, array $record, string $field, bool $excludeField): bool
+    {
+        if (!$this->canEditRecord($table, $record)) {
             return false;
         }
 
         return $this->backendUser?->isAdmin() === true
             || !$excludeField
-            || $this->backendUser?->check('non_exclude_fields', 'tt_content:' . $field) === true;
+            || $this->backendUser?->check('non_exclude_fields', $table . ':' . $field) === true;
     }
 }

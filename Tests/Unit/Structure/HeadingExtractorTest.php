@@ -198,4 +198,36 @@ final class HeadingExtractorTest extends TestCase
             (new HeadingExtractor())->extract($html, 'main')
         );
     }
+
+    #[Test]
+    public function takesTheContentElementFromTheMarkOfTheHeading(): void
+    {
+        // a Content Block has no frame with an id: the headings name their element themselves
+        $html = '<body><section><h2 data-headliner-element="82" data-headliner-edit="tt_content:82:header_tag">Cards</h2>'
+            . '<article><h3 data-headliner-element="82" data-headliner-edit="cards:7:tag">First</h3></article></section></body>';
+
+        self::assertEquals(
+            [new Heading(2, 'Cards', 'tt_content:82:header_tag', 82), new Heading(3, 'First', 'cards:7:tag', 82)],
+            (new HeadingExtractor())->extract($html)
+        );
+    }
+
+    #[Test]
+    public function theMarkOfTheHeadingWinsOverTheFrameAroundIt(): void
+    {
+        $html = '<body><div id="c5"><h2 data-headliner-element="82">Inner</h2><h2>Plain</h2></div></body>';
+
+        self::assertEquals(
+            [new Heading(2, 'Inner', null, 82), new Heading(2, 'Plain', null, 5)],
+            (new HeadingExtractor())->extract($html)
+        );
+    }
+
+    #[Test]
+    public function aMarkThatIsNoUidIsIgnored(): void
+    {
+        $html = '<body><div id="c5"><h2 data-headliner-element="abc">A</h2><h2 data-headliner-element="0">B</h2></div></body>';
+
+        self::assertEquals([new Heading(2, 'A', null, 5), new Heading(2, 'B', null, 5)], (new HeadingExtractor())->extract($html));
+    }
 }

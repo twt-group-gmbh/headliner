@@ -129,4 +129,24 @@ final class EditAccessTest extends TestCase
 
         self::assertFalse($access->canEditField(self::CONTENT, 'bodytext', false));
     }
+
+    #[Test]
+    public function aRecordOfAnotherTableNeedsTheRightToModifyThatTable(): void
+    {
+        // a card of a Content Block: the editor may modify content elements, but not that table
+        $access = new EditAccess($this->user(checks: ['tables_modify:tt_content' => true]), ['uid' => 2]);
+
+        self::assertTrue($access->canEditRecord('tt_content', self::CONTENT));
+        self::assertFalse($access->canEditRecord('cards', ['uid' => 7, 'pid' => 2]));
+    }
+
+    #[Test]
+    public function aFieldOfAnotherTableFollowsTheSameRules(): void
+    {
+        $access = new EditAccess($this->user(checks: ['tables_modify:cards' => true]), ['uid' => 2]);
+
+        self::assertTrue($access->canEditFieldOf('cards', ['uid' => 7, 'pid' => 2], 'tag', false));
+        // an "exclude" field needs its own permission, named by table and field
+        self::assertFalse($access->canEditFieldOf('cards', ['uid' => 7, 'pid' => 2], 'tag', true));
+    }
 }

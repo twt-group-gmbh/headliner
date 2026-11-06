@@ -20,6 +20,16 @@ final class HeadingTest extends TestCase
         );
     }
 
+    #[Test]
+    public function describesTheRecordOfAnotherTableToo(): void
+    {
+        // the record of a collection of a Content Block (a card); whether it is a field for a tag is for the box to say
+        self::assertSame(
+            ['table' => 'cards', 'uid' => 7, 'field' => 'tag'],
+            (new Heading(3, 'First card', 'cards:7:tag'))->editTarget()
+        );
+    }
+
     /**
      * @return iterable<string, array{string|null}>
      */
@@ -32,7 +42,9 @@ final class HeadingTest extends TestCase
         yield 'zero uid' => ['tt_content:0:header_tag'];
         yield 'negative uid' => ['tt_content:-3:header_tag'];
         yield 'too many parts' => ['tt_content:1:header_tag:x'];
-        yield 'other table' => ['be_users:1:password'];
+        yield 'upper case table' => ['Cards:1:tag'];
+        yield 'table with a dash' => ['my-table:1:tag'];
+        yield 'no table' => [':1:tag'];
     }
 
     #[Test]

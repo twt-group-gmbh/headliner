@@ -50,8 +50,8 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     {
         $html = $this->render(true, self::content());
 
-        self::assertStringContainsString('<h2 class="ce-headline-layout-2" data-headliner-edit="tt_content:12:header_tag">Header</h2>', $html);
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag">Subheader</h3>', $html);
+        self::assertStringContainsString('<h2 class="ce-headline-layout-2" data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Header</h2>', $html);
+        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag" data-headliner-element="12">Subheader</h3>', $html);
     }
 
     #[Test]
@@ -67,7 +67,7 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     {
         $html = $this->render(true, self::content());
 
-        self::assertStringContainsString('<h4 data-headliner-edit="tt_content:99:header_tag">Explicit</h4>', $html);
+        self::assertStringContainsString('<h4 data-headliner-edit="tt_content:99:header_tag" data-headliner-element="12">Explicit</h4>', $html);
     }
 
     #[Test]
@@ -98,7 +98,28 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
 
         $html = $this->render(true, $record);
 
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:header_tag">Header</h2>', $html);
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag">Subheader</h3>', $html);
+        self::assertStringContainsString('data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Header</h2>', $html);
+        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag" data-headliner-element="12">Subheader</h3>', $html);
+    }
+
+    #[Test]
+    public function everyHeadingNamesItsContentElementForThePageModule(): void
+    {
+        $html = $this->render(true, self::content());
+
+        // also the one with an explicit edit: it can be the record of a collection, the element is still the one of data
+        self::assertSame(3, substr_count($html, 'data-headliner-element="12"'));
+    }
+
+    #[Test]
+    public function aVisitorGetsNoElementMarkEither(): void
+    {
+        self::assertStringNotContainsString('data-headliner-element', $this->render(false, self::content()));
+    }
+
+    #[Test]
+    public function withoutDataThereIsNoElementMark(): void
+    {
+        self::assertStringNotContainsString('data-headliner-element', $this->render(true, []));
     }
 }

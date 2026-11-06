@@ -70,4 +70,14 @@ final class EditMarkTest extends TestCase
         self::assertNull(EditMark::forContent(self::record('cards', 7), 'header_tag'));
         self::assertNull(EditMark::forContent(self::record('pages', 1), 'header_tag'));
     }
+
+    #[Test]
+    public function namesTheContentElementItself(): void
+    {
+        self::assertSame(12, EditMark::elementUid(['uid' => 12, 'CType' => 'text']));
+        self::assertSame(40, EditMark::elementUid(['uid' => 12, '_LOCALIZED_UID' => 40, 'CType' => 'text']));
+        self::assertSame(12, EditMark::elementUid(self::record('tt_content.text', 12)));
+        self::assertNull(EditMark::elementUid(self::record('cards', 7)));
+        self::assertNull(EditMark::elementUid(null));
+    }
 }
