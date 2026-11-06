@@ -104,4 +104,45 @@ final class InspectRequestTest extends TestCase
 
         self::assertFalse($this->context->getPropertyFromAspect('visibility', 'includeHiddenPages'));
     }
+
+    #[Test]
+    public function aMarkedRequestWithATimeSimulatesThatTimeForTheStartAndEndTimesOfPages(): void
+    {
+        $oldGlobals = [$GLOBALS['SIM_EXEC_TIME'] ?? null, $GLOBALS['SIM_ACCESS_TIME'] ?? null];
+        try {
+            (new InspectRequest($this->context))->process(
+                (new ServerRequest())
+                    ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                    ->withAttribute(InspectRequest::TIME_ATTRIBUTE, 1_800_000_090),
+                $this->handler()
+            );
+
+            self::assertSame(1_800_000_090, $this->context->getPropertyFromAspect('date', 'timestamp'));
+            self::assertSame(1_800_000_090, $GLOBALS['SIM_EXEC_TIME']);
+            // like the preview of the core: the access time is rounded down to the minute
+            self::assertSame(1_800_000_060, $GLOBALS['SIM_ACCESS_TIME']);
+        } finally {
+            [$GLOBALS['SIM_EXEC_TIME'], $GLOBALS['SIM_ACCESS_TIME']] = $oldGlobals;
+        }
+    }
+
+    #[Test]
+    public function withoutATimeTheTimeIsLeftAlone(): void
+    {
+        $before = $this->context->getPropertyFromAspect('date', 'timestamp');
+
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::ATTRIBUTE, true), $this->handler());
+
+        self::assertSame($before, $this->context->getPropertyFromAspect('date', 'timestamp'));
+    }
+
+    #[Test]
+    public function aTimeWithoutTheMarkIsIgnored(): void
+    {
+        $before = $this->context->getPropertyFromAspect('date', 'timestamp');
+
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::TIME_ATTRIBUTE, 1_800_000_090), $this->handler());
+
+        self::assertSame($before, $this->context->getPropertyFromAspect('date', 'timestamp'));
+    }
 }

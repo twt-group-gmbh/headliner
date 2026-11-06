@@ -16,6 +16,9 @@
             <trans-unit id="fromText"><source>From the text of this element</source><target>Aus dem Text dieses Elements</target></trans-unit>
             <trans-unit id="untranslated"><source>The page is not translated into this language.</source><target>Die Seite ist in dieser Sprache nicht übersetzt.</target></trans-unit>
             <trans-unit id="hiddenPage"><source>The page is hidden. The structure shows how it will look when the page is published.</source><target>Die Seite ist versteckt. Die Struktur zeigt, wie sie nach der Veröffentlichung aussieht.</target></trans-unit>
+            <trans-unit id="publicationNotYet"><source>The page is not published yet (from %s). The structure shows how it will look from then on.</source><target>Die Seite ist noch nicht veröffentlicht (ab %s). Die Struktur zeigt, wie sie ab dann aussieht.</target></trans-unit>
+            <trans-unit id="publicationExpired"><source>The page is no longer published (until %s). The structure shows how it looked shortly before it ended.</source><target>Die Seite ist nicht mehr veröffentlicht (bis %s). Die Struktur zeigt, wie sie kurz vor dem Ende aussah.</target></trans-unit>
+            <trans-unit id="publicationNever"><source>The page can never be shown: its end time is not after its start time.</source><target>Die Seite kann nie angezeigt werden: Ihre Endzeit liegt nicht nach der Startzeit.</target></trans-unit>
             <trans-unit id="empty"><source>(empty heading)</source><target>(leere Überschrift)</target></trans-unit>
             <trans-unit id="noHeadings"><source>The page has no headings.</source><target>Die Seite hat keine Überschriften.</target></trans-unit>
             <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source><target>Das Frontend dieser Seite konnte nicht geladen werden, daher können die Überschriften nicht angezeigt werden.</target></trans-unit>

@@ -99,4 +99,44 @@ final class InspectionTest extends AbstractFrontendTestCase
 
         self::assertSame(404, $response->getStatusCode());
     }
+
+    #[Test]
+    public function aPageThatStartsLaterAndOneThatHasEndedAreGoneForAVisitor(): void
+    {
+        $this->writeSite();
+
+        self::assertSame(404, $this->executeFrontendSubRequest(new InternalRequest('https://website.local/starts-later'))->getStatusCode());
+        self::assertSame(404, $this->executeFrontendSubRequest(new InternalRequest('https://website.local/ended'))->getStatusCode());
+    }
+
+    #[Test]
+    public function aMarkedRequestWithoutATimeStillGetsNothingOfThem(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/starts-later'))->withAttribute(InspectRequest::ATTRIBUTE, true);
+
+        self::assertSame(404, $this->executeFrontendSubRequest($request)->getStatusCode());
+    }
+
+    #[Test]
+    public function aMarkedRequestWithTheStartTimeRendersThePageThatStartsLater(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/starts-later'))
+            ->withAttribute(InspectRequest::ATTRIBUTE, true)
+            ->withAttribute(InspectRequest::TIME_ATTRIBUTE, 4102444800);
+
+        self::assertStringContainsString('Starts later</h2>', $this->render($request));
+    }
+
+    #[Test]
+    public function aMarkedRequestJustBeforeTheEndTimeRendersThePageThatHasEnded(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/ended'))
+            ->withAttribute(InspectRequest::ATTRIBUTE, true)
+            ->withAttribute(InspectRequest::TIME_ATTRIBUTE, 1000000000 - 1);
+
+        self::assertStringContainsString('Has ended</h2>', $this->render($request));
+    }
 }

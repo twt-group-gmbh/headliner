@@ -94,6 +94,9 @@ Tests split into two suites by what they need to boot:
   cannot set it (no header, no secret). That markup must never be cached or shown to visitors.
   For such a request `InspectRequest` also includes hidden pages (not hidden content) in the visibility, so a page that is
   not published yet can be checked; it must run before `page-resolver`, where a hidden page is turned down.
+  With the attribute `headliner.inspect.time` it also simulates that time (date aspect plus the globals `SIM_EXEC_TIME` and
+  `SIM_ACCESS_TIME`, which the start/end time restrictions read), computed by `PublicationTime` from the root line. The
+  fetcher puts those globals back.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

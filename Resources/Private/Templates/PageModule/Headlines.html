@@ -38,6 +38,12 @@
                                 <f:if condition="{section.hidden}">
                                     <div class="alert alert-info"><f:translate key="{l}hiddenPage" /></div>
                                 </f:if>
+                                <f:if condition="{section.publication} == 'notYet'">
+                                    <div class="alert alert-info"><f:translate key="{l}publicationNotYet" arguments="{0: section.publicationFrom}" /></div>
+                                </f:if>
+                                <f:if condition="{section.publication} == 'expired'">
+                                    <div class="alert alert-info"><f:translate key="{l}publicationExpired" arguments="{0: section.publicationUntil}" /></div>
+                                </f:if>
                                 <f:if condition="{section.hasHeadings}">
                                     <f:then>
                                         <f:for each="{section.pageIssues}" as="issue">
@@ -103,7 +109,14 @@
                                 </f:if>
                             </f:then>
                             <f:else>
-                                <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
+                                <f:if condition="{section.publication} == 'never'">
+                                    <f:then>
+                                        <div class="alert alert-warning"><f:translate key="{l}publicationNever" /></div>
+                                    </f:then>
+                                    <f:else>
+                                        <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
+                                    </f:else>
+                                </f:if>
                             </f:else>
                         </f:if>
                     </f:else>

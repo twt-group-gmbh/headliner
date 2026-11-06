@@ -93,6 +93,12 @@ What is checked, and what is not
 *   A **hidden** page is rendered too, so you can check its structure before it is published. The box says
     :guilabel:`The page is hidden` and shows how the page will look when it is published. Hidden content elements are not
     part of it, a visitor would not see them either.
-*   Pages with a **start or end time** or a **frontend user group**, and workspace versions, are not simulated. The box
-    then says that the frontend could not be loaded.
+*   A page with a **start or end time** is rendered at a time when it is published: a page that starts later at its
+    start time, a page that has ended shortly before its end time. Start and end times of parent pages that extend to
+    their subpages count too. The box says :guilabel:`The page is not published yet (from ...)` or
+    :guilabel:`The page is no longer published (until ...)`, and shows how the page looks then. If the end time is not
+    after the start time, there is no such moment and the box says that the page can never be shown. Content elements
+    with their own times are judged at the same moment, so one that starts later is missing in the preview.
+*   Pages with a **frontend user group** and workspace versions are not simulated. The box then says that the frontend
+    could not be loaded.
 *   Only standard pages are checked.

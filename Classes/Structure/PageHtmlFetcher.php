@@ -33,9 +33,10 @@ final readonly class PageHtmlFetcher
     ) {}
 
     /**
+     * @param int|null $simulatedTime Render the page at this time (for a page with a start or end time); see InspectRequest
      * @return string|null The HTML, NULL if the page could not be rendered
      */
-    public function fetch(UriInterface $uri): ?string
+    public function fetch(UriInterface $uri, ?int $simulatedTime = null): ?string
     {
         // - $GLOBALS['BE_USER'] becomes null (the sub-request carries no backend cookie), which breaks session based
         //   flash messages afterwards;
@@ -48,6 +49,8 @@ final readonly class PageHtmlFetcher
         $backendUser = $GLOBALS['BE_USER'] ?? null;
         $originalRequest = $GLOBALS['TYPO3_REQUEST'] ?? null;
         $languageService = $GLOBALS['LANG'] ?? null;
+        // the simulated time of the frontend: set only if there was none, so what was not there is removed again
+        $simulatedTimes = array_intersect_key($GLOBALS, array_flip(['SIM_EXEC_TIME', 'SIM_ACCESS_TIME']));
         $pageRenderer = $this->getPageRenderer();
         $pageRendererState = $pageRenderer !== null ? clone $pageRenderer : null;
         $context = GeneralUtility::makeInstance(Context::class);
@@ -63,7 +66,8 @@ final readonly class PageHtmlFetcher
                 ->withQueryParams([])
                 ->withUri($uri)
                 ->withMethod('GET')
-                ->withAttribute(InspectRequest::ATTRIBUTE, true);
+                ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                ->withAttribute(InspectRequest::TIME_ATTRIBUTE, $simulatedTime);
             $response = $this->requestHandler->handle($request);
 
             return $response->getStatusCode() === 200 ? (string) $response->getBody() : null;
@@ -78,6 +82,13 @@ final readonly class PageHtmlFetcher
             }
             if ($languageService !== null) {
                 $GLOBALS['LANG'] = $languageService;
+            }
+            foreach (['SIM_EXEC_TIME', 'SIM_ACCESS_TIME'] as $key) {
+                if (array_key_exists($key, $simulatedTimes)) {
+                    $GLOBALS[$key] = $simulatedTimes[$key];
+                } else {
+                    unset($GLOBALS[$key]);
+                }
             }
             foreach ($aspects as $name => $aspect) {
                 $context->setAspect($name, $aspect);

@@ -30,6 +30,8 @@ final class PageHtmlFetcherTest extends TestCase
             'BE_USER' => $GLOBALS['BE_USER'] ?? null,
             'TYPO3_REQUEST' => $GLOBALS['TYPO3_REQUEST'] ?? null,
             'EXEC_TIME' => $GLOBALS['EXEC_TIME'] ?? null,
+            'SIM_EXEC_TIME' => $GLOBALS['SIM_EXEC_TIME'] ?? null,
+            'SIM_ACCESS_TIME' => $GLOBALS['SIM_ACCESS_TIME'] ?? null,
         ];
         // the date aspect of the Context reads it; the application sets it in real life
         $GLOBALS['EXEC_TIME'] = time();
@@ -42,6 +44,13 @@ final class PageHtmlFetcherTest extends TestCase
         $GLOBALS['BE_USER'] = $this->globalsBackup['BE_USER'];
         $GLOBALS['TYPO3_REQUEST'] = $this->globalsBackup['TYPO3_REQUEST'];
         $GLOBALS['EXEC_TIME'] = $this->globalsBackup['EXEC_TIME'];
+        foreach (['SIM_EXEC_TIME', 'SIM_ACCESS_TIME'] as $key) {
+            if ($this->globalsBackup[$key] === null) {
+                unset($GLOBALS[$key]);
+            } else {
+                $GLOBALS[$key] = $this->globalsBackup[$key];
+            }
+        }
     }
 
     private function handler(\Closure $callback): RecordingRequestHandler
@@ -138,5 +147,44 @@ final class PageHtmlFetcherTest extends TestCase
         (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
 
         self::assertSame($backendUser, $GLOBALS['BE_USER']);
+    }
+
+    #[Test]
+    public function passesTheSimulatedTimeOnToTheFrontend(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), 1_800_000_000);
+
+        self::assertSame(1_800_000_000, $handler->receivedRequest()->getAttribute(InspectRequest::TIME_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function sendsNoTimeUnlessOneIsGiven(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
+
+        self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::TIME_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function putsBackTheSimulatedTimeTheFrontendSet(): void
+    {
+        $GLOBALS['SIM_EXEC_TIME'] = 111;
+        unset($GLOBALS['SIM_ACCESS_TIME']);
+
+        $handler = $this->handler(static function (): ResponseInterface {
+            $GLOBALS['SIM_EXEC_TIME'] = 1_800_000_000;
+            $GLOBALS['SIM_ACCESS_TIME'] = 1_799_999_940;
+
+            return new Response();
+        });
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), 1_800_000_000);
+
+        self::assertSame(111, $GLOBALS['SIM_EXEC_TIME']);
+        self::assertArrayNotHasKey('SIM_ACCESS_TIME', $GLOBALS);
     }
 }

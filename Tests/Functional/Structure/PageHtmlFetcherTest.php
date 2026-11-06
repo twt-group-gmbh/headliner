@@ -66,4 +66,21 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
 
         self::assertNull($this->fetcher()->fetch(new Uri('https://website.local/does-not-exist')));
     }
+
+    #[Test]
+    public function rendersAPageThatStartsLaterAtItsStartTimeAndPutsTheTimeBack(): void
+    {
+        $this->writeSite();
+        unset($GLOBALS['SIM_EXEC_TIME'], $GLOBALS['SIM_ACCESS_TIME']);
+        $uri = new Uri('https://website.local/starts-later');
+
+        self::assertNull($this->fetcher()->fetch($uri));
+        $html = $this->fetcher()->fetch($uri, 4102444800);
+
+        self::assertNotNull($html);
+        self::assertStringContainsString('Starts later</h2>', $html);
+        // the simulated time must not stay behind in the backend request
+        self::assertArrayNotHasKey('SIM_EXEC_TIME', $GLOBALS);
+        self::assertArrayNotHasKey('SIM_ACCESS_TIME', $GLOBALS);
+    }
 }

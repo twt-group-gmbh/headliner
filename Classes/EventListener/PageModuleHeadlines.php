@@ -19,6 +19,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use Twtgroup\Headliner\Backend\EditAccess;
+use Twtgroup\Headliner\Backend\PublicationState;
+use Twtgroup\Headliner\Backend\PublicationTime;
 use Twtgroup\Headliner\Backend\SelectedLanguages;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Structure\Heading;
@@ -188,6 +190,9 @@ final readonly class PageModuleHeadlines
             'loaded' => false,
             'untranslated' => false,
             'hidden' => (bool) ($page['hidden'] ?? false),
+            'publication' => PublicationState::Published->value,
+            'publicationFrom' => '',
+            'publicationUntil' => '',
             'hasHeadings' => false,
             'headings' => [],
             'pageIssues' => [],
@@ -207,7 +212,21 @@ final readonly class PageModuleHeadlines
             $section['hidden'] = true;
         }
 
-        $html = $this->fetcher->fetch($site->getRouter()->generateUri($pageId, ['_language' => $languageId]));
+        // A page with a start or end time is rendered at a time when it is published
+        $publication = PublicationTime::forRootLine(
+            array_values(BackendUtility::BEgetRootLine($pageId)),
+            $pageId,
+            (int) $GLOBALS['EXEC_TIME'],
+            $translation[0] ?? null
+        );
+        $section['publication'] = $publication->state->value;
+        $section['publicationFrom'] = $publication->start > 0 ? date('Y-m-d H:i', $publication->start) : '';
+        $section['publicationUntil'] = $publication->end > 0 ? date('Y-m-d H:i', $publication->end) : '';
+        if ($publication->state === PublicationState::Never) {
+            return $section;
+        }
+
+        $html = $this->fetcher->fetch($site->getRouter()->generateUri($pageId, ['_language' => $languageId]), $publication->simulatedTime);
         if ($html === null) {
             return $section;
         }

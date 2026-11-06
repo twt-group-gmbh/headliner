@@ -31,6 +31,10 @@ First release.
 - Page module, hidden pages: a hidden page is rendered too, so its structure can be checked before it is published. The
   box says that the page is hidden. Hidden content elements stay out, as they do for a visitor. A request from outside
   still gets a 404 for a hidden page.
+- Page module, start and end time: a page whose start time is still to come, or whose end time is over, is rendered at
+  a time when it is published (its start time, or a second before its end time), so its structure can be checked. Start
+  and end times of parent pages that extend to their subpages count too. The box says so; if the end time is not after
+  the start time it says that the page can never be shown.
 - Page module, rights: the select and the edit link appear only if the backend user may use them, with the rules of the
   page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
   content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the

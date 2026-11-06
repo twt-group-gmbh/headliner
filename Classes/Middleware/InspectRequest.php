@@ -9,6 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Context\Context;
+use TYPO3\CMS\Core\Context\DateTimeAspect;
+use TYPO3\CMS\Core\Domain\DateTimeFactory;
 use TYPO3\CMS\Frontend\Cache\CacheInstruction;
 
 /**
@@ -17,7 +19,9 @@ use TYPO3\CMS\Frontend\Cache\CacheInstruction;
  * - the headings are rendered with the record they come from;
  * - the page cache is neither read nor written, so the marked markup never reaches a visitor;
  * - a hidden page is rendered too, so the page module can show the structure of a page that is not published yet.
- *   Hidden content elements are not, a visitor would not see them either.
+ *   Hidden content elements are not, a visitor would not see them either;
+ * - with the attribute "headliner.inspect.time" the page is rendered at that time, so a page whose start time is still
+ *   to come, or whose end time is over, can be shown too (the preview of the core does the same with ADMCMD_simTime).
  *
  * The attribute exists only inside the PHP process: a request from outside cannot set it, whatever headers it sends.
  * This middleware has to run before the page is resolved, which is where a hidden page is turned down.
@@ -25,6 +29,8 @@ use TYPO3\CMS\Frontend\Cache\CacheInstruction;
 final readonly class InspectRequest implements MiddlewareInterface
 {
     public const ATTRIBUTE = 'headliner.inspect';
+
+    public const TIME_ATTRIBUTE = 'headliner.inspect.time';
 
     public function __construct(private Context $context) {}
 
@@ -40,6 +46,21 @@ final readonly class InspectRequest implements MiddlewareInterface
         // The frontend application sets the default (no hidden pages) before the middleware stack runs
         $this->context->setAspect('visibility', $this->context->getAspect('visibility')->withIncludeHiddenPages(true));
 
+        $time = $request->getAttribute(self::TIME_ATTRIBUTE);
+        if (is_int($time) && $time > 0) {
+            $this->simulateTime($time);
+        }
+
         return $handler->handle($request->withAttribute('frontend.cache.instruction', $cacheInstruction));
+    }
+
+    /**
+     * The same as the preview of the core does: the date aspect, and the globals the start and end time restrictions read.
+     */
+    private function simulateTime(int $time): void
+    {
+        $GLOBALS['SIM_EXEC_TIME'] = $time;
+        $GLOBALS['SIM_ACCESS_TIME'] = $time - $time % 60;
+        $this->context->setAspect('date', new DateTimeAspect(DateTimeFactory::createFromTimestamp($time)));
     }
 }
