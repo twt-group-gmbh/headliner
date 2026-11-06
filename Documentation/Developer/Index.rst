@@ -56,7 +56,7 @@ where its limits are.
   A mark for a record of another page is a label, so a forged mark cannot make the box change something else. The rights
   of the backend user for the table and the field are checked in the box (`EditAccess`) and again by the DataHandler.
 - *The request attributes `headliner.inspect…`* exist only inside the PHP process that renders the sub-request: no header or
-  parameter from outside sets them, so a request from outside cannot ask for the marks.
+  parameter from outside sets them.
 
 **The routes:** `headliner_structure` (GET) and `headliner_rte_tag` (POST) need a backend login and the request token of the
 core (a request without or with a wrong token gets `401`). The first also needs the right to see the page and the
