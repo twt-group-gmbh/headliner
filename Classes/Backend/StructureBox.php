@@ -310,7 +310,7 @@ final readonly class StructureBox
             return $section;
         }
 
-        $headings = $this->extractor->extract($html, (string) $site->getSettings()->get('headliner.contentSelector', 'main'));
+        $headings = $this->extractor->extract($html, (string) $site->getSettings()->get('headliner.contentSelector', ''));
         $issues = $this->validator->validate($headings);
         $section['loaded'] = true;
         $section['hasHeadings'] = $headings !== [];

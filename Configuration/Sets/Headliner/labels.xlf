@@ -20,8 +20,8 @@
 			</trans-unit>
 			<trans-unit id="settings.description.headliner.contentSelector">
 				<source>
-					CSS selector of the content of the page, for example "main" or "#content". Only the headings in it are checked; headings in the header, the menu and the footer are shown, but not
-					checked. Without a match, or if empty, the whole page is checked.
+					CSS selector of the content of the page, for example "main" or "#content". The headings in it are checked; of the headings in the header, the menu and the footer
+					only the H1 counts. Without a match, or if empty (the default), the whole page is checked.
 				</source>
 			</trans-unit>
 		</body>

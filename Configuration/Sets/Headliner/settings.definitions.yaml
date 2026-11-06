@@ -8,5 +8,5 @@ settings:
     category: headliner
   headliner.contentSelector:
     type: string
-    default: main
+    default: ''
     category: headliner

@@ -54,6 +54,12 @@ echo "› configuring trusted hosts in settings.php"
 # deliberately uneven heading structure: an H2 followed by an H4 (skipped level) and a "div" header.
 echo "› enabling the site sets and seeding demo content"
 SITE_CONFIG="$(ls config/sites/*/config.yaml | head -1)"
+# The demo's content is in <main>
+cat >> "$(dirname "${SITE_CONFIG}")/settings.yaml" <<'SETTINGS'
+
+headliner:
+  contentSelector: main
+SETTINGS
 # A header and a footer with an h2 each around the content, which is in <main>, as in most themes: the box shows the
 # headings around the content (site setting headliner.contentSelector) very pale and does not check them. An h1 in the
 # header would count as the h1 of the page, so the pages with one h1 in their content would have two.

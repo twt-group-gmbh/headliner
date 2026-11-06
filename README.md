@@ -18,7 +18,7 @@ A hidden page is rendered too, so you can check its structure before it is publi
 is hidden. The same goes for a page with a start time that has not come yet or an end time that is over: it is
 rendered at a time when it is published, and the box says so. A page for frontend user groups is rendered as a member of them. In a workspace the box shows the versions of that workspace.
 
-The content of the page is the elements of the site setting `headliner.contentSelector` (default `main`). Headings in
+The content of the page is the elements of the site setting `headliner.contentSelector` (empty by default: the whole page). Headings in
 the header, the menu and the footer are shown very pale, and only their H1 counts: an H1 outside of the content is an H1
 of the page, even if the editor cannot change it, so it can make a second H1 or be the one H1 of the page. Their other
 levels cause no problem. Without such an element the whole page is checked.
@@ -72,7 +72,7 @@ existing pages do not change until an editor chooses a tag.
 | Setting                      | Default | Description |
 |------------------------------|---------|-------------|
 | `headliner.subheader.enabled` | on      | Show the field *Subheader tag*. If switched off for a site, it is hidden in the backend and the subheader follows the tag of the header. |
-| `headliner.contentSelector`   | `main`  | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
+| `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
 
 ## Requirements
 

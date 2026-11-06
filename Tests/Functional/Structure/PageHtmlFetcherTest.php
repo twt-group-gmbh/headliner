@@ -174,7 +174,7 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
     }
 
     #[Test]
-    public function theSiteSettingForTheContentIsMainByDefaultAndCanBeChanged(): void
+    public function theSiteSettingForTheContentIsEmptyByDefaultAndCanBeChanged(): void
     {
         $this->writeSite();
         $default = $this->get(SiteFinder::class)->getSiteByIdentifier('test')->getSettings()->get('headliner.contentSelector');
@@ -182,7 +182,8 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
         $this->writeSite(['headliner' => ['contentSelector' => '#content']]);
         $changed = $this->get(SiteFinder::class)->getSiteByIdentifier('test')->getSettings()->get('headliner.contentSelector');
 
-        self::assertSame('main', $default);
+        // empty: the whole page is checked
+        self::assertSame('', $default);
         self::assertSame('#content', $changed);
     }
 }

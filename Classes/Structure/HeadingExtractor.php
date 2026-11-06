@@ -14,7 +14,7 @@ use Symfony\Component\CssSelector\Exception\ExceptionInterface;
 final class HeadingExtractor
 {
     /**
-     * @param string|null $contentSelector CSS selector of the content of the page (usually "main"). Headings outside of the
+     * @param string|null $contentSelector CSS selector of the content of the page (for example "main"). Headings outside of the
      *     elements it matches are marked as outside. Without a selector, with an invalid one, or if it matches nothing,
      *     the whole page is the content.
      * @return list<Heading>

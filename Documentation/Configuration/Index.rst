@@ -34,21 +34,21 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
 ..  confval:: headliner.contentSelector
     :name: headliner-contentselector
     :type: string
-    :Default: main
+    :Default: (empty)
 
-    A CSS selector for the content of the page, for example `main`, `#content` or `.page-content`. The headings in
-    the elements it matches are checked. Headings in the header, the menu and the footer are shown very pale (the
+    A CSS selector for the content of the page, for example `main`, `#content` or `.page-content`. Empty by default:
+    then the whole page is the content. If it is set, the headings in the elements it matches are checked. Headings in the header, the menu and the footer are shown very pale (the
     tooltip says :guilabel:`Outside the content`); only their H1 counts, because the page has that H1, and their other
     levels cause no problem.
 
     If the page has no element that matches, or if the setting is empty or not a valid selector, the whole page is
-    checked.
+    checked. Use `main` if your theme puts the content of the page in a `<main>` element.
 
 ..  code-block:: yaml
     :caption: config/sites/<identifier>/settings.yaml
 
     headliner:
-      contentSelector: '#content'
+      contentSelector: 'main'
 
 ..  _configuration-extension:
 

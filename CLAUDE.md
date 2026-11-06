@@ -91,7 +91,7 @@ Tests split into two suites by what they need to boot:
   element `typo3-backend-contextual-record-edit-trigger`), so it slides in from the right like the core's own edit
   buttons. Do not build edit URLs by hand.
 - The content of the page is what is checked: `HeadingExtractor::extract($html, $selector)` marks headings that are not in the
-  elements of the site setting `headliner.contentSelector` (default `main`) as `outside`; `HeadingValidator` skips their levels except h1 (an h1 outside counts for
+  elements of the site setting `headliner.contentSelector` (empty by default: the whole page) as `outside`; `HeadingValidator` skips their levels except h1 (an h1 outside counts for
   missing and multiple h1, even if it cannot be edited), the box shows them very pale (not if they have a problem). No match, an empty or an invalid selector: the whole page (never show nothing). `symfony/css-selector`
   (a requirement) turns the selector into XPath.
 - What a backend user may do in the box is decided by `EditAccess`, with the rules of the page module's own edit buttons
