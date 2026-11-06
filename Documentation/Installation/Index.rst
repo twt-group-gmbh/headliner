@@ -35,9 +35,10 @@ You can also select the set in :guilabel:`Sites > Setup`.
 
 ..  note::
 
-    Content that was created before the extension is installed has no tag yet. It keeps the behaviour of
-    `fluid_styled_content` (layout 1 to 6 means H1 to H6), so existing pages do not change until an editor chooses a
-    tag.
+    Content that was created before the extension is installed has no tag: the field :guilabel:`Tag` is empty, which is
+    the choice :guilabel:`From the layout (as before)`. It keeps the behaviour of `fluid_styled_content` (layout 1 to 6
+    means H1 to H6), so existing pages do not change until an editor chooses a tag. The database column has an empty
+    default for this, so adding it changes nothing in the existing content.
 
 ..  _installation-database:
 

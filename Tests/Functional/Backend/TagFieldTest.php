@@ -48,6 +48,15 @@ final class TagFieldTest extends FunctionalTestCase
     }
 
     #[Test]
+    public function theEmptyChoiceOfTheTagFieldsIsNoTagAndDoesNotMakeThemNoTagField(): void
+    {
+        // header_tag has the choice "from the layout" with the empty value: that is no tag, but no other field either
+        self::assertTrue($this->tagField()->is('tt_content', 'header_tag'));
+        self::assertTrue($this->tagField()->is('tt_content', 'subheader_tag'));
+        self::assertNotContains('', $this->tagField()->options('tt_content', 'header_tag'));
+    }
+
+    #[Test]
     public function offersTheTagsTheFieldKnows(): void
     {
         self::assertSame(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div'], $this->tagField()->options('tt_content', 'header_tag'));

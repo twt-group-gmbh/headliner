@@ -34,7 +34,7 @@ The headings are read from the rendered frontend of the page, which is rendered 
 There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter. Headings
 from content elements, RTE content and other extensions are included without any configuration. Only standard pages are checked.
 
-Content elements get the field **Tag** (H1-H6 or div, default H2). It decides the HTML tag of the header, so the
+Content elements get the field **Tag** (H1-H6 or div, or "from the layout" as the default, which is what content did before). It decides the HTML tag of the header, so the
 heading hierarchy can be fixed without touching the look: the layout (**Type**) only sets the CSS class
 `ce-headline-layout-N`. The field **Subheader tag** does the same for the subheader and offers
 the same choices; the subheader has no layout of its own, it looks like its header (and "Hidden" hides both). Without
@@ -67,8 +67,8 @@ via the Extension Manager.
 ## Setup
 
 Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
-header partial of `fluid_styled_content`. Content without a Tag keeps the old behaviour (layout 1-6 = H1-H6), so
-existing pages do not change until an editor chooses a tag.
+header partial of `fluid_styled_content`. Content without a Tag (the field is empty by default, also in the database) keeps the old
+behaviour (layout 1-6 = H1-H6), so existing pages do not change until an editor chooses a tag.
 
 ### Site setting
 

@@ -9,6 +9,12 @@
 			<trans-unit id="tt_content.subheader_tag">
 				<source>Subheader tag</source>
 			</trans-unit>
+			<trans-unit id="tt_content.header_tag.layout">
+				<source>From the layout (as before)</source>
+			</trans-unit>
+			<trans-unit id="tt_content.subheader_tag.below">
+				<source>One level below the header</source>
+			</trans-unit>
 			<trans-unit id="tt_content.header_tag.h1">
 				<source>H1</source>
 			</trans-unit>

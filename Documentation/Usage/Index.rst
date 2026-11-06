@@ -47,14 +47,15 @@ The fields of a content element
 ===============================
 
 :guilabel:`Tag` (`header_tag`)
-    H1 to H6 or `div`. Default H2. Decides the HTML tag of the header.
+    H1 to H6 or `div`, or :guilabel:`From the layout (as before)`, which is the default and means: layout 1 to 6 is H1 to
+    H6, otherwise the tag of the setting `defaultHeaderType` (H2 in the default setup). Decides the HTML tag of the header.
 
 :guilabel:`Type` (`header_layout`)
     The core field. It only decides how the header looks: the CSS class `ce-headline-layout-N` (N is 1 to 6).
     "Default" and "Hidden" set no class; "Hidden" hides the header.
 
 :guilabel:`Subheader tag` (`subheader_tag`)
-    Like :guilabel:`Tag`, for the subheader. Default H3.
+    Like :guilabel:`Tag`, for the subheader. The default is :guilabel:`One level below the header`.
 
 The subheader has no layout of its own: it has the layout class of its header, and the layout "Hidden" of the header
 hides both.

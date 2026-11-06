@@ -18,8 +18,8 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  * (`header_type`, 0 to 6) becomes the tag of the header (`header_tag`). The layout (`header_layout`) is the same field in
  * both and stays as it is. The Semantilizer has no field for the subheader, so the subheader is not touched.
  *
- * It only fills what is still the default of the field or empty: a tag that somebody chose after headliner was installed
- * is kept. It works on the column `header_type` of the table, which stays in the database after the Semantilizer is
+ * It only fills what is empty, which is what the field is until somebody chooses a tag: a tag in it, also an h2, was chosen
+ * after headliner was installed and is kept. It works on the column `header_type` of the table, which stays in the database after the Semantilizer is
  * removed (until the unused columns are deleted), so it can run after it. It can run again.
  */
 #[UpgradeWizard('headlinerMigrateSemantilizerFields')]
@@ -29,9 +29,6 @@ final class MigrateSemantilizerFields implements UpgradeWizardInterface, Repeata
 
     /** The column the Semantilizer adds */
     private const TYPE_COLUMN = 'header_type';
-
-    /** What the field has when nobody has chosen: the default of the TCA, or nothing */
-    private const DEFAULT_TAG = 'h2';
 
     public function getTitle(): string
     {
@@ -82,7 +79,7 @@ final class MigrateSemantilizerFields implements UpgradeWizardInterface, Repeata
     }
 
     /**
-     * The rows of one type that still have to be changed: the tag is empty or the default, and not the tag of the type
+     * The rows of one type that still have to be changed: the tag is empty (nobody chose one) and not the tag of the type
      * already.
      */
     private function query(int $type): QueryBuilder
@@ -96,8 +93,7 @@ final class MigrateSemantilizerFields implements UpgradeWizardInterface, Repeata
             $expr->eq(self::TYPE_COLUMN, $queryBuilder->createNamedParameter($type, Connection::PARAM_INT)),
             $expr->or(
                 $expr->eq('header_tag', $queryBuilder->createNamedParameter('')),
-                $expr->isNull('header_tag'),
-                $expr->eq('header_tag', $queryBuilder->createNamedParameter(self::DEFAULT_TAG))
+                $expr->isNull('header_tag')
             ),
             $expr->or($expr->isNull('header_tag'), $expr->neq('header_tag', $queryBuilder->createNamedParameter($tag)))
         );

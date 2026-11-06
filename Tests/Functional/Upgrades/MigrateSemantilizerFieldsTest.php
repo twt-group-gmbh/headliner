@@ -69,7 +69,7 @@ final class MigrateSemantilizerFieldsTest extends FunctionalTestCase
     {
         $this->addSemantilizerColumn();
         foreach ([0, 1, 2, 3, 4, 5, 6] as $uid => $type) {
-            $this->insert($uid + 1, ['header_type' => $type, 'header' => 'H', 'header_tag' => 'h2']);
+            $this->insert($uid + 1, ['header_type' => $type, 'header' => 'H', 'header_tag' => '']);
         }
         $wizard = new MigrateSemantilizerFields();
 
@@ -87,15 +87,17 @@ final class MigrateSemantilizerFieldsTest extends FunctionalTestCase
     public function aTagThatAnEditorSetAfterwardsIsNotTouched(): void
     {
         $this->addSemantilizerColumn();
-        // h4 is not the default of the field, so somebody chose it
+        // a tag in the field was chosen by somebody (the field is empty until then), also if it is an h2
         $this->insert(1, ['header_type' => 1, 'header' => 'H', 'header_tag' => 'h4']);
         $this->insert(2, ['header_type' => 3, 'header' => 'H', 'header_tag' => '']);
+        $this->insert(3, ['header_type' => 4, 'header' => 'H', 'header_tag' => 'h2']);
 
         (new MigrateSemantilizerFields())->executeUpdate();
 
         self::assertSame('h4', $this->row(1)['header_tag']);
         // an empty tag is filled
         self::assertSame('h3', $this->row(2)['header_tag']);
+        self::assertSame('h2', $this->row(3)['header_tag']);
     }
 
     #[Test]
@@ -103,9 +105,9 @@ final class MigrateSemantilizerFieldsTest extends FunctionalTestCase
     {
         // the Semantilizer has no field for the subheader, so there is nothing to take over
         $this->addSemantilizerColumn();
-        $this->insert(1, ['header_type' => 1, 'header' => 'H', 'subheader' => 'S', 'header_tag' => 'h2', 'subheader_tag' => 'h3']);
-        $this->insert(2, ['header_type' => 6, 'header' => 'H', 'subheader' => 'S', 'header_tag' => 'h2', 'subheader_tag' => '']);
-        $this->insert(3, ['header_type' => 3, 'header' => 'H', 'subheader' => 'S', 'header_tag' => 'h2', 'subheader_tag' => 'h5']);
+        $this->insert(1, ['header_type' => 1, 'header' => 'H', 'subheader' => 'S', 'header_tag' => '', 'subheader_tag' => 'h3']);
+        $this->insert(2, ['header_type' => 6, 'header' => 'H', 'subheader' => 'S', 'header_tag' => '', 'subheader_tag' => '']);
+        $this->insert(3, ['header_type' => 3, 'header' => 'H', 'subheader' => 'S', 'header_tag' => '', 'subheader_tag' => 'h5']);
 
         (new MigrateSemantilizerFields())->executeUpdate();
 
@@ -131,7 +133,7 @@ final class MigrateSemantilizerFieldsTest extends FunctionalTestCase
     public function canRunAgainAndChangesNothingTheSecondTime(): void
     {
         $this->addSemantilizerColumn();
-        $this->insert(1, ['header_type' => 3, 'header' => 'H', 'header_tag' => 'h2']);
+        $this->insert(1, ['header_type' => 3, 'header' => 'H', 'header_tag' => '']);
         $wizard = new MigrateSemantilizerFields();
         $wizard->executeUpdate();
 

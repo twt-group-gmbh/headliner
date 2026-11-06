@@ -7,7 +7,8 @@ namespace Twtgroup\Headliner\Backend;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 
 /**
- * Whether a field is one for the tag of a heading: a select whose choices are tags and nothing else (h1 to h6, div).
+ * Whether a field is one for the tag of a heading: a select whose choices are tags and nothing else (h1 to h6, div), and
+ * the empty choice that leaves the tag to the layout.
  * The mark `data-headliner-edit="table:uid:field"` is part of the rendered page, and an editor can write to that (in a
  * rich text, for example), so the box only believes it where the field is such a select, and never offers a change to
  * another field.
@@ -45,6 +46,10 @@ final readonly class TagField
         $values = [];
         foreach ($configuration['items'] as $item) {
             $value = is_array($item) ? ($item['value'] ?? null) : null;
+            if ($value === '') {
+                // "from the layout": no tag, and no reason to take the field for another one
+                continue;
+            }
             if (!is_string($value) || !in_array($value, self::TAGS, true)) {
                 // one choice that is no tag, and it is no field for a tag
                 return [];

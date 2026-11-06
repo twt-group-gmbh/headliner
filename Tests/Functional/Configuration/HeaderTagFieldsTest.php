@@ -26,12 +26,14 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function theTagFieldOffersTheHeadingTagsAndDiv(): void
+    public function theTagFieldOffersTheHeadingTagsAndDivAndTheLayoutAsTheDefault(): void
     {
         $column = $GLOBALS['TCA']['tt_content']['columns']['header_tag'];
 
-        self::assertSame(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div'], $this->values($column));
-        self::assertSame('h2', $column['config']['default']);
+        // the empty choice is "from the layout": what content did before it had a tag. It is what a new element has, and what
+        // the elements that were there before the extension was installed have.
+        self::assertSame(['', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div'], $this->values($column));
+        self::assertSame('', $column['config']['default']);
         self::assertTrue($column['exclude']);
     }
 
@@ -41,7 +43,8 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
         $columns = $GLOBALS['TCA']['tt_content']['columns'];
 
         self::assertSame($this->values($columns['header_tag']), $this->values($columns['subheader_tag']));
-        self::assertSame('h3', $columns['subheader_tag']['config']['default']);
+        // empty: one level below the header
+        self::assertSame('', $columns['subheader_tag']['config']['default']);
         self::assertTrue($columns['subheader_tag']['exclude']);
         // the layout of the header decides how the subheader looks, there is no layout of its own
         self::assertArrayNotHasKey('subheader_layout', $columns);
@@ -75,5 +78,27 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
         foreach (['header_tag', 'subheader_tag'] as $column) {
             self::assertTrue($table->hasColumn($column), $column);
         }
+    }
+
+    #[Test]
+    public function theColumnsHaveNoTagUntilSomebodyChoosesOne(): void
+    {
+        // Elements that exist when the extension is installed get the default of the new column. It must be empty: with a
+        // tag in it, the layout of every one of them (h3 for layout 3) would be lost.
+        $table = $this->getConnectionPool()->getConnectionForTable('tt_content')->createSchemaManager()->introspectTable('tt_content');
+
+        self::assertSame('', $table->getColumn('header_tag')->getDefault());
+        self::assertSame('', $table->getColumn('subheader_tag')->getDefault());
+    }
+
+    #[Test]
+    public function aRowThatSetsNoTagHasNone(): void
+    {
+        $connection = $this->getConnectionPool()->getConnectionForTable('tt_content');
+        $connection->insert('tt_content', ['uid' => 1, 'pid' => 1, 'CType' => 'text', 'header' => 'Older', 'header_layout' => 3]);
+
+        $row = $connection->select(['header_tag', 'subheader_tag'], 'tt_content', ['uid' => 1])->fetchAssociative();
+
+        self::assertSame(['header_tag' => '', 'subheader_tag' => ''], $row);
     }
 }

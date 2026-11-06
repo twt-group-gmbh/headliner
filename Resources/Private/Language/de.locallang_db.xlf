@@ -11,6 +11,14 @@
 				<source>Subheader tag</source>
 				<target>Untertitel-Tag</target>
 			</trans-unit>
+			<trans-unit id="tt_content.header_tag.layout">
+				<source>From the layout (as before)</source>
+				<target>Aus dem Layout (wie bisher)</target>
+			</trans-unit>
+			<trans-unit id="tt_content.subheader_tag.below">
+				<source>One level below the header</source>
+				<target>Eine Ebene unter der Überschrift</target>
+			</trans-unit>
 			<trans-unit id="tt_content.header_tag.h1">
 				<source>H1</source>
 				<target>H1</target>

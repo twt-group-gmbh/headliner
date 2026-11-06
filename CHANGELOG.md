@@ -75,11 +75,12 @@ First release.
 - Page module, language: the summary uses the correct singular and plural ("1 issue", "2 issues") and the dates in the
   notes about start and end time are shown in the format of the language of the backend user, not as ISO dates.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
-- Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default H2) decides the HTML tag of the header. The
+- Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default "from the layout") decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The
   subheader is rendered one level below the header. Provided as a partial override for `fluid_styled_content`
-  through the site set `twtgroup/headliner`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6).
-- Content elements with a subheader: the field "Subheader tag" (`subheader_tag`, default H3) inherits the choices of
+  through the site set `twtgroup/headliner`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6). The field is empty by default, in the TCA and as the
+  default of the database column, so installing the extension changes nothing in existing content.
+- Content elements with a subheader: the field "Subheader tag" (`subheader_tag`, default "one level below the header") inherits the choices of
   `header_tag`. The subheader has no layout of its own: it looks like its header (the CSS class `ce-headline-layout-N`
   of `header_layout`), and the layout "Hidden" hides the header and the subheader.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the

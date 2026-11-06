@@ -56,8 +56,8 @@ still in the database and there is something to change.
 - The layout (`header_layout`) is the same field in both extensions and is not changed.
 - The Semantilizer has no field for the subheader (it renders it one level below its header), so there is nothing to take
   over and the subheader is not touched.
-- It fills only what is empty or still the default of the field (`h2`). A tag that somebody has chosen since headliner was
-  installed is kept.
+- It fills only what is empty, which is what `header_tag` is until somebody chooses a tag. A tag that somebody has chosen
+  since headliner was installed is kept, also an H2.
 - The wizard works on the column `header_type` of the database. That stays after the Semantilizer is removed, until the
   unused columns are deleted (:guilabel:`Analyze Database Structure`), so run the wizard before that.
 - It can run again, and changes nothing the second time.
