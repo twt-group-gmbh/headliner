@@ -34,6 +34,7 @@ Composer dependencies and builds a ready-to-use TYPO3 on the first start (post-s
 ```bash
 ddev setup              # composer install into .Build/
 ddev demo               # (re)build the demo at https://headliner.ddev.site/ (.Build/)
+ddev demo --extras      # the same, after installing Content Blocks, the Visual Editor and the demo blocks (cards, slider)
 ddev test [unit|functional|all]   # PHPUnit suites
 ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/Scripts/xlf-lint.php`: valid XLIFF) + prettier
                         # (formatting of the *.xlf); `ddev cgl-fix` auto-fixes PHP,
@@ -46,6 +47,17 @@ The demo has subpages with different heading structures (clean, two H1, no H1, d
 see `Build/Scripts/setup-demo-instance.sh`. It also has a second site language, German (`/de/`), with translated
 pages (`/de/ueber-uns`, `/de/produkte`, `/de/kontakt`) and content elements. `ddev demo` resets the database, so an open
 backend session is gone afterwards: log in again.
+
+Child records (IRRE) have demos in `Build/Demo/`, two small TYPO3 extensions that are only installed in the demo instance
+(path repositories in `composer.json`; `Build/` is `export-ignore`, so they are not in the package):
+- `headliner_demo` (`twtgroup/headliner-demo`, in `require-dev`, needs nothing but the core): the content element
+  "Teaser list" with a child table made with plain TCA, its own site set and a Fluid template with
+  `headliner:headline.children`. The page `/teaser` is seeded by `setup-demo-instance.sh`.
+- `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "cards" and "slider" with the Basic
+  `Twtgroup/Headline`. NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
+  runs `composer require --dev` for them (this changes `composer.json` and `composer.lock` locally: do not commit it,
+  `git checkout composer.json` takes it out). The script seeds `/cards` and `/slider` when the tables exist.
+The seed blocks for the demos only run if their tables exist, and unlike the older seeds they show SQL errors.
 
 Backend login: `https://headliner.ddev.site/typo3/`, user `admin`, password `Password.1` (local demo only; the
 default lives in `Build/Scripts/setup-demo-instance.sh`, `ADMIN_PASS` overrides it). The instance (`config/`, `var/`,

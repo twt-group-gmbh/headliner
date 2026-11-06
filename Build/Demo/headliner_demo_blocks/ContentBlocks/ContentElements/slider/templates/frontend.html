@@ -1,0 +1,17 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<section class="slider">
+    <f:if condition="{data.header}">
+        <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{data.header}</headliner:headline>
+    </f:if>
+    <f:for each="{data.slides}" as="slide">
+        <headliner:headline.children record="{slide}">
+            <div class="slide">
+                <headliner:headline tag="{slide.tag}">{slide.title}</headliner:headline>
+                <f:format.html>{slide.text}</f:format.html>
+            </div>
+        </headliner:headline.children>
+    </f:for>
+</section>
+</html>

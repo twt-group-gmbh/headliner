@@ -41,6 +41,8 @@ echo "› TYPO3 setup (database + admin user + site)"
     --driver=mysqli --host="${DB_HOST}" --port="${DB_PORT}" --dbname="${DB_NAME}" --username="${DB_USER}" --password="${DB_PASS}" \
     --admin-username="${ADMIN_USER}" --admin-user-password="${ADMIN_PASS}" --admin-email=admin@example.com \
     --project-name=headliner --create-site="${BASE_URL}" --server-type=other --no-interaction --force
+# The tables of the demo packages (the child records of the demo content elements) are created from their TCA
+"${TYPO3_BIN}" database:updateschema
 
 # Persist trusted hosts into settings.php (not additional.php, which DDEV manages for the default
 # docroot). DDEV only writes its additional.php once the docroot exists at `ddev start`, so a
@@ -69,11 +71,17 @@ page.10.stdWrap.wrap = <div style="max-width: 800px; margin: 2em auto;"><header>
 TYPOSCRIPT
 # German as second language (base /de/), to test translations
 sed -i '/^    flag: us$/a\  -\n    title: Deutsch\n    enabled: true\n    languageId: 1\n    base: /de/\n    locale: de_DE.UTF-8\n    navigationTitle: Deutsch\n    flag: de\n    fallbackType: strict' "${SITE_CONFIG}"
+# The demo of a content element with child records, made with the means of the core (package twtgroup/headliner-demo,
+# which has a site set of its own), if it is installed
+DEMO_DEPENDENCY=""
+if [ -d .Build/vendor/twtgroup/headliner-demo ]; then
+    DEMO_DEPENDENCY='\n  - twtgroup/headliner-demo'
+fi
 if grep -q '^dependencies: {  }$' "${SITE_CONFIG}"; then
-    sed -i 's#^dependencies: {  }$#dependencies:\n  - typo3/fluid-styled-content\n  - twtgroup/headliner#' "${SITE_CONFIG}"
+    sed -i "s#^dependencies: {  }\$#dependencies:\n  - typo3/fluid-styled-content\n  - twtgroup/headliner${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
 else
     # `typo3 setup` already lists the fluid_styled_content sets; add ours to that list
-    sed -i 's#^dependencies:$#dependencies:\n  - twtgroup/headliner#' "${SITE_CONFIG}"
+    sed -i "s#^dependencies:\$#dependencies:\n  - twtgroup/headliner${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
 fi
 mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
     INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, bodytext, crdate, tstamp) VALUES
@@ -180,6 +188,62 @@ mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}
     SELECT pid, CType, colPos, sorting, sys_language_uid, 'Our services (draft)', header_layout, 'h1', subheader, subheader_tag, bodytext, uid, @ws, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
     FROM tt_content WHERE header = 'Our services' AND sys_language_uid = 0 AND t3ver_wsid = 0;
 " 2>/dev/null
+
+# SQL as the demo user. Unlike the seeds above, errors are shown: these seeds depend on packages that may be missing.
+demo_sql() {
+    mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" "$@"
+}
+demo_has_table() {
+    [ -n "$(demo_sql -N -e "SHOW TABLES LIKE '$1'")" ]
+}
+
+# A content element with child records (IRRE) made with the means of the core, no Content Blocks: the wrapper
+# headliner:headline.children, the tag field of a record, the heading in a rich text of a record. Package
+# twtgroup/headliner-demo (Build/Demo/headliner_demo).
+if demo_has_table tx_headlinerdemo_item; then
+    echo "› creating the demo of child records (core)"
+    demo_sql -e "
+        INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
+            (1, 'Teaser (core IRRE)', '/teaser', 1, 1024, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @page = LAST_INSERT_ID();
+        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, headlinerdemo_items, crdate, tstamp)
+            VALUES (@page, 'headlinerdemo_teaser', 0, 256, 0, 'Teaser list', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @element = LAST_INSERT_ID();
+        INSERT INTO tx_headlinerdemo_item (pid, sorting, title, tag, text, parent, crdate, tstamp) VALUES
+            (@page, 256, 'First teaser', 'h3', '<p>A teaser from a plain TCA table.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 512, 'Second teaser', 'h3', '<p>No heading in this text.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 768, 'Third teaser', 'h4', '<h3>A heading in the text of a teaser</h3><p>Text.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    "
+fi
+
+# The same with Content Blocks (cards, a slider) and the Visual Editor, if `ddev demo --extras` installed them
+# (package twtgroup/headliner-demo-blocks, Build/Demo/headliner_demo_blocks).
+if demo_has_table cards && demo_has_table slides; then
+    echo "› creating the demo of the Content Blocks (cards, slider)"
+    demo_sql -e "
+        INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
+            (1, 'Cards (Content Block)', '/cards', 1, 1280, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @page = LAST_INSERT_ID();
+        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, cards, crdate, tstamp)
+            VALUES (@page, 'twtgroup_cards', 0, 256, 0, 'Our cards', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @element = LAST_INSERT_ID();
+        INSERT INTO cards (pid, sorting, title, tag, text, foreign_table_parent_uid, crdate, tstamp) VALUES
+            (@page, 256, 'First card', 'h3', '<p>The first card has an H3.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 512, 'Second card', 'h3', '<p>The second card has an H3 as well.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 768, 'Third card', 'h4', '<h3>A heading in the text of a card</h3><p>An H4 right after an H2: a level is skipped.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+
+        INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
+            (1, 'Slider (Content Block)', '/slider', 1, 1536, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @page = LAST_INSERT_ID();
+        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, slides, crdate, tstamp)
+            VALUES (@page, 'twtgroup_slider', 0, 256, 0, 'Our slider', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @element = LAST_INSERT_ID();
+        INSERT INTO slides (pid, sorting, title, tag, text, foreign_table_parent_uid, crdate, tstamp) VALUES
+            (@page, 256, 'First slide', 'h3', '<p>The first slide has an H3.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 512, 'Second slide', 'h3', '<p>A slide without a heading in its text.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 768, 'Third slide', 'h4', '<h3>A heading in the text of a slide</h3><p>An H4 title and an H3 in the text.</p><h4>And another one</h4>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    "
+fi
 
 echo "› finalising extensions and caches"
 "${TYPO3_BIN}" extension:setup

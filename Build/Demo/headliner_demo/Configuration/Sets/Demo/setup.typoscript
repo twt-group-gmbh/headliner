@@ -1,0 +1,5 @@
+tt_content.headlinerdemo_teaser =< lib.contentElement
+tt_content.headlinerdemo_teaser {
+    templateName = Teaser
+    templateRootPaths.250 = EXT:headliner_demo/Resources/Private/Templates
+}

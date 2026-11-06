@@ -16,6 +16,14 @@ has pages with different heading structures (a clean one, two H1, no H1, div hea
 second language (German) with translations and a workspace with a draft, so you can see the main cases. `ddev demo`
 builds it again; that resets the database.
 
+Content elements with child records (IRRE) are shown by two small demo extensions in `Build/Demo/`, which are only installed in
+the demo instance, never in the package:
+
+- **Teaser list** (`/teaser`), made with the means of the core only. It is part of `ddev start` and `ddev demo`.
+- **Cards** and **Slider** (`/cards`, `/slider`), Content Blocks, plus the Visual Editor. They need packages that CI does not
+  install, so `ddev demo --extras` installs them first. That changes `composer.json` and `composer.lock` on your machine:
+  do not commit them (`git checkout composer.json` takes the extras out again).
+
 Without DDEV: `composer update` installs everything into `.Build/`.
 
 ## How to work

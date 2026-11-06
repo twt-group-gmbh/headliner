@@ -42,7 +42,8 @@
         "phpstan/phpstan-phpunit": "^2.0",
         "typo3/cms-fluid-styled-content": "^14.3",
         "typo3/cms-rte-ckeditor": "^14.3",
-        "typo3/cms-workspaces": "^14.3"
+        "typo3/cms-workspaces": "^14.3",
+        "twtgroup/headliner-demo": "@dev"
     },
     "autoload": {
         "psr-4": {
@@ -80,5 +81,15 @@
                 "providesPackages": {}
             }
         }
-    }
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "Build/Demo/headliner_demo"
+        },
+        {
+            "type": "path",
+            "url": "Build/Demo/headliner_demo_blocks"
+        }
+    ]
 }

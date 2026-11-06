@@ -1,9 +1,19 @@
 #!/bin/bash
-## Description: (Re)build the default demo at https://headliner.ddev.site/ from .Build/
-## Usage: demo
+## Description: (Re)build the default demo at https://headliner.ddev.site/ from .Build/ (--extras: with Content Blocks and the Visual Editor)
+## Usage: demo [--extras]
 ## Example: "ddev demo"
+## Example: "ddev demo --extras"
 
 set -e
 cd /var/www/html
 [ -f .Build/bin/typo3 ] || composer install --no-interaction
+
+if [ "${1:-}" = "--extras" ]; then
+    # The Content Blocks demo (cards, slider) and the Visual Editor are not in the composer.json of the repository, so CI does not
+    # install them. composer.json and composer.lock list them now: do not commit that.
+    echo "› installing the extras: Content Blocks, Visual Editor, demo blocks"
+    composer require --dev --no-interaction friendsoftypo3/visual-editor:^1.10 friendsoftypo3/content-blocks:^2.4 twtgroup/headliner-demo-blocks:@dev
+    echo "  (composer.json now lists them: do not commit it, \`git checkout composer.json\` takes them out again)"
+fi
+
 bash Build/Scripts/setup-demo-instance.sh

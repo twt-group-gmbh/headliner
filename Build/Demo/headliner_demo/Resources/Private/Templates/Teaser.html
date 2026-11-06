@@ -1,0 +1,18 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<f:layout name="Default" />
+
+<f:section name="Main">
+    <div class="teasers">
+        <f:for each="{record.headlinerdemo_items}" as="item">
+            <headliner:headline.children record="{item}">
+                <article class="teaser">
+                    <headliner:headline tag="{item.tag}">{item.title}</headliner:headline>
+                    <f:format.html>{item.text}</f:format.html>
+                </article>
+            </headliner:headline.children>
+        </f:for>
+    </div>
+</f:section>
+</html>
