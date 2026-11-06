@@ -29,8 +29,10 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
       subheader:
         enabled: false
 
+..  _configuration-contentselector:
+
 ..  confval:: headliner.contentSelector
-    :name: headliner-contentSelector
+    :name: headliner-contentselector
     :type: string
     :Default: main
 

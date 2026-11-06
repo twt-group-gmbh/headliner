@@ -39,6 +39,16 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run lint:xlf
 
+  docs:
+    name: documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Render the documentation, a warning fails the job
+        run: |
+          docker run --rm -v "${GITHUB_WORKSPACE}:/project" \
+            ghcr.io/typo3-documentation/render-guides:latest --config=Documentation --no-progress --fail-on-log
+
   unit:
     name: unit (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})
     runs-on: ubuntu-latest

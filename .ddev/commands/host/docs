@@ -1,9 +1,9 @@
 #!/bin/bash
-## Description: Render the documentation with the TYPO3 docs toolchain (needs Docker); warnings are printed
+## Description: Render the documentation with the TYPO3 docs toolchain (needs Docker); a warning fails
 ## Usage: docs
 ## Example: "ddev docs"
 
 set -e
 docker run --rm --user "$(id -u):$(id -g)" -v "${DDEV_APPROOT}:/project" \
-    ghcr.io/typo3-documentation/render-guides:latest --config=Documentation --no-progress
+    ghcr.io/typo3-documentation/render-guides:latest --config=Documentation --no-progress --fail-on-log
 echo "Rendered into Documentation-GENERATED-temp/ (open Index.html)"

@@ -90,7 +90,7 @@ What is checked, and what is not
 *   The page is rendered in the running PHP process, as a visitor would get it. There is no HTTP request, so a firewall,
     Basic Auth, TLS settings or a CDN in front of the site do not matter.
 *   Only the **content** of the page is checked: the elements the site setting :ref:`headliner.contentSelector
-    <headliner-contentSelector>` matches (`main` by default). Headings in the header, the menu and the footer are shown
+    <configuration-contentselector>` matches (`main` by default). Headings in the header, the menu and the footer are shown
     greyed, marked :guilabel:`Outside the content`, and cause no problem, as an editor cannot change them. If the page has
     no such element, the whole page is checked.
 *   A **hidden** page is rendered too, so you can check its structure before it is published. The box says
