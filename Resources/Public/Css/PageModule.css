@@ -68,9 +68,17 @@
     min-width: 0;
 }
 
-.headliner__section + .headliner__section {
+/* The divider sits in the gap, so every section has the same room for its content */
+.headliner__section {
+    position: relative;
+}
+
+.headliner__section + .headliner__section::before {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: -0.75rem;
     border-left: 1px solid var(--typo3-component-border-color);
-    padding-left: 1.5rem;
 }
 
 /* The language of a section, shown when the page module compares several languages */
