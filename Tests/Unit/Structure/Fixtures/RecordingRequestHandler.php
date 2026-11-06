@@ -20,6 +20,11 @@ final class RecordingRequestHandler implements RequestHandlerInterface
      */
     public function __construct(private readonly \Closure $callback) {}
 
+    public function receivedRequest(): ServerRequestInterface
+    {
+        return $this->received ?? throw new \LogicException('The handler has not been called.', 1767000001);
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $this->received = $request;

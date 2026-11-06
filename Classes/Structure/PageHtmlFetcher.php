@@ -7,7 +7,7 @@ namespace Twtgroup\Headliner\Structure;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Twtgroup\Headliner\Inspection\InspectToken;
+use Twtgroup\Headliner\Middleware\InspectRequest;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Http\RequestHandler;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -30,7 +30,6 @@ final readonly class PageHtmlFetcher
     public function __construct(
         #[Autowire(service: RequestHandler::class)]
         private RequestHandlerInterface $requestHandler,
-        private InspectToken $inspectToken,
     ) {}
 
     /**
@@ -64,7 +63,7 @@ final readonly class PageHtmlFetcher
                 ->withQueryParams([])
                 ->withUri($uri)
                 ->withMethod('GET')
-                ->withHeader(InspectToken::HEADER, $this->inspectToken->create());
+                ->withAttribute(InspectRequest::ATTRIBUTE, true);
             $response = $this->requestHandler->handle($request);
 
             return $response->getStatusCode() === 200 ? (string) $response->getBody() : null;

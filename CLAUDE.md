@@ -79,10 +79,10 @@ Tests split into two suites by what they need to boot:
 - `PageHtmlFetcher` renders the frontend in the same PHP process (a sub-request through the core's `RequestHandler`),
   not over HTTP. The frontend middleware stack changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
   shared `PageRenderer`, so the fetcher puts them back (unit-tested); if you add state the sub-request touches, restore
-  it there too. It sends the header `X-Headliner-Inspect` (an HMAC, `InspectToken`). Only then
-  `InspectRequest` (frontend middleware) disables the page cache for that request and sets the attribute
-  `headliner.inspect`, and `headliner:headline` adds `data-headliner-edit="table:uid:field"`. That markup must never
-  be cached or shown to visitors.
+  it there too. It marks the sub-request with the request attribute `headliner.inspect`. Only then `InspectRequest`
+  (frontend middleware) disables the page cache for that request, and `headliner:headline` adds
+  `data-headliner-edit="table:uid:field"`. The attribute exists only inside the PHP process, a request from outside
+  cannot set it (no header, no secret). That markup must never be cached or shown to visitors.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

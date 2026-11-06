@@ -20,7 +20,7 @@ First release.
   frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as
   "not a heading". The text of a header opens the edit form of its content element in the side panel, like the edit
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
-  (`data-headliner-edit`); that happens only for the request of the page module (signed header, no page cache), never
+  (`data-headliner-edit`); that happens only for the request of the page module (a mark that only exists inside the PHP process, no page cache), never
   for visitors.
 - Page module, language comparison: the box follows the page module. The layout view shows the structure of the one
   language it shows; the language comparison shows one section per column, the default language and the selected

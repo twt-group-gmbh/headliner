@@ -8,13 +8,12 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Twtgroup\Headliner\Inspection\InspectToken;
+use Twtgroup\Headliner\Middleware\InspectRequest;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
 use Twtgroup\Headliner\Tests\Unit\Structure\Fixtures\RecordingRequestHandler;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Context\VisibilityAspect;
-use TYPO3\CMS\Core\Crypto\HashService;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\Http\Uri;
@@ -30,10 +29,8 @@ final class PageHtmlFetcherTest extends TestCase
         $this->globalsBackup = [
             'BE_USER' => $GLOBALS['BE_USER'] ?? null,
             'TYPO3_REQUEST' => $GLOBALS['TYPO3_REQUEST'] ?? null,
-            'encryptionKey' => $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'] ?? null,
             'EXEC_TIME' => $GLOBALS['EXEC_TIME'] ?? null,
         ];
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'] = 'test-key';
         // the date aspect of the Context reads it; the application sets it in real life
         $GLOBALS['EXEC_TIME'] = time();
         GeneralUtility::setSingletonInstance(Context::class, new Context());
@@ -44,13 +41,7 @@ final class PageHtmlFetcherTest extends TestCase
         GeneralUtility::resetSingletonInstances([]);
         $GLOBALS['BE_USER'] = $this->globalsBackup['BE_USER'];
         $GLOBALS['TYPO3_REQUEST'] = $this->globalsBackup['TYPO3_REQUEST'];
-        $GLOBALS['TYPO3_CONF_VARS']['SYS']['encryptionKey'] = $this->globalsBackup['encryptionKey'];
         $GLOBALS['EXEC_TIME'] = $this->globalsBackup['EXEC_TIME'];
-    }
-
-    private function token(): InspectToken
-    {
-        return new InspectToken(new HashService());
     }
 
     private function handler(\Closure $callback): RecordingRequestHandler
@@ -68,20 +59,20 @@ final class PageHtmlFetcherTest extends TestCase
             return $response;
         });
 
-        self::assertSame('<h1>Hi</h1>', (new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/')));
+        self::assertSame('<h1>Hi</h1>', (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/')));
     }
 
     #[Test]
-    public function requestsThePageWithGetAndTheInspectToken(): void
+    public function requestsThePageWithGetAndMarksItAsInspection(): void
     {
         $handler = $this->handler(static fn(): ResponseInterface => new Response());
 
-        (new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/about'));
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/about'));
 
         self::assertNotNull($handler->received);
         self::assertSame('GET', $handler->received->getMethod());
         self::assertSame('https://example.com/about', (string) $handler->received->getUri());
-        self::assertTrue($this->token()->isValid($handler->received->getHeaderLine(InspectToken::HEADER)));
+        self::assertTrue($handler->received->getAttribute(InspectRequest::ATTRIBUTE));
     }
 
     #[Test]
@@ -89,7 +80,7 @@ final class PageHtmlFetcherTest extends TestCase
     {
         $handler = $this->handler(static fn(): ResponseInterface => new Response('php://temp', 404));
 
-        self::assertNull((new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/')));
+        self::assertNull((new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/')));
     }
 
     #[Test]
@@ -99,7 +90,7 @@ final class PageHtmlFetcherTest extends TestCase
             throw new \RuntimeException('No page configured for type=0');
         });
 
-        self::assertNull((new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/')));
+        self::assertNull((new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/')));
     }
 
     #[Test]
@@ -125,7 +116,7 @@ final class PageHtmlFetcherTest extends TestCase
             return new Response();
         });
 
-        (new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/'));
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
 
         self::assertSame($backendUser, $GLOBALS['BE_USER']);
         self::assertSame($originalRequest, $GLOBALS['TYPO3_REQUEST']);
@@ -144,7 +135,7 @@ final class PageHtmlFetcherTest extends TestCase
             throw new \RuntimeException('boom');
         });
 
-        (new PageHtmlFetcher($handler, $this->token()))->fetch(new Uri('https://example.com/'));
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
 
         self::assertSame($backendUser, $GLOBALS['BE_USER']);
     }
