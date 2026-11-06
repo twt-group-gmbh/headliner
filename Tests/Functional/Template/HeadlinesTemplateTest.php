@@ -116,12 +116,12 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
     /**
      * @return array<string, mixed>
      */
-    private static function heading(bool $canEditTag, bool $tagInherited): array
+    private static function heading(bool $canEditTag, bool $tagInherited, bool $subheader = false, bool $fromText = false): array
     {
         return [
-            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'rte' => null, 'tagOptions' => ['h1', 'h2', 'div'], 'editUid' => 5,
-            'canOpen' => true, 'canEditTag' => $canEditTag, 'outside' => false, 'subheader' => false, 'fromText' => false,
-            'parentText' => '', 'tagInherited' => $tagInherited,
+            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'group' => null, 'groupPosition' => '', 'groupHue' => 0, 'rte' => null, 'tagOptions' => ['h1', 'h2', 'div'], 'editUid' => 5,
+            'canOpen' => true, 'canEditTag' => $canEditTag, 'outside' => false, 'subheader' => $subheader, 'fromText' => $fromText,
+            'tagInherited' => $tagInherited,
         ];
     }
 
@@ -142,5 +142,26 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
 
         self::assertStringContainsString('<select', $html);
         self::assertStringNotContainsString('comes from the original', $html);
+    }
+
+    #[Test]
+    public function aSubheaderAndAHeadingFromTheTextHaveShortBadges(): void
+    {
+        $html = $this->render(0, 'default', [self::heading(false, false, subheader: true), self::heading(false, false, fromText: true)]);
+
+        // the group of the element shows what belongs together, so the badges only say what the heading is
+        self::assertMatchesRegularExpression('#<span class="badge badge-secondary">\s*Subheader\s*</span>#', $html);
+        self::assertMatchesRegularExpression('#<span class="badge badge-secondary">\s*RTE text\s*</span>#', $html);
+        self::assertStringNotContainsString('Subheader of', $html);
+        self::assertStringNotContainsString('From the text', $html);
+    }
+
+    #[Test]
+    public function aHeaderHasNoBadgeOfThatKind(): void
+    {
+        $html = $this->render(0, 'default', [self::heading(false, false)]);
+
+        self::assertStringNotContainsString('RTE text', $html);
+        self::assertDoesNotMatchRegularExpression('#<span class="badge badge-secondary">\s*Subheader#', $html);
     }
 }

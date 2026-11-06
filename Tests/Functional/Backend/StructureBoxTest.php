@@ -121,4 +121,29 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         // only the select of the header of the element is left
         self::assertSame(1, substr_count($html, '<select'));
     }
+
+    #[Test]
+    public function theHeadingsOfOneElementAreMarkedAsAGroup(): void
+    {
+        $this->writeSite(['headliner' => ['editRteHeadings' => true]]);
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        // element 21: its header and the two headings of its text, one run of three rows
+        self::assertSame(3, substr_count($html, 'data-headliner-group="21"'));
+        self::assertSame(1, substr_count($html, 'headliner__item--group-start'));
+        self::assertSame(1, substr_count($html, 'headliner__item--group-middle'));
+        self::assertSame(1, substr_count($html, 'headliner__item--group-end'));
+    }
+
+    #[Test]
+    public function aHeadingThatIsAloneInItsElementHasNoGroup(): void
+    {
+        // page 1: the elements have one heading each, except the one with a subheader
+        $html = $this->structureBox()->render($this->backendRequest(), 1, [0], '');
+
+        self::assertSame(1, substr_count($html, 'headliner__item--group-start'));
+        self::assertSame(1, substr_count($html, 'headliner__item--group-end'));
+        self::assertSame(0, substr_count($html, 'headliner__item--group-middle'));
+    }
 }

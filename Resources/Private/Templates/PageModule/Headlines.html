@@ -81,7 +81,7 @@
                             <ol class="headliner__list">
                                 <f:for each="{section.headings}" as="heading">
                                     <f:variable name="outsideTitle"><f:if condition="{heading.outside}"><f:translate key="{l}outside" /></f:if></f:variable>
-                                    <li title="{outsideTitle}" class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.issues, then: ' headliner__item--issue')}{f:if(condition: '{heading.level} == 0', then: ' headliner__item--nolevel')}{f:if(condition: '{heading.subheader} || {heading.fromText}', then: ' headliner__item--sub')}{f:if(condition: heading.outside, then: ' headliner__item--outside')}">
+                                    <li title="{outsideTitle}"{f:if(condition: heading.groupPosition, then: ' data-headliner-group="{heading.group}" style="--headliner-hue: {heading.groupHue}"')} class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.groupPosition, then: ' headliner__item--group headliner__item--group-{heading.groupPosition}')}{f:if(condition: heading.issues, then: ' headliner__item--issue')}{f:if(condition: '{heading.level} == 0', then: ' headliner__item--nolevel')}{f:if(condition: '{heading.subheader} || {heading.fromText}', then: ' headliner__item--sub')}{f:if(condition: heading.outside, then: ' headliner__item--outside')}">
                                         <span class="headliner__tag">
                                             <f:if condition="{heading.canEditTag}">
                                                 <f:then>
@@ -107,20 +107,10 @@
                                             </f:if>
                                         </span>
                                         <f:if condition="{heading.subheader}">
-                                            <span class="badge badge-secondary">
-                                                <f:if condition="{heading.parentText}">
-                                                    <f:then><f:translate key="{l}subheaderOf" arguments="{0: heading.parentText}" /></f:then>
-                                                    <f:else><f:translate key="{l}subheader" /></f:else>
-                                                </f:if>
-                                            </span>
+                                            <span class="badge badge-secondary"><f:translate key="{l}subheader" /></span>
                                         </f:if>
                                         <f:if condition="{heading.fromText}">
-                                            <span class="badge badge-secondary">
-                                                <f:if condition="{heading.parentText}">
-                                                    <f:then><f:translate key="{l}fromTextOf" arguments="{0: heading.parentText}" /></f:then>
-                                                    <f:else><f:translate key="{l}fromText" /></f:else>
-                                                </f:if>
-                                            </span>
+                                            <span class="badge badge-secondary"><f:translate key="{l}rteText" /></span>
                                         </f:if>
                                         <f:if condition="{heading.level} == 0">
                                             <span class="badge badge-secondary"><f:translate key="{l}noHeading" /></span>

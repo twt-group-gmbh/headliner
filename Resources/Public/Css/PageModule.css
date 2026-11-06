@@ -124,6 +124,29 @@
     background: var(--typo3-component-hover-bg);
 }
 
+/* The headings of one content element (its header, subheader and the headings of its text) form a group: a bar in the
+   colour of the group runs along the left edge of all of its rows. The rows touch, so the bar is one piece; the corners
+   of the rows are square where the bar goes on. Hovering a row marks the whole group, and its element in the page
+   module below. */
+.headliner__item--group {
+    --headliner-group-color: oklch(.62 .12 var(--headliner-hue, 285));
+
+    box-shadow: inset .25rem 0 0 var(--headliner-group-color);
+}
+
+.headliner__item--group-start { border-bottom-left-radius: 0; }
+.headliner__item--group-middle { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.headliner__item--group-end { border-top-left-radius: 0; }
+
+.headliner__item--related {
+    background: var(--typo3-component-hover-bg);
+}
+
+.headliner-related-element {
+    outline: 2px solid oklch(.62 .12 var(--headliner-hue, 285));
+    outline-offset: 2px;
+}
+
 /* The hierarchy: every level is indented by one step; the step gets smaller in a narrow section */
 .headliner__item--h2 { padding-left: calc(.5rem + var(--headliner-step)); }
 .headliner__item--h3 { padding-left: calc(.5rem + 2 * var(--headliner-step)); }
@@ -159,15 +182,6 @@
 .headliner__item--issue .headliner__text {
     text-decoration: underline wavy var(--typo3-state-warning-border-color, #f0ad4e);
     text-underline-offset: .2rem;
-}
-
-.headliner__item--sub::before {
-    content: '\21B3';
-    flex: none;
-    margin-left: -1.25rem;
-    margin-right: -.5rem;
-    opacity: .55;
-    width: 1rem;
 }
 
 .headliner__item--sub .headliner__text {

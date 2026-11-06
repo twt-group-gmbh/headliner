@@ -15,8 +15,8 @@ First release.
   not jump when the page is changed) with a summary
   (structure OK / number of problems). The tag of a header
   can be changed in place with a select styled as a pill whose colour tells the level (a scale from violet H1 over blue and teal to green H6, a div is neutral and dashed); the select has the size of the plain label; it is saved through the core's DataHandler (with the rights of the
-  backend user) and the structure is checked again. A subheader is marked with an arrow and says whose subheader it is. A heading from the text of a content element
-  (for example RTE content) is marked the same way ("From the text of ..."), opens that content element and has a select
+  backend user) and the structure is checked again. A subheader has the badge "Subheader". A heading from the text of a content element
+  (for example RTE content) has the badge "RTE text", opens that content element and has a select
   too if the new site setting `headliner.editRteHeadings` is on (default off, because it changes the text of the element), which offers the headings the editor of the text offers (`heading.options` of the RTE configuration, so H2 and H3
   in the default preset; without options H1-H6; the heading's own tag is always in the list): the tag is changed in the stored text (`bodytext`) at the place of the heading, through the DataHandler and
   its rights, by the AJAX route `headliner_rte_tag`. The heading is found by its place among the headings of the text and
@@ -34,6 +34,10 @@ First release.
   loaded again, not the whole page module. The box is also loaded again when the page module changes content without
   loading the page again: hiding or showing an element, and moving or dragging one (the DataHandler event). The route needs the same right as the page module (the user must be
   allowed to see the page).
+- Page module, headings of one element: the headings of one content element (its header, its subheader and the
+  headings of its text) are drawn as a group: a bar in the colour of the group runs along the left edge of their rows
+  (a different colour for the next group), so it is clear which belong together. Hovering a row marks all rows of the
+  group and outlines the element in the page module below. An element with a single heading has no group.
 - Page module, language comparison: the box follows the page module. The layout view shows the structure of the one
   language it shows; the language comparison shows one section per column, the default language and the selected
   translations. With several languages the box has one section per language, side by side like the columns below (flag, name

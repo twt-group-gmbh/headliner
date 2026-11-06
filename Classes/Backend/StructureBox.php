@@ -38,6 +38,9 @@ final readonly class StructureBox
     /** Name of the AJAX route that changes the tag of a heading in a rich text field (key `headliner_rte_tag`) */
     public const RTE_ROUTE = 'ajax_headliner_rte_tag';
 
+    /** The hues of the groups, one after the other: apart from each other, and not the colours of the levels */
+    private const GROUP_HUES = [285, 215, 160, 95, 40, 350];
+
     /** Standard pages; folders, links, spacers etc. render no content. */
     private const DOKTYPE_STANDARD = 1;
 
@@ -126,20 +129,12 @@ final readonly class StructureBox
     /**
      * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
-     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, rte: string|null, tagOptions: list<string>, editUid: int|null, canOpen: bool, canEditTag: bool, tagInherited: bool, outside: bool, subheader: bool, fromText: bool, parentText: string}>
+     * @return list<array<string, mixed>> One row per heading: its tag, text, problems, what the user may do with it and
+     *     the place in its group (see `markGroups()`)
      */
     private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess, bool $editRteHeadings): array
     {
         $rows = [];
-        // The text of the header of every content element, so a subheader or a heading from the text can say whose it is
-        $headerTexts = [];
-        foreach ($headings as $heading) {
-            $target = $heading->editTarget();
-            if ($target !== null && $target['field'] === HeaderTag::FIELD) {
-                $headerTexts[$target['uid']] = $heading->text;
-            }
-        }
-
         // The place of a heading from the text among the headings of its content element, in the order of the text
         $textOrdinals = [];
         // What the editor of the text offers, per content element
@@ -173,6 +168,9 @@ final readonly class StructureBox
                     array_filter($issues, static fn($issue): bool => $issue->index === $index)
                 )),
                 'edit' => $heading->edit,
+                'group' => $elementUid,
+                'groupPosition' => '',
+                'groupHue' => 0,
                 'rte' => $rte ? $elementUid . ':' . $textOrdinal : null,
                 // a heading in a text offers what the editor of the text offers (and its own tag, so the select shows it)
                 'tagOptions' => $rte ? $this->textTagOptions($textTags[$elementUid] ??= $this->rteEditor->allowedTags($contentRecord), $heading->level) : HeaderTag::ALLOWED,
@@ -185,8 +183,33 @@ final readonly class StructureBox
                 'tagInherited' => $tagInherited,
                 'subheader' => $isSubheader,
                 'fromText' => $fromText,
-                'parentText' => ($isSubheader || $fromText) && $elementUid !== null ? ($headerTexts[$elementUid] ?? '') : '',
             ];
+        }
+
+        return $this->markGroups($rows);
+    }
+
+    /**
+     * The headings of one content element (its header, its subheader, the headings of its text) follow each other in
+     * the list. A run of two or more of them is a group: the rows get their place in it (start, middle, end) and a
+     * colour (a hue, taken in turn per group), so the box can draw them as one.
+     *
+     * @param list<array<string, mixed>> $rows
+     * @return list<array<string, mixed>>
+     */
+    private function markGroups(array $rows): array
+    {
+        $hues = [];
+        foreach ($rows as $index => $row) {
+            $group = $row['group'];
+            $joinsPrevious = $group !== null && ($rows[$index - 1]['group'] ?? null) === $group;
+            $joinsNext = $group !== null && ($rows[$index + 1]['group'] ?? null) === $group;
+            if (!$joinsPrevious && !$joinsNext) {
+                continue;
+            }
+            $hues[$group] ??= self::GROUP_HUES[count($hues) % count(self::GROUP_HUES)];
+            $rows[$index]['groupPosition'] = !$joinsPrevious ? 'start' : (!$joinsNext ? 'end' : 'middle');
+            $rows[$index]['groupHue'] = $hues[$group];
         }
 
         return $rows;

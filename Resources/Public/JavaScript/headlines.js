@@ -17,6 +17,36 @@ document.addEventListener('toggle', (event) => {
   }
 }, true);
 
+// Hovering a heading marks all the headings of the same content element, and the element itself in the page module
+// below: the headings of one element belong together.
+let relatedGroup = null;
+function clearRelated() {
+  document.querySelectorAll('.headliner__item--related, .headliner-related-element').forEach((element) => {
+    element.classList.remove('headliner__item--related', 'headliner-related-element');
+  });
+  relatedGroup = null;
+}
+document.addEventListener('mouseover', (event) => {
+  const row = event.target instanceof Element ? event.target.closest('.headliner__item[data-headliner-group]') : null;
+  const group = row?.dataset.headlinerGroup ?? null;
+  if (group === relatedGroup) {
+    return;
+  }
+  clearRelated();
+  if (group === null) {
+    return;
+  }
+  relatedGroup = group;
+  document.querySelectorAll(`.headliner__item[data-headliner-group="${CSS.escape(group)}"]`).forEach((related) => {
+    related.classList.add('headliner__item--related');
+  });
+  const element = document.querySelector(`.t3js-page-ce[data-uid="${CSS.escape(group)}"]`);
+  if (element) {
+    element.style.setProperty('--headliner-hue', row.style.getPropertyValue('--headliner-hue'));
+    element.classList.add('headliner-related-element');
+  }
+});
+
 // The page module only holds a placeholder: the page is checked here, afterwards, so the rendering of the frontend
 // does not delay the page module. This also happens while the box is collapsed, so its summary shows the problems.
 const url = document.querySelector(SELECTOR)?.dataset.headlinerUrl;
@@ -44,6 +74,7 @@ async function load() {
     const box = template.content.firstElementChild;
     box.open = current.open;
     wasOpen = box.open;
+    clearRelated();
     current.replaceWith(box);
     return true;
   } catch {
