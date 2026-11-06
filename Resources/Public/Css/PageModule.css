@@ -216,6 +216,16 @@
     display: inline-block;
 }
 
+/* Same size as the pill without a dropdown: the core's .form-select sets its own width, minimum width, height and padding */
+.headliner .headliner__select {
+    display: inline-block;
+    height: auto;
+    min-height: 0;
+    min-width: 0;
+    padding-block: .1rem;
+    width: 5.25rem;
+}
+
 .headliner__select {
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -241,20 +251,20 @@
     opacity: .5;
 }
 
-/* The colour tells the level: one scale from strong (h1) to light (h6), the state colour "primary" mixed with the
-   background of the component. A div (no heading) is neutral and dashed. */
+/* The colour tells the level: a scale from violet (h1) over blue and teal to green (h6), in steps wide enough to tell
+   the levels apart at a glance. White text on all of them. A div (no heading) is neutral and dashed. */
 .headliner__tag [data-current^='h'] {
-    --headliner-tag-bg: color-mix(in srgb, var(--typo3-state-primary-bg) var(--headliner-level-strength), var(--typo3-component-bg));
-    --headliner-tag-border: color-mix(in srgb, var(--typo3-state-primary-border-color) var(--headliner-level-border), var(--typo3-component-border-color));
-    --headliner-tag-color: var(--headliner-level-color, var(--typo3-component-color));
+    --headliner-tag-bg: oklch(var(--headliner-level));
+    --headliner-tag-border: oklch(from var(--headliner-tag-bg) calc(l + .12) c h);
+    --headliner-tag-color: #fff;
 }
 
-.headliner__tag [data-current='h1'] { --headliner-level-strength: 100%; --headliner-level-border: 100%; --headliner-level-color: var(--typo3-state-primary-color); }
-.headliner__tag [data-current='h2'] { --headliner-level-strength: 78%; --headliner-level-border: 90%; --headliner-level-color: var(--typo3-state-primary-color); }
-.headliner__tag [data-current='h3'] { --headliner-level-strength: 58%; --headliner-level-border: 78%; --headliner-level-color: var(--typo3-state-primary-color); }
-.headliner__tag [data-current='h4'] { --headliner-level-strength: 40%; --headliner-level-border: 62%; }
-.headliner__tag [data-current='h5'] { --headliner-level-strength: 26%; --headliner-level-border: 46%; }
-.headliner__tag [data-current='h6'] { --headliner-level-strength: 14%; --headliner-level-border: 32%; }
+.headliner__tag [data-current='h1'] { --headliner-level: .40 .19 300; }
+.headliner__tag [data-current='h2'] { --headliner-level: .43 .17 265; }
+.headliner__tag [data-current='h3'] { --headliner-level: .47 .13 235; }
+.headliner__tag [data-current='h4'] { --headliner-level: .50 .11 200; }
+.headliner__tag [data-current='h5'] { --headliner-level: .52 .11 165; }
+.headliner__tag [data-current='h6'] { --headliner-level: .50 .09 135; }
 
 .headliner__tag [data-current='div'] {
     border-style: dashed;
