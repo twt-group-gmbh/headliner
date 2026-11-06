@@ -95,25 +95,38 @@ Content Blocks and records in a content element
 ===============================================
 
 A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
-records of tables of their own. The ViewHelper works with both:
+records of tables of their own. Wrap what is rendered for each record in `headliner:headline.children`:
 
 ..  code-block:: html
 
     <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{data.header}</headliner:headline>
 
     <f:for each="{data.cards}" as="card">
-        <headliner:headline tag="{card.tag}" edit="{card.mainType}:{card.uid}:tag">{card.title}</headliner:headline>
+        <headliner:headline.children record="{card}">
+            <article class="card">
+                <headliner:headline tag="{card.tag}">{card.title}</headliner:headline>
+                <f:format.html>{card.text}</f:format.html>
+            </article>
+        </headliner:headline.children>
     </f:for>
 
-- The ViewHelper takes the uid of the content element from `{data}` and writes it as `data-headliner-element` on every
-  heading, so the page module knows which element a heading is in without a frame `id="c12"` around it. The headings of
-  one element form a group, as with `fluid_styled_content`.
-- For a heading from a record of a collection, name that record with `edit` (`table:uid:field`). The tag is changed in
-  that field with the rights of the backend user for the table. The badge of the heading is the title of the table.
-- The field must be a **select whose values are tags and nothing else** (`h1` to `h6`, `div`). The select in the box
-  offers the values of the field. The box ignores a mark for any other field.
-- A heading in the rich text of a collection record has no mark, so it is listed, but it is no part of the group and
-  cannot be changed in the box.
+The wrapper is all it takes: no `edit`, and nothing for the rich text.
+
+- For a visitor the wrapper changes nothing. For the page module it marks the record (`data-headliner-record`) and the
+  content element it belongs to (`data-headliner-element`, taken from `{data}`), so a Content Block, which has no frame
+  `id="c12"` around its element, still gets the group and the badges.
+- The page module then finds the field of every heading in the record by itself: the **rich text** it is written in (a
+  heading of a text that has its level and its text), or else the **field with its tag**, a select whose value is the tag
+  the heading was rendered with. The heading of a rich text has the badge :guilabel:`RTE` and, with the site setting
+  :ref:`headliner.editRteHeadings <configuration-editrteheadings>`, a select of the headings the editor offers; the
+  heading of the tag field has the title of the table as its badge (for example :guilabel:`Cards`) and a select with
+  the values of the field.
+- The tag field must be a **select whose values are tags and nothing else** (`h1` to `h6`, `div`), and a text is only
+  changed in a rich text field. The page module ignores anything else: the marks are part of the rendered page, which an
+  editor can write to.
+- If a record has two tag fields with the same value, the page module cannot tell which one a heading was rendered with,
+  and shows it as a label. Then name the field with `edit` (`{card.mainType}:{card.uid}:tag`).
+- The wrapper can be nested (a collection in a collection): a heading belongs to the nearest wrapper around it.
 
 ..  _integration-visual-editor:
 

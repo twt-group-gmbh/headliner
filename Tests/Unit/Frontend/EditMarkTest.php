@@ -80,4 +80,21 @@ final class EditMarkTest extends TestCase
         self::assertNull(EditMark::elementUid(self::record('cards', 7)));
         self::assertNull(EditMark::elementUid(null));
     }
+
+    #[Test]
+    public function namesAnyRecordObject(): void
+    {
+        self::assertSame('cards:7', EditMark::recordSource(self::record('cards', 7)));
+        self::assertSame('tt_content:12', EditMark::recordSource(self::record('tt_content.text', 12)));
+        // a translation is named by its own uid
+        self::assertSame('cards:40', EditMark::recordSource(self::record('cards', 7, 40)));
+    }
+
+    #[Test]
+    public function aRecordIsOnlyNamedForARecordObject(): void
+    {
+        self::assertNull(EditMark::recordSource(null));
+        self::assertNull(EditMark::recordSource(['uid' => 7, 'CType' => 'text']));
+        self::assertNull(EditMark::recordSource('cards'));
+    }
 }

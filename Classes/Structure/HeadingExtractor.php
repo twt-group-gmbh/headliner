@@ -45,7 +45,8 @@ final class HeadingExtractor
                 trim((string) preg_replace('/\s+/u', ' ', $node->textContent)),
                 $node->getAttribute('data-headliner-edit') ?: null,
                 $this->findContentElement($node),
-                $contentRoots !== [] && !$this->isInside($node, $contentRoots)
+                $contentRoots !== [] && !$this->isInside($node, $contentRoots),
+                $this->findRecord($node)
             );
         }
 
@@ -58,13 +59,28 @@ final class HeadingExtractor
      */
     private function findContentElement(\DOMElement $node): ?int
     {
-        // A heading rendered with the ViewHelper names its element itself: a Content Block has no frame with an id
-        if (preg_match('/^[1-9]\d*$/', $node->getAttribute('data-headliner-element')) === 1) {
-            return (int) $node->getAttribute('data-headliner-element');
-        }
-        for ($parent = $node->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode) {
-            if (preg_match('/^c([1-9]\d*)$/', $parent->getAttribute('id'), $match) === 1) {
+        // The nearest mark or frame says which element it is: the heading itself (rendered with the ViewHelper), a marked
+        // text around it, or the frame fluid_styled_content puts around the element. A Content Block has no frame.
+        for ($current = $node; $current instanceof \DOMElement; $current = $current->parentNode) {
+            if (preg_match('/^[1-9]\d*$/', $current->getAttribute('data-headliner-element')) === 1) {
+                return (int) $current->getAttribute('data-headliner-element');
+            }
+            if ($current !== $node && preg_match('/^c([1-9]\d*)$/', $current->getAttribute('id'), $match) === 1) {
                 return (int) $match[1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * The record around a heading, from the mark a template put around it (`data-headliner-record`).
+     */
+    private function findRecord(\DOMElement $node): ?string
+    {
+        for ($parent = $node->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode) {
+            if ($parent->hasAttribute('data-headliner-record')) {
+                return $parent->getAttribute('data-headliner-record');
             }
         }
 

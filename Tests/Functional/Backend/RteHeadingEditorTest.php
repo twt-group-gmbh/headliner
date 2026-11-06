@@ -63,7 +63,7 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         $this->setUpBackendUser(1);
 
         // the default preset of the RTE offers h2 and h3
-        $result = $this->editor()->change(21, 1, 'h2', 'Opening hours');
+        $result = $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h2', 'Opening hours');
 
         self::assertSame('changed', $result->value);
         self::assertSame('<h2>Visit us</h2><p>Street</p><h2>Opening <strong>hours</strong></h2><p>Mon-Fri</p>', $this->bodytext());
@@ -76,7 +76,7 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         $this->setUpBackendUser(1);
 
         // the page was changed after the box was drawn
-        $result = $this->editor()->change(21, 1, 'h2', 'Something else');
+        $result = $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h2', 'Something else');
 
         self::assertSame('mismatch', $result->value);
         self::assertStringContainsString('<h3>Opening', $this->bodytext());
@@ -88,9 +88,9 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         $this->enableTheSetting();
         $this->setUpBackendUser(1);
 
-        self::assertSame('mismatch', $this->editor()->change(21, 5, 'h2', 'Visit us')->value);
-        self::assertSame('notFound', $this->editor()->change(21, 0, 'div', 'Visit us')->value);
-        self::assertSame('notFound', $this->editor()->change(9999, 0, 'h2', 'Visit us')->value);
+        self::assertSame('mismatch', $this->editor()->change('tt_content', 21, 'bodytext', 5, 'h2', 'Visit us')->value);
+        self::assertSame('notFound', $this->editor()->change('tt_content', 21, 'bodytext', 0, 'div', 'Visit us')->value);
+        self::assertSame('notFound', $this->editor()->change('tt_content', 9999, 'bodytext', 0, 'h2', 'Visit us')->value);
     }
 
     #[Test]
@@ -100,7 +100,7 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         // this editor has no rights on any table
         $this->setUpBackendUser(2);
 
-        $result = $this->editor()->change(21, 1, 'h2', 'Opening hours');
+        $result = $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h2', 'Opening hours');
 
         self::assertSame('notAllowed', $result->value);
         self::assertStringContainsString('<h3>Opening', $this->bodytext());
@@ -113,9 +113,9 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         $this->setUpBackendUser(1);
         $record = ['uid' => 21, 'pid' => 8, 'CType' => 'text'];
 
-        self::assertSame(['h2', 'h3'], $this->editor()->allowedTags($record));
+        self::assertSame(['h2', 'h3'], $this->editor()->allowedTags('tt_content', 'bodytext', $record));
         // h5 is no choice in the editor, so it is none here
-        self::assertSame('notAllowed', $this->editor()->change(21, 1, 'h5', 'Opening hours')->value);
+        self::assertSame('notAllowed', $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h5', 'Opening hours')->value);
         self::assertStringContainsString('<h3>Opening', $this->bodytext());
     }
 
@@ -125,9 +125,33 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
         // off by default: the text of an element is not changed from the box
         $this->setUpBackendUser(1);
 
-        $result = $this->editor()->change(21, 1, 'h2', 'Opening hours');
+        $result = $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h2', 'Opening hours');
 
         self::assertSame('notAllowed', $result->value);
         self::assertStringContainsString('<h3>Opening', $this->bodytext());
+    }
+
+    #[Test]
+    public function changesNothingInAFieldThatIsNoRichText(): void
+    {
+        $this->enableTheSetting();
+        $this->setUpBackendUser(1);
+
+        // a mark in the page names the field: only a rich text is ever changed, never a plain text field
+        self::assertSame('notFound', $this->editor()->change('tt_content', 21, 'header', 0, 'h2', 'Intro')->value);
+        self::assertSame('notFound', $this->editor()->change('be_users', 1, 'password', 0, 'h2', 'x')->value);
+        self::assertSame('notFound', $this->editor()->change('no_such_table', 1, 'text', 0, 'h2', 'x')->value);
+    }
+
+    #[Test]
+    public function knowsWhichFieldsAreRichText(): void
+    {
+        // for a content element the rich text is on per type of element
+        self::assertTrue($this->editor()->isRichTextField('tt_content', 'bodytext', ['CType' => 'text']));
+        self::assertFalse($this->editor()->isRichTextField('tt_content', 'bodytext', ['CType' => 'header']));
+        self::assertFalse($this->editor()->isRichTextField('tt_content', 'header', ['CType' => 'text']));
+        self::assertFalse($this->editor()->isRichTextField('tt_content', 'CType', ['CType' => 'text']));
+        self::assertFalse($this->editor()->isRichTextField('be_users', 'password', []));
+        self::assertFalse($this->editor()->isRichTextField('no_such_table', 'text', []));
     }
 }

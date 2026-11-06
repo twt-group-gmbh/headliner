@@ -230,4 +230,40 @@ final class HeadingExtractorTest extends TestCase
 
         self::assertEquals([new Heading(2, 'A', null, 5), new Heading(2, 'B', null, 5)], (new HeadingExtractor())->extract($html));
     }
+
+    #[Test]
+    public function aHeadingInAMarkedRecordKnowsTheRecordAndTheElement(): void
+    {
+        // a card of a Content Block: the wrapper names the record, and the element it belongs to
+        $html = '<body><section><article data-headliner-record="cards:3" data-headliner-element="82">'
+            . '<h3>Title</h3><p>x</p><h4>In the text</h4></article><h2>Not in the card</h2></section></body>';
+
+        self::assertEquals(
+            [
+                new Heading(3, 'Title', null, 82, false, 'cards:3'),
+                new Heading(4, 'In the text', null, 82, false, 'cards:3'),
+                new Heading(2, 'Not in the card'),
+            ],
+            (new HeadingExtractor())->extract($html)
+        );
+    }
+
+    #[Test]
+    public function aHeadingTakesItsElementFromTheNearestMarkOrFrame(): void
+    {
+        $html = '<body><div id="c5"><div data-headliner-element="82"><h2>A</h2></div><h2>B</h2></div></body>';
+
+        self::assertEquals([new Heading(2, 'A', null, 82), new Heading(2, 'B', null, 5)], (new HeadingExtractor())->extract($html));
+    }
+
+    #[Test]
+    public function aHeadingWithAMarkOfItsOwnKeepsItAndTheRecordAround(): void
+    {
+        $html = '<body><div data-headliner-record="cards:3"><h2 data-headliner-edit="cards:3:tag">Own</h2></div></body>';
+
+        self::assertEquals(
+            [new Heading(2, 'Own', 'cards:3:tag', null, false, 'cards:3')],
+            (new HeadingExtractor())->extract($html)
+        );
+    }
 }

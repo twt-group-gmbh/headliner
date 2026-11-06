@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Twtgroup\Headliner\Frontend\EditMark;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Middleware\InspectRequest;
+use Twtgroup\Headliner\ViewHelpers\Headline\ChildrenViewHelper;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
 /**
@@ -52,7 +53,11 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
             // the content element this is rendered for, as the templates of fluid_styled_content have it ("data"; a
             // Content Block has it as a record object)
             $data = $this->renderingContext?->getVariableProvider()->get('data');
-            $edit = $this->arguments['edit'] ?? EditMark::forContent($data, $this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);
+            // Inside of the content of a record (a card) the heading is not the header of the element: the page module
+            // finds the field from the record. Only an explicit edit names it.
+            $inRecord = $this->renderingContext?->getVariableProvider()->exists(ChildrenViewHelper::VARIABLE) === true;
+            $edit = $this->arguments['edit']
+                ?? ($inRecord ? null : EditMark::forContent($data, $this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD));
             if ($edit) {
                 $this->tag->addAttribute('data-headliner-edit', $edit);
             }

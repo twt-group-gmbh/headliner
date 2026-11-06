@@ -88,8 +88,8 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '/typo3/module/web/layout?id=8');
 
         // the headings of the text: place 0 and 1 in the text of element 21, without div as a choice
-        self::assertStringContainsString('data-headliner-rte="21:0"', $html);
-        self::assertStringContainsString('data-headliner-rte="21:1"', $html);
+        self::assertStringContainsString('data-headliner-rte="tt_content:21:bodytext:0"', $html);
+        self::assertStringContainsString('data-headliner-rte="tt_content:21:bodytext:1"', $html);
         self::assertStringContainsString('data-headliner-text="Opening hours"', $html);
         // the select of the header offers every tag, the two selects of the text only what the editor offers (h2, h3)
         self::assertSame(1, substr_count($html, '<option value="div"'));
@@ -107,7 +107,7 @@ final class StructureBoxTest extends AbstractFrontendTestCase
 
         $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
 
-        self::assertStringNotContainsString('data-headliner-rte="21:', $html);
+        self::assertStringNotContainsString('data-headliner-rte="tt_content:21:', $html);
         self::assertStringNotContainsString('<select', $html);
     }
 
@@ -117,7 +117,7 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         // the setting is off by default
         $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
 
-        self::assertStringNotContainsString('data-headliner-rte="21:', $html);
+        self::assertStringNotContainsString('data-headliner-rte="tt_content:21:', $html);
         // only the select of the header of the element is left
         self::assertSame(1, substr_count($html, '<select'));
     }

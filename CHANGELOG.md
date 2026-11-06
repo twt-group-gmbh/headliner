@@ -95,6 +95,12 @@ First release.
   user for the table, and the select offers the values of the field. The box only accepts a field that is a select with tags
   and nothing else (h1 to h6, div): the mark is part of the rendered page, which an editor can write to, so it never
   trusts a mark for another field or table.
+- Content Blocks, `headliner:headline.children`: wrapping the content of a record of a collection (a card) in this
+  ViewHelper is all a template needs. The page module finds the field of every heading in the record itself: the rich text
+  it is written in (badge "RTE", and a select if `headliner.editRteHeadings` is on), or the field with its tag. So no `edit`
+  is needed, and the rich text of a card is grouped and can be changed like the text of a content element. The rich text can
+  be a field of any table, if it is a rich text for the type of its record. A text is changed through the DataHandler
+  with the rights of the backend user for that table and field.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

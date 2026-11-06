@@ -125,10 +125,12 @@ document.addEventListener('typo3:datahandler:process', reloadSoon);
 // Resolves to whether the box was loaded again.
 async function changeTagInText(select) {
   const box = select.closest(SELECTOR);
-  const [uid, ordinal] = select.dataset.headlinerRte.split(':');
+  const [table, uid, field, ordinal] = select.dataset.headlinerRte.split(':');
   try {
     await new AjaxRequest(box.dataset.headlinerRteUrl).post({
+      table,
       uid,
+      field,
       ordinal,
       tag: select.value,
       text: select.dataset.headlinerText,

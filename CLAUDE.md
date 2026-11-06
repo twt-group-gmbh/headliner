@@ -100,6 +100,12 @@ Tests split into two suites by what they need to boot:
   the box only believes it for a field that `TagField` says is a select of tags (h1-h6, div) - never for another field
   or table - and checks the rights for that table (`EditAccess::canEditFieldOf`). The record of a collection is not the
   element: it is saved in its own table, the edit link and the group are those of its content element.
+  `headliner:headline.children record="{card}"` marks the record around its content (`data-headliner-record`, plus the
+  element from `data`); a headline inside it gets no automatic `edit` for the element's header. `StructureBox::resolveInRecord()`
+  then finds the field of each heading in the record: the first not yet used heading of a rich text field with the same
+  level and text, else the one tag field whose value is the rendered tag (ambiguous: a label). A rich text is only ever
+  changed if `RteHeadingEditor::isRichTextField()` says so for the type of that record (for a content element the
+  rich text is on per type of element, in `columnsOverrides`), through the DataHandler.
 - Headings from the text of a content element (RTE) can have a tag select, but only with the site setting
   `headliner.editRteHeadings` (default off, it changes the editors' text), checked in the box and again in
   `RteHeadingEditor`. The heading is matched with its place in `bodytext` by `RteHeadings` (the n-th heading of the text,

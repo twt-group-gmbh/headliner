@@ -136,10 +136,12 @@ final readonly class StructureBox
     private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess, bool $editRteHeadings): array
     {
         $rows = [];
-        // The place of a heading from the text among the headings of its content element, in the order of the text
+        // The place of a heading from a text among the headings of that text, in the order of the text, per text
         $textOrdinals = [];
-        // What the editor of the text offers, per content element
+        // What the editor of the text offers, per text
         $textTags = [];
+        // The headings of a marked record that were found in one of its rich texts already: "table:uid" => field => place
+        $usedInRecord = [];
 
         foreach ($headings as $index => $heading) {
             $target = $heading->editTarget();
@@ -148,10 +150,17 @@ final readonly class StructureBox
             if ($target !== null && !$this->tagField->is($target['table'], $target['field'])) {
                 $target = null;
             }
+            // A heading in a record the template marked (a card) has no mark of its own: the field is found from the
+            // record, in its rich texts or in the field with its tag
+            $textTarget = null;
+            $recordTarget = $heading->recordTarget();
+            if ($target === null && $recordTarget !== null) {
+                ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord);
+            }
             $isElementTarget = $target !== null && $target['table'] === 'tt_content';
             $isSubheader = $isElementTarget && $target['field'] === HeaderTag::SUBHEADER_FIELD;
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
-            $fromText = $target === null && $heading->element !== null;
+            $fromText = $target === null && ($heading->element !== null || $textTarget !== null);
             // The content element: the record of the mark, or the one the heading says it is rendered in (the record
             // of a collection, a card of a Content Block, is not the element)
             $elementUid = $isElementTarget ? $target['uid'] : $this->getTranslatedUid($heading->element, $languageId);
@@ -163,14 +172,30 @@ final readonly class StructureBox
             $childRecord = $target !== null && !$isElementTarget ? BackendUtility::getRecordWSOL($target['table'], $target['uid']) : null;
             $tagRecord = $isElementTarget ? $contentRecord : $childRecord;
             $tagInherited = $tagRecord !== null && $target !== null && $this->tagComesFromOriginal($target['table'], $tagRecord, $target['field']);
+            // The rich text a heading from a text is in: the text a template marked (the text of a card, say), or the
+            // text of the content element the frame names
+            $textSource = $textTarget !== null
+                ? ['table' => $textTarget['table'], 'uid' => $textTarget['uid'], 'field' => $textTarget['field']]
+                : (!$fromText ? null : ($elementUid !== null
+                    ? ['table' => 'tt_content', 'uid' => $elementUid, 'field' => RteHeadingEditor::FIELD]
+                    : null));
+            $textKey = $textSource !== null ? $textSource['table'] . ':' . $textSource['uid'] . ':' . $textSource['field'] : null;
             $textOrdinal = null;
-            if ($fromText) {
-                $textOrdinal = $textOrdinals[$heading->element] = ($textOrdinals[$heading->element] ?? -1) + 1;
+            if ($textTarget !== null) {
+                // found in the text already, at its place
+                $textOrdinal = $textTarget['ordinal'];
+            } elseif ($textKey !== null) {
+                $textOrdinal = $textOrdinals[$textKey] = ($textOrdinals[$textKey] ?? -1) + 1;
             }
-            // A heading from the text is changed in the text itself, if it is where the order of the text says it is
-            $rte = $editRteHeadings && $contentRecord !== null && $textOrdinal !== null && $canOpen && !$heading->outside
-                && $this->rteEditor->canEditText($editAccess, $contentRecord)
-                && $this->isHeadingInText($contentRecord, $textOrdinal, $heading);
+            $textRecord = $textSource === null ? null : (
+                $textSource['table'] === 'tt_content' && $textSource['uid'] === $elementUid
+                    ? $contentRecord
+                    : BackendUtility::getRecordWSOL($textSource['table'], $textSource['uid'])
+            );
+            // A heading from a text is changed in the text itself, if it is where the order of the text says it is
+            $rte = $editRteHeadings && $textSource !== null && $textRecord !== null && $textOrdinal !== null && !$heading->outside
+                && $this->rteEditor->canEditText($editAccess, $textSource['table'], $textRecord, $textSource['field'])
+                && $this->isHeadingInText($textRecord, $textSource['field'], $textOrdinal, $heading);
             $rows[] = [
                 'tag' => $heading->level === 0 ? 'div' : 'h' . $heading->level,
                 'level' => $heading->level,
@@ -179,15 +204,15 @@ final readonly class StructureBox
                     static fn($issue): string => $issue->type->value,
                     array_filter($issues, static fn($issue): bool => $issue->index === $index)
                 )),
-                'edit' => $target !== null ? $heading->edit : null,
+                'edit' => $target !== null ? $target['table'] . ':' . $target['uid'] . ':' . $target['field'] : null,
                 'childLabel' => $target !== null && !$isElementTarget ? $this->tableTitle($target['table']) : '',
                 'group' => $elementUid,
                 'groupPosition' => '',
                 'groupHue' => 0,
-                'rte' => $rte ? $elementUid . ':' . $textOrdinal : null,
+                'rte' => $rte ? $textKey . ':' . $textOrdinal : null,
                 // a heading in a text offers what the editor of the text offers (and its own tag, so the select shows it)
                 'tagOptions' => $rte
-                    ? $this->textTagOptions($textTags[$elementUid] ??= $this->rteEditor->allowedTags($contentRecord), $heading->level)
+                    ? $this->textTagOptions($textTags[$textKey] ??= $this->rteEditor->allowedTags($textSource['table'], $textSource['field'], $textRecord), $heading->level)
                     : ($target !== null ? $this->tagField->options($target['table'], $target['field']) : HeaderTag::ALLOWED),
                 // opens the content element: its own header, or the element the heading is rendered in
                 'editUid' => $elementUid,
@@ -252,13 +277,56 @@ final readonly class StructureBox
      * what the frontend rendered is what the field says (a text that is changed by the output, or a heading that
      * another source adds, does not match and is left alone).
      *
-     * @param array<string, mixed> $contentRecord
+     * @param array<string, mixed> $record The record with the text
      */
-    private function isHeadingInText(array $contentRecord, int $ordinal, Heading $heading): bool
+    private function isHeadingInText(array $record, string $field, int $ordinal, Heading $heading): bool
     {
-        $inText = RteHeadings::all((string) ($contentRecord[RteHeadingEditor::FIELD] ?? ''))[$ordinal] ?? null;
+        $inText = RteHeadings::all((string) ($record[$field] ?? ''))[$ordinal] ?? null;
 
         return $inText !== null && $inText['level'] === $heading->level && $inText['text'] === $heading->text;
+    }
+
+    /**
+     * The field behind a heading in a record that a template marked (a card of a Content Block): the rich text the
+     * heading is written in (the first heading of a text that has its level and text and is not taken yet), or else
+     * the one field with its tag (a select of tags whose value is the tag the heading was rendered with). None if it
+     * is neither, or the tag fields cannot be told apart.
+     *
+     * @param array{table: string, uid: int} $recordTarget
+     * @param array<string, array<string, array<int, true>>> $used
+     * @return array{tag: array{table: string, uid: int, field: string}|null, text: array{table: string, uid: int, field: string, ordinal: int}|null}
+     */
+    private function resolveInRecord(array $recordTarget, Heading $heading, array &$used): array
+    {
+        $none = ['tag' => null, 'text' => null];
+        ['table' => $table, 'uid' => $uid] = $recordTarget;
+        $record = $this->tcaSchemaFactory->has($table) ? BackendUtility::getRecordWSOL($table, $uid) : null;
+        if ($record === null) {
+            return $none;
+        }
+        $fields = array_map(static fn($field): string => $field->getName(), iterator_to_array($this->tcaSchemaFactory->get($table)->getFields(), false));
+
+        $key = $table . ':' . $uid;
+        foreach ($fields as $field) {
+            if (!$this->rteEditor->isRichTextField($table, $field, $record)) {
+                continue;
+            }
+            foreach (RteHeadings::all((string) ($record[$field] ?? '')) as $ordinal => $inText) {
+                if (!isset($used[$key][$field][$ordinal]) && $inText['level'] === $heading->level && $inText['text'] === $heading->text) {
+                    $used[$key][$field][$ordinal] = true;
+
+                    return ['tag' => null, 'text' => ['table' => $table, 'uid' => $uid, 'field' => $field, 'ordinal' => $ordinal]];
+                }
+            }
+        }
+
+        $rendered = $heading->level === 0 ? 'div' : 'h' . $heading->level;
+        $matches = array_values(array_filter(
+            $fields,
+            fn(string $field): bool => $this->tagField->is($table, $field) && ($record[$field] ?? null) === $rendered
+        ));
+
+        return count($matches) === 1 ? ['tag' => ['table' => $table, 'uid' => $uid, 'field' => $matches[0]], 'text' => null] : $none;
     }
 
     /**

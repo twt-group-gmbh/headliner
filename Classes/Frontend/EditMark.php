@@ -28,6 +28,21 @@ final class EditMark
     }
 
     /**
+     * The record of any table, "table:uid": a card of a Content Block, say. The translation is named by its own uid.
+     *
+     * @param mixed $record A record object; anything else is no record
+     */
+    public static function recordSource(mixed $record): ?string
+    {
+        if (!$record instanceof RecordInterface || $record->getMainType() === '') {
+            return null;
+        }
+        $uid = $record->getComputedProperties()->getLocalizedUid() ?? $record->getUid();
+
+        return $uid > 0 ? $record->getMainType() . ':' . $uid : null;
+    }
+
+    /**
      * The uid of the content element the data is of (the translation in a translation), NULL if it is none.
      *
      * @param mixed $data See forContent()

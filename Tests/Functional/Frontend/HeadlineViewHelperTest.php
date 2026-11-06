@@ -122,4 +122,62 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     {
         self::assertStringNotContainsString('data-headliner-element', $this->render(true, []));
     }
+
+    private static function card(int $uid): Record
+    {
+        return new Record(new RawRecord($uid, 1, ['title' => 'A card'], new ComputedProperties(), 'cards'), ['title' => 'A card']);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function renderCard(bool $forThePageModule, array $data, mixed $card): string
+    {
+        $request = new ServerRequest('https://website.local/', 'GET');
+        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: $request,
+        ));
+        $view->assignMultiple(['data' => $data, 'card' => $card]);
+
+        return trim($view->render('Card'));
+    }
+
+    #[Test]
+    public function aRecordIsMarkedWithItselfAndItsElementForThePageModule(): void
+    {
+        $html = $this->renderCard(true, self::content(), self::card(7));
+
+        self::assertStringContainsString('data-headliner-record="cards:7"', $html);
+        self::assertStringContainsString('data-headliner-element="12"', $html);
+        // what is inside comes out as it is
+        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $html);
+    }
+
+    #[Test]
+    public function aHeadlineInARecordDoesNotTakeTheTagFieldOfTheElement(): void
+    {
+        $html = $this->renderCard(true, self::content(), self::card(7));
+
+        // outside of the record the heading is the header of the element, as before
+        self::assertStringContainsString('<h2 data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Outside</h2>', $html);
+        // inside it is not: the page module finds the field from the record. Only an explicit edit names a field.
+        self::assertStringContainsString('<h3 data-headliner-element="12">Inside</h3>', $html);
+        self::assertStringContainsString('<h4 data-headliner-edit="cards:7:tag" data-headliner-element="12">Explicit</h4>', $html);
+    }
+
+    #[Test]
+    public function aVisitorGetsTheCardAndNothingElse(): void
+    {
+        self::assertStringNotContainsString('data-headliner', $this->renderCard(false, self::content(), self::card(7)));
+        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $this->renderCard(false, self::content(), self::card(7)));
+    }
+
+    #[Test]
+    public function withoutARecordThereIsNoMark(): void
+    {
+        self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), null));
+        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $this->renderCard(true, self::content(), null));
+    }
 }

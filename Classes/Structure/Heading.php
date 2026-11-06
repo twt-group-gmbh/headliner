@@ -11,6 +11,7 @@ namespace Twtgroup\Headliner\Structure;
  * RTE content or a plugin): what the heading says itself (data-headliner-element), else the frame around it.
  * $outside says the heading is not in the content of the page (see HeadingExtractor): in the header, the menu, the footer.
  * It is shown, but not checked.
+ * $record says the record the heading is rendered for ("table:uid"), if the template marked it: a card of a Content Block.
  */
 final readonly class Heading
 {
@@ -20,6 +21,7 @@ final readonly class Heading
         public ?string $edit = null,
         public ?int $element = null,
         public bool $outside = false,
+        public ?string $record = null,
     ) {}
 
     /**
@@ -35,5 +37,19 @@ final readonly class Heading
         }
 
         return ['table' => $match[1], 'uid' => (int) $match[2], 'field' => $match[3]];
+    }
+
+    /**
+     * The record the template says this heading is rendered for, taken from $record: a table and a positive uid.
+     *
+     * @return array{table: string, uid: int}|null
+     */
+    public function recordTarget(): ?array
+    {
+        if ($this->record === null || preg_match('/^([a-z][a-z0-9_]*):([1-9]\d*)$/', $this->record, $match) !== 1) {
+            return null;
+        }
+
+        return ['table' => $match[1], 'uid' => (int) $match[2]];
     }
 }

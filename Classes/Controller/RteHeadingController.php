@@ -22,7 +22,9 @@ final readonly class RteHeadingController
     {
         $body = (array) ($request->getParsedBody() ?? []);
         $result = $this->editor->change(
+            (string) ($body['table'] ?? 'tt_content'),
             (int) ($body['uid'] ?? 0),
+            (string) ($body['field'] ?? RteHeadingEditor::FIELD),
             (int) ($body['ordinal'] ?? -1),
             (string) ($body['tag'] ?? ''),
             (string) ($body['text'] ?? '')

@@ -30,6 +30,19 @@ final class HeadingTest extends TestCase
         );
     }
 
+    #[Test]
+    public function describesTheRecordAHeadingIsRenderedFor(): void
+    {
+        self::assertSame(
+            ['table' => 'cards', 'uid' => 3],
+            (new Heading(3, 'Title', null, 82, false, 'cards:3'))->recordTarget()
+        );
+        self::assertNull((new Heading(3, 'Title'))->recordTarget());
+        self::assertNull((new Heading(3, 'Title', null, null, false, 'cards:0'))->recordTarget());
+        self::assertNull((new Heading(3, 'Title', null, null, false, 'Cards:3'))->recordTarget());
+        self::assertNull((new Heading(3, 'Title', null, null, false, 'cards:3:text'))->recordTarget());
+    }
+
     /**
      * @return iterable<string, array{string|null}>
      */
