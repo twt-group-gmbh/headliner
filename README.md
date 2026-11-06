@@ -21,7 +21,7 @@ rendered at a time when it is published, and the box says so. A page for fronten
 The content of the page is the elements of the site setting `headliner.contentSelector` (empty by default: the whole page). Headings in
 the header, the menu and the footer are shown very pale, and only their H1 counts: an H1 outside of the content is an H1
 of the page, even if the editor cannot change it, so it can make a second H1 or be the one H1 of the page. Their other
-levels cause no problem, but an empty heading is a problem wherever it is (red badge). Without such an element the whole page is checked.
+levels cause no problem, but an empty heading is a problem wherever it is. Without such an element the whole page is checked.
 
 The select and the link appear only for backend users who may edit the element; changing the tag also needs the
 permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).

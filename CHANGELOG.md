@@ -48,7 +48,7 @@ First release.
   it says that the page can never be shown.
 - Page module, content of the page: the headings in the content of the page are checked; of the headings around it only
   the H1 counts, because the page has it even if an editor cannot change it (an h1 in the header and one in the content are
-  two h1; an h1 in the header is the h1 of the page), while an h2 in the footer causes no problem. An empty heading is a problem wherever it is, also around the content, and gets a red badge (the other problems are amber). The content is what the new site setting
+  two h1; an h1 in the header is the h1 of the page), while an h2 in the footer causes no problem. An empty heading is a problem wherever it is, also around the content, and gets the badge "Empty heading" like the other problems. The content is what the new site setting
   `headliner.contentSelector` matches (empty by default: the whole page, set it to `main` or `#content` if the content has its own element); the headings around it are shown very pale, in the colour of their level, with the
   tooltip "Outside the content". If the page has no such element, the whole page is checked as before. The selector is translated by
   `symfony/css-selector`, which is a requirement now.
