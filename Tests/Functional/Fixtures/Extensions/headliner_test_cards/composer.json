@@ -1,0 +1,14 @@
+{
+    "name": "twtgroup/headliner-test-cards",
+    "description": "Test fixture for headliner: a table for the cards of a content element, with a rich text and two tag fields. Only for the functional tests.",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "require": {
+        "typo3/cms-core": "^14.3"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "headliner_test_cards"
+        }
+    }
+}

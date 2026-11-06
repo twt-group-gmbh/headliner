@@ -64,6 +64,10 @@ Tests split into two suites by what they need to boot:
   with `InspectRequest::ATTRIBUTE` to get the marks of the page module. The testing framework's own frontend middleware
   needs the request attribute `typo3.testing.context`, which only its own way of requesting sets, so
   `TestingContextRequestHandler` adds it when a test calls the real `PageHtmlFetcher`.
+  `Tests/Functional/Fixtures/Extensions/headliner_test_cards` is a small extension that only the tests load (listed in
+  `$testExtensionsToLoad` by path): a table with a rich text and two tag fields, like the collection of a Content Block.
+  `structureBox($html)` gives the box a fixed page html instead of rendering the frontend, so a test can put the marks of
+  `headliner:headline.children` on the page by hand (`StructureBoxRecordsTest`).
 
 ## Project decisions
 

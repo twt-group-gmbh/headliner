@@ -6,11 +6,15 @@ namespace Twtgroup\Headliner\Tests\Functional;
 
 use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
 use TYPO3\CMS\Core\Configuration\Richtext;
 use TYPO3\CMS\Core\Core\Environment;
 use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\RequestHandler;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -97,11 +101,23 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
      * The box of the page module, with the real fetcher and the real request handler of the core, only wrapped for the
      * testing framework.
      */
-    protected function structureBox(): StructureBox
+    protected function structureBox(?string $pageHtml = null): StructureBox
     {
+        // with a page html the page is not rendered: the box gets what the ViewHelpers would have put there
+        $handler = $pageHtml !== null
+            ? new class ($pageHtml) implements RequestHandlerInterface {
+                public function __construct(private readonly string $html) {}
+
+                public function handle(ServerRequestInterface $request): ResponseInterface
+                {
+                    return new HtmlResponse($this->html);
+                }
+            }
+        : new TestingContextRequestHandler($this->get(RequestHandler::class));
+
         return new StructureBox(
             $this->get(SiteFinder::class),
-            new PageHtmlFetcher(new TestingContextRequestHandler($this->get(RequestHandler::class))),
+            new PageHtmlFetcher($handler),
             new HeadingExtractor(),
             new HeadingValidator(),
             $this->get(ViewFactoryInterface::class),

@@ -1,0 +1,5 @@
+"tx_headlinertestcards_card"
+,"uid","pid","title","tag","subtag","text"
+,1,8,"First card","h3","h4","<p>x</p><h3>Card text heading</h3>"
+,2,8,"Second card","h3","h3",""
+,3,8,"Third card","h2","h4","<h3>Same</h3><p>a</p><h3>Same</h3>"
