@@ -39,6 +39,7 @@ ddev test [unit|functional|all]   # PHPUnit suites
 ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/Scripts/xlf-lint.php`: valid XLIFF) + prettier
                         # (formatting of the *.xlf); `ddev cgl-fix` auto-fixes PHP,
                         # `ddev npm run lint:xlf-fix` fixes the XLIFF formatting
+ddev flush              # flush all TYPO3 caches, including the compiled container (after a branch switch)
 ddev scan-extension [--strict]    # TYPO3 Extension Scanner (Install Tool "Scan Extension Files") on CLI
 ddev docs               # render Documentation/ with the TYPO3 docs toolchain (Docker); fix every warning
 ```

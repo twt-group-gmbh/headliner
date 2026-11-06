@@ -1,0 +1,14 @@
+#!/bin/bash
+## Description: Flush all TYPO3 caches of the demo instance (also the compiled container, e.g. after a branch switch)
+## Usage: flush
+## Example: "ddev flush"
+
+# The compiled container (var/cache/code/di) is removed by hand first: after a switch to a branch with other classes it
+# can be out of date so that the TYPO3 CLI does not boot ("Class ... not found") and cache:flush could not run.
+
+cd /var/www/html || exit 1
+
+[ -x .Build/bin/typo3 ] || { echo "No TYPO3 instance yet: run 'ddev start' or 'ddev demo' first." >&2; exit 1; }
+
+rm -rf var/cache/code/di
+.Build/bin/typo3 cache:flush
