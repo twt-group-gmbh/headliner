@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\ViewHelpers;
 
 use Psr\Http\Message\ServerRequestInterface;
+use Twtgroup\Headliner\Frontend\EditMark;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Middleware\InspectRequest;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
@@ -16,6 +17,9 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
  *   <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="{settings.defaultHeaderType}">
  *       {header}
  *   </headliner:headline>
+ *
+ * The page module finds the record behind a header by the attribute data-headliner-edit, which is only rendered for it.
+ * The record is taken from the variable "data" of the content element; "edit" names it explicitly.
  *
  * Only h1-h6 and div can come out, so the value can never inject markup.
  */
@@ -30,7 +34,7 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('layout', 'string', 'The layout of the header (header_layout), only used for the CSS class');
         $this->registerArgument('default', 'string', 'Layout to take the tag from if no tag is set (older content)');
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header', false, false);
-        $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module');
+        $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
         $this->registerArgument('subheaderTag', 'string', 'The tag chosen for the subheader; without it the subheader is one level below the header');
     }
 
@@ -44,8 +48,16 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
             HeaderTag::layoutClass($this->arguments['layout']),
         ]);
         $this->tag->addAttribute('class', implode(' ', $classes));
-        if ($this->arguments['edit'] && $this->isInspectRequest()) {
-            $this->tag->addAttribute('data-headliner-edit', $this->arguments['edit']);
+        $edit = $this->arguments['edit'] ?? null;
+        if ($edit === null && $this->isInspectRequest()) {
+            // the record of the content element this is rendered for, as the templates of fluid_styled_content have it
+            $edit = EditMark::forContent(
+                $this->renderingContext?->getVariableProvider()->get('data'),
+                $this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD
+            );
+        }
+        if ($edit && $this->isInspectRequest()) {
+            $this->tag->addAttribute('data-headliner-edit', $edit);
         }
         $this->tag->ignoreEmptyAttributes(true);
         $this->tag->setContent((string) $this->renderChildren());

@@ -44,8 +44,7 @@ If your templates render the header themselves, use the ViewHelper:
           data-namespace-typo3-fluid="true">
 
     <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}"
-                        default="{settings.defaultHeaderType}"
-                        edit="tt_content:{data.uid}:header_tag">
+                        default="{settings.defaultHeaderType}">
         {record -> f:render.text(field: 'header')}
     </headliner:headline>
 
@@ -54,8 +53,7 @@ A subheader is rendered the same way, with `subheader`:
 ..  code-block:: html
 
     <headliner:headline subheader="1" tag="{data.header_tag}" subheaderTag="{data.subheader_tag}"
-                        layout="{data.header_layout}" default="{settings.defaultHeaderType}"
-                        edit="tt_content:{data.uid}:subheader_tag">
+                        layout="{data.header_layout}" default="{settings.defaultHeaderType}">
         {record -> f:render.text(field: 'subheader')}
     </headliner:headline>
 
@@ -67,10 +65,11 @@ A subheader is rendered the same way, with `subheader`:
 
 ..  note::
 
-    In a translation, give `edit` the uid of the translated record: `data._LOCALIZED_UID` if it is set, else
-    `data.uid`. The partial of the extension does it like this:
-    `{f:if(condition: data._LOCALIZED_UID, then: data._LOCALIZED_UID, else: data.uid)}`.
-    The page module opens and changes the record the mark names.
+    The page module finds the record behind a header by the mark `data-headliner-edit`. The ViewHelper adds it itself,
+    for the page module only, from the variable `data` of the content element: its uid (in a translation the uid of
+    the translation, `data._LOCALIZED_UID`) and the field, `header_tag` or, with `subheader`, `subheader_tag`. You do not
+    have to pass `edit`. Pass it only if the ViewHelper is used where there is no `data` (a partial gets only the
+    arguments it is given, so pass `data` to it).
 
 `tag`
     The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`.
@@ -82,8 +81,9 @@ A subheader is rendered the same way, with `subheader`:
     The layout to take the tag from if no tag is set (content from before the extension was installed).
 
 `edit`
-    `table:uid:field`. Lets the page module find the record behind a heading. It is rendered only for the request of the
-    page module, never for visitors.
+    Optional. `table:uid:field`. Lets the page module find the record behind a heading. Without it the ViewHelper takes
+    the record from the variable `data` of the content element. It is rendered only for the request of the page module,
+    never for visitors.
 
 `subheader`, `subheaderTag`
     Render a subheader instead of the header. Without `subheaderTag` it is one level below the header.
