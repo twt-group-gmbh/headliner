@@ -241,3 +241,50 @@ Other themes
 For a theme that does not use the header partial of `fluid_styled_content`, use the ViewHelper as shown above. The page
 module finds the headings in the rendered page whatever template produced them; only headers rendered with the
 ViewHelper carry the `data-headliner-edit` mark and so can be changed in the box.
+
+..  _integration-camino:
+
+Themes with their own header templates (Camino)
+-----------------------------------------------
+
+The theme `typo3/theme-camino` renders the header of some content elements with partials of its own, not with the header
+partial of `fluid_styled_content`. It takes the tag from `header_layout` (1 to 6) and the look from a field of its own, and
+renders the subheader as a `p`. For these elements:
+
+*   the fields :guilabel:`Tag` (`header_tag`) and :guilabel:`Subheader tag` (`subheader_tag`) are in the form, but have no
+    effect in the frontend;
+*   the box shows their headings, but only as a label: it cannot change their tag, because nothing in the template names
+    the field (the mark `data-headliner-edit` is written by `headliner:headline`).
+
+This was seen with the content element :guilabel:`Regular Text Element` (`text`). The other element types that Camino
+does not override, for example :guilabel:`Header` (`header`) and :guilabel:`Bullet List` (`bullets`), use the partial of
+`fluid_styled_content`, so the fields work and the box can change their tags.
+
+Some of Camino's own element types do not render a heading at all, so the box has nothing to list for them. The :guilabel:`Text Teaser`
+(`camino_textteaser`) renders `<p class="headline">` with the layout :guilabel:`Default`, and an `h1` to `h6` only with the
+layout 1 to 6. The :guilabel:`Text Media Teaser Grid` (`camino_textmedia_teaser_grid`) renders its header as a `p` whatever
+the layout is, and the headers of its entries as `<header>`. The box lists headings (`h1` to `h6`), so these do not
+appear in it.
+
+To keep editors from setting a tag that does nothing, hide the two fields for the element types that ignore them. Use the
+page TSconfig of your site (for example `page.tsconfig` in the site package or site set), with the element type after
+`types`:
+
+..  code-block:: typoscript
+    :caption: page.tsconfig
+
+    TCEFORM.tt_content {
+        header_tag.types.text.disabled = 1
+        subheader_tag.types.text.disabled = 1
+    }
+
+Add a line per type (`textpic`, `camino_hero`, and so on). A hidden field keeps its value, which is empty ("from the
+layout") for content that was never given a tag, so nothing changes in the frontend. To hide a field for every
+element type, leave out `types.<type>`:
+
+..  code-block:: typoscript
+
+    TCEFORM.tt_content.header_tag.disabled = 1
+
+The subheader tag can also be switched off for a whole site with the site setting
+:confval:`headliner.subheader.enabled`.

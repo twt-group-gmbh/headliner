@@ -48,6 +48,12 @@ The header partial keeps the `f:render.text` calls of the partial of `fluid_styl
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. headliner needs no ViewHelper in your own templates.
 
+A theme that does not use the header partial of `fluid_styled_content` ignores the fields *Tag* and *Subheader tag* for the
+content elements it renders itself. This was seen with the Regular Text Element of `typo3/theme-camino`: the box shows
+their headings but cannot change their tag, and some of its own elements (Text Teaser, Text Media Teaser Grid) render
+paragraphs instead of headings, so they do not appear in the box. The documentation (Integration) says how to hide the fields for such
+element types with page TSconfig (`TCEFORM.tt_content.header_tag.types.<type>.disabled = 1`).
+
 The full documentation is in [`Documentation/`](Documentation/Index.rst).
 
 ## Installation

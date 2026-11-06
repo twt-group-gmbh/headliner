@@ -45,6 +45,11 @@ You can also select the set in :guilabel:`Sites > Setup`.
     Only under an H2 the tag stays the same. Check the CSS and the heading structure of pages that have subheaders, or
     choose :guilabel:`H3` in :guilabel:`Subheader tag` for them.
 
+..  note::
+
+    A theme that renders its headers with partials of its own, such as `typo3/theme-camino`, ignores the fields for
+    those elements. See :ref:`integration-camino` for what that means and how to hide the fields for them.
+
 ..  _installation-database:
 
 Database
