@@ -117,13 +117,16 @@ records of tables of their own. Wrap what is rendered for each record in `headli
 
 ..  code-block:: html
 
-    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{data.header}</headliner:headline>
+    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
+    <f:if condition="{header}">
+        <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{header}</headliner:headline>
+    </f:if>
 
     <f:for each="{data.cards}" as="card">
         <headliner:headline.children record="{card}">
             <article class="card">
-                <headliner:headline tag="{card.tag}">{card.title}</headliner:headline>
-                <f:format.html>{card.text}</f:format.html>
+                <headliner:headline tag="{card.tag}">{card -> f:render.text(field: 'title')}</headliner:headline>
+                {card -> f:render.text(field: 'text')}
             </article>
         </headliner:headline.children>
     </f:for>
@@ -204,8 +207,8 @@ records (inline, IRRE) made with the means of the core works the same way. This 
         <f:for each="{record.myext_items}" as="item">
             <headliner:headline.children record="{item}">
                 <article>
-                    <headliner:headline tag="{item.tag}">{item.title}</headliner:headline>
-                    <f:format.html>{item.text}</f:format.html>
+                    <headliner:headline tag="{item.tag}">{item -> f:render.text(field: 'title')}</headliner:headline>
+                    {item -> f:render.text(field: 'text')}
                 </article>
             </headliner:headline.children>
         </f:for>

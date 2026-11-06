@@ -8,8 +8,8 @@
         <f:for each="{record.headlinerdemo_items}" as="item">
             <headliner:headline.children record="{item}">
                 <article class="teaser">
-                    <headliner:headline tag="{item.tag}">{item.title}</headliner:headline>
-                    <f:format.html>{item.text}</f:format.html>
+                    <headliner:headline tag="{item.tag}">{item -> f:render.text(field: 'title')}</headliner:headline>
+                    {item -> f:render.text(field: 'text')}
                 </article>
             </headliner:headline.children>
         </f:for>
