@@ -33,6 +33,8 @@ The header partial keeps the `f:render.text` calls of the partial of `fluid_styl
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. headliner needs no ViewHelper in your own templates.
 
+The full documentation is in [`Documentation/`](Documentation/Index.rst).
+
 ## Installation
 
 ### Composer

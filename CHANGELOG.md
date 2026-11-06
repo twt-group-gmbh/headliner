@@ -42,6 +42,7 @@ First release.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the two subheader fields are hidden in the
   backend of that site and the subheader follows the tag and layout of the header (one level below).
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
+- Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 
 ### Requirements
 - PHP 8.3 or newer
