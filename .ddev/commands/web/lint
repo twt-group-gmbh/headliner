@@ -1,5 +1,5 @@
 #!/bin/bash
-## Description: Run static analysis and the coding-style check (PHPStan + CS-Fixer dry-run)
+## Description: Run static analysis, the coding-style check and the XLIFF lint (PHPStan + CS-Fixer dry-run + xlf-lint)
 ## Usage: lint
 ## Example: "ddev lint"
 
@@ -11,3 +11,6 @@ echo "=== PHPStan ==="
 
 echo "=== PHP-CS-Fixer (dry-run) ==="
 .Build/bin/php-cs-fixer fix --config .php-cs-fixer.dist.php --dry-run --diff
+
+echo "=== XLIFF files ==="
+php Build/Scripts/xlf-lint.php

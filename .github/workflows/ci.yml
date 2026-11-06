@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   lint:
-    name: cs-fixer + phpstan
+    name: cs-fixer + phpstan + xlf
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -31,6 +31,7 @@ jobs:
       - run: composer update --prefer-dist --no-progress --no-interaction
       - run: .Build/bin/php-cs-fixer fix --dry-run --diff
       - run: .Build/bin/phpstan analyse -c Build/phpstan/phpstan.neon --no-progress
+      - run: php Build/Scripts/xlf-lint.php
 
   unit:
     name: unit (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})
