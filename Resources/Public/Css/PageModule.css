@@ -100,7 +100,8 @@
 }
 
 .headliner__text {
-    flex: 1 1 4rem;
+    /* the badges follow the text directly */
+    flex: 0 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
 }
@@ -118,6 +119,9 @@
 
 @container headliner-section (max-width: 30rem) {
     .headliner__item { --headliner-step: 1rem; }
+
+    /* in a narrow section the text may use the room next to the pill and wrap, instead of moving below it */
+    .headliner__text { flex: 1 1 4rem; }
 }
 
 @container headliner-section (max-width: 22rem) {
