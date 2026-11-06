@@ -41,6 +41,7 @@ First release.
   (`subheader_layout`) inherit the choices of `header_tag` and `header_layout`. Layout "Hidden" hides the subheader.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the two subheader fields are hidden in the
   backend of that site and the subheader follows the tag and layout of the header (one level below).
+- Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 
 ### Requirements
 - PHP 8.3 or newer
