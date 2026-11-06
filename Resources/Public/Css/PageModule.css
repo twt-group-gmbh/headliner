@@ -114,8 +114,10 @@
     overflow-wrap: anywhere;
 }
 
+/* the gap sits after the text and the badges, so a badge that wraps starts at the left edge of the text */
+.headliner__body > .headliner__text,
 .headliner__body > .badge {
-    margin-inline-start: .5rem;
+    margin-inline-end: .5rem;
 }
 
 .headliner__item:hover {
