@@ -13,6 +13,14 @@ The Semantilizer keeps the type of a header in one field, `header_type` (0 to 6)
 Headliner does the same with two fields, `header_tag` for the tag and `header_layout` for the look, so the content can be
 taken over.
 
+..  important::
+
+    Do not run both extensions side by side. Both override the header partial of `fluid_styled_content`, and the
+    Semantilizer's partial wins, so the tags of headliner would have no effect in the frontend and the editor would see two
+    fields for the same thing. Headliner therefore conflicts with `zeroseven/z7-semantilizer` in Composer. The order is:
+    remove the Semantilizer, install headliner, run the wizard. The wizard does not need the Semantilizer: it reads the
+    column `header_type`, which stays in the database.
+
 The upgrade wizard :guilabel:`Headliner: take the heading types of the Semantilizer (z7_semantilizer) into the tags of
 headliner` does that:
 

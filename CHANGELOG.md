@@ -112,6 +112,8 @@ First release.
 - Documentation: the chapter "Child records without Content Blocks" shows the wrapper `headliner:headline.children` with a
   content element made with the means of the core (TCA of the field and of the child table, Fluid template with
   `{record}`).
+- Composer conflict with `zeroseven/z7-semantilizer`: both override the header partial and the Semantilizer's wins, so they
+  must not run side by side. The documentation says in which order to switch (remove, install, run the wizard).
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

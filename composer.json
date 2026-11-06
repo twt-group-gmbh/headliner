@@ -25,6 +25,9 @@
         "typo3/cms-core": "^14.3",
         "symfony/css-selector": "^7.3 || ^8.0"
     },
+    "conflict": {
+        "zeroseven/z7-semantilizer": "*"
+    },
     "require-dev": {
         "typo3/testing-framework": "^8.2 || ^9.0",
         "typo3/cms-install": "^14.3",
