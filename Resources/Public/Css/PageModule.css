@@ -174,13 +174,14 @@
     font-style: italic;
 }
 
-/* Headings outside of the content: not checked (an h1 is, see below), so they are quiet: the colour of their level,
-   but very pale. The tooltip of the row says why. A row with a problem is not pale. */
-.headliner__item--outside:not(.headliner__item--issue) .headliner__text {
+/* Headings outside of the content: the colour of their level, but very pale, also if they have a problem (an h1 or an
+   empty heading counts wherever it is): the amber badge after the text stays as it is. The tooltip of the row says
+   why they are pale. */
+.headliner__item--outside .headliner__text {
     opacity: .7;
 }
 
-.headliner__item--outside:not(.headliner__item--issue) .headliner__tag [data-current] {
+.headliner__item--outside .headliner__tag [data-current] {
     opacity: .35;
 }
 
