@@ -39,7 +39,7 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
     A CSS selector for the content of the page, for example `main`, `#content` or `.page-content`. Empty by default:
     then the whole page is the content. If it is set, the headings in the elements it matches are checked. Headings in the header, the menu and the footer are shown very pale (the
     tooltip says :guilabel:`Outside the content`); only their H1 counts, because the page has that H1, and their other
-    levels cause no problem.
+    levels cause no problem; an empty heading is a problem wherever it is.
 
     If the page has no element that matches, or if the setting is empty or not a valid selector, the whole page is
     checked. Use `main` if your theme puts the content of the page in a `<main>` element.

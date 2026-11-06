@@ -16,9 +16,7 @@ final class HeadingValidator
      */
     public function validate(array $headings): array
     {
-        if (array_filter($headings, static fn(Heading $heading): bool => $heading->level > 0 && !$heading->outside) === []) {
-            return [];
-        }
+        $hasContent = array_filter($headings, static fn(Heading $heading): bool => $heading->level > 0 && !$heading->outside) !== [];
 
         $issues = [];
         $h1Count = 0;
@@ -32,6 +30,10 @@ final class HeadingValidator
             // Every h1 counts, also one outside of the content (in the header, say) that the editor cannot change: the
             // page has one h1 or it has not. The other levels outside of the content are listed, but not checked.
             if ($heading->outside) {
+                // an empty heading is a problem wherever it is, also where the editor cannot change it
+                if ($heading->text === '') {
+                    $issues[] = new Issue(IssueType::EmptyHeading, $index);
+                }
                 if ($heading->level === 1 && ++$h1Count > 1) {
                     $issues[] = new Issue(IssueType::MultipleH1, $index);
                 }
@@ -49,7 +51,8 @@ final class HeadingValidator
             $previousLevel = $heading->level;
         }
 
-        if ($h1Count === 0) {
+        // a page without content headings has nothing to check but the empty headings around it
+        if ($hasContent && $h1Count === 0) {
             array_unshift($issues, new Issue(IssueType::MissingH1, null));
         }
 

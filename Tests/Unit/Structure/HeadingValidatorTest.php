@@ -161,6 +161,27 @@ final class HeadingValidatorTest extends TestCase
     }
 
     #[Test]
+    public function anEmptyHeadingOutsideOfTheContentIsMarked(): void
+    {
+        // an empty heading is a problem wherever it is, also where the editor cannot change it
+        $issues = (new HeadingValidator())->validate([
+            new Heading(2, '', outside: true),
+            new Heading(1, 'Title'),
+            new Heading(4, '', outside: true),
+        ]);
+
+        self::assertEquals([new Issue(IssueType::EmptyHeading, 0), new Issue(IssueType::EmptyHeading, 2)], $issues);
+    }
+
+    #[Test]
+    public function anEmptyHeadingOutsideOfTheContentIsMarkedEvenIfTheContentHasNoHeadings(): void
+    {
+        $issues = (new HeadingValidator())->validate([new Heading(2, '', outside: true), new Heading(3, 'Footer', outside: true)]);
+
+        self::assertEquals([new Issue(IssueType::EmptyHeading, 0)], $issues);
+    }
+
+    #[Test]
     public function otherLevelsOutsideOfTheContentAreNotChecked(): void
     {
         // an h4 in the footer is no skipped level

@@ -93,7 +93,7 @@ What is checked, and what is not
     <configuration-contentselector>` matches (empty by default: then the whole page). Headings in the header, the menu and the footer are shown
     very pale (the tooltip says :guilabel:`Outside the content`). Only their H1 counts, also where an editor cannot change
     it: an H1 in the header and one in the content are two H1, and an H1 in the header is the H1 of the page. Their other
-    levels cause no problem. If the page has no such element, the whole page is checked.
+    levels cause no problem, but an empty heading is a problem wherever it is, and it gets a red badge. If the page has no such element, the whole page is checked.
 *   A **hidden** page is rendered too, so you can check its structure before it is published. The box says
     :guilabel:`The page is hidden` and shows how the page will look when it is published. Hidden content elements are not
     part of it, a visitor would not see them either.
