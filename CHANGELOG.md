@@ -119,7 +119,7 @@ First release.
 - Security: the box takes nothing in the page for markup. The text of a heading is output as text (an editor can write
   `&lt;img onerror=…&gt;` as a header, which is `<img onerror=…>` in the rendered text), a mark for a record that is not on
   the page shown makes a label and no select, and the route that loads the box checks the languages it is asked for. Both
-  routes need the request token of the core. The documentation lists the rules and the limits.
+  routes need the request token of the core.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 
