@@ -34,9 +34,9 @@ from content elements, RTE content and other extensions are included without any
 
 Content elements get the field **Tag** (H1-H6 or div, default H2). It decides the HTML tag of the header, so the
 heading hierarchy can be fixed without touching the look: the layout (**Type**) only sets the CSS class
-`ce-headline-layout-N`. The fields **Subheader tag** and **Subheader type** do the same for the subheader and offer
-the same choices; the layout "Hidden" hides the subheader. Without them (see below), the subheader is rendered one level
-below the header.
+`ce-headline-layout-N`. The field **Subheader tag** does the same for the subheader and offers
+the same choices; the subheader has no layout of its own, it looks like its header (and "Hidden" hides both). Without
+the field (see below), the subheader is rendered one level below the header.
 
 ## Compatibility
 
@@ -70,7 +70,7 @@ existing pages do not change until an editor chooses a tag.
 
 | Setting                      | Default | Description |
 |------------------------------|---------|-------------|
-| `headliner.subheader.enabled` | on      | Show the fields *Subheader tag* and *Subheader type*. If switched off for a site, they are hidden in the backend and the subheader follows the tag and layout of the header. |
+| `headliner.subheader.enabled` | on      | Show the field *Subheader tag*. If switched off for a site, it is hidden in the backend and the subheader follows the tag of the header. |
 | `headliner.contentSelector`   | `main`  | CSS selector of the content of the page. Only the headings in it are checked; the ones around it are shown greyed. If nothing matches, or if empty, the whole page is checked. |
 
 ## Requirements

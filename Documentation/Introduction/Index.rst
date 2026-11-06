@@ -17,8 +17,8 @@ Features
     the frontend, and marks problems: no H1, more than one H1, skipped levels (an H2 followed by an H4) and empty
     headings.
 *   **Choose the tag.** Content elements get the field :guilabel:`Tag` (H1 to H6 or `div`). The layout
-    (:guilabel:`Type`) only decides how the header looks, through a CSS class. The same works for the subheader
-    (:guilabel:`Subheader tag`, :guilabel:`Subheader type`).
+    (:guilabel:`Type`) only decides how the header looks, through a CSS class. The subheader has its own tag
+    (:guilabel:`Subheader tag`) and looks like its header.
 *   **Change it in place.** In the box the tag can be changed with a select. It is saved through the DataHandler and the
     structure is checked again.
 *   **Open the element.** The text of a header opens the edit form of its content element in the side panel, also for

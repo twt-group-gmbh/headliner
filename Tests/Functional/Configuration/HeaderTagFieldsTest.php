@@ -36,15 +36,15 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function theSubheaderFieldsInheritTheChoicesOfTheHeaderFields(): void
+    public function theSubheaderTagInheritsTheChoicesOfTheHeaderTag(): void
     {
         $columns = $GLOBALS['TCA']['tt_content']['columns'];
 
         self::assertSame($this->values($columns['header_tag']), $this->values($columns['subheader_tag']));
         self::assertSame('h3', $columns['subheader_tag']['config']['default']);
-        self::assertSame($this->values($columns['header_layout']), $this->values($columns['subheader_layout']));
         self::assertTrue($columns['subheader_tag']['exclude']);
-        self::assertTrue($columns['subheader_layout']['exclude']);
+        // the layout of the header decides how the subheader looks, there is no layout of its own
+        self::assertArrayNotHasKey('subheader_layout', $columns);
     }
 
     #[Test]
@@ -58,12 +58,12 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function theSubheaderFieldsAreOnlyInThePaletteWithASubheader(): void
+    public function theSubheaderTagIsOnlyInThePaletteWithASubheader(): void
     {
         $palettes = $GLOBALS['TCA']['tt_content']['palettes'];
 
         self::assertStringContainsString('subheader_tag', (string) $palettes['headers']['showitem']);
-        self::assertStringContainsString('subheader_layout', (string) $palettes['headers']['showitem']);
+        self::assertStringNotContainsString('subheader_layout', (string) $palettes['headers']['showitem']);
         self::assertStringNotContainsString('subheader_tag', (string) $palettes['header']['showitem']);
     }
 
@@ -72,7 +72,7 @@ final class HeaderTagFieldsTest extends FunctionalTestCase
     {
         $table = $this->getConnectionPool()->getConnectionForTable('tt_content')->createSchemaManager()->introspectTable('tt_content');
 
-        foreach (['header_tag', 'subheader_tag', 'subheader_layout'] as $column) {
+        foreach (['header_tag', 'subheader_tag'] as $column) {
             self::assertTrue($table->hasColumn($column), $column);
         }
     }

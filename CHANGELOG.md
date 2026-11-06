@@ -64,10 +64,11 @@ First release.
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The
   subheader is rendered one level below the header. Provided as a partial override for `fluid_styled_content`
   through the site set `twtgroup/headliner`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6).
-- Content elements with a subheader: the fields "Subheader tag" (`subheader_tag`, default H3) and "Subheader type"
-  (`subheader_layout`) inherit the choices of `header_tag` and `header_layout`. Layout "Hidden" hides the subheader.
-- Site setting `headliner.subheader.enabled` (default on): if switched off, the two subheader fields are hidden in the
-  backend of that site and the subheader follows the tag and layout of the header (one level below).
+- Content elements with a subheader: the field "Subheader tag" (`subheader_tag`, default H3) inherits the choices of
+  `header_tag`. The subheader has no layout of its own: it looks like its header (the CSS class `ce-headline-layout-N`
+  of `header_layout`), and the layout "Hidden" hides the header and the subheader.
+- Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the
+  backend of that site and the subheader follows the tag of the header (one level below).
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

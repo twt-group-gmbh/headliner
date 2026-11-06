@@ -1,9 +1,9 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
 <f:comment>
     Overrides the partial of fluid_styled_content. It is a copy of it, except that the tag of the header and
-    subheader comes from the fields "header_tag" and "subheader_tag", and the layouts only decide the CSS class
-    (ce-headline-layout-N). The subheader fields can be switched off in the site settings (headliner.subheader.enabled);
-    then the subheader follows the header tag and layout.
+    subheader comes from the fields "header_tag" and "subheader_tag", and the layout only decides the CSS class
+    (ce-headline-layout-N); the subheader has the layout of its header. The subheader tag can be switched off in the
+    site settings (headliner.subheader.enabled); then the subheader follows the header tag.
 </f:comment>
 <f:variable name="ownSubheader" value="{settings.headliner.subheaderFields}" />
 <f:variable name="editUid" value="{f:if(condition: data._LOCALIZED_UID, then: data._LOCALIZED_UID, else: data.uid)}" />
@@ -22,16 +22,14 @@
                 link: data.header_link}" />
             <f:if condition="{ownSubheader}">
                 <f:then>
-                    <f:if condition="{data.subheader_layout} != 100">
-                        <f:render partial="Headliner/SubHeader" arguments="{
-                            subheader: subheader,
-                            tag: data.header_tag,
-                            subheaderTag: data.subheader_tag,
-                            edit: 'tt_content:{editUid}:subheader_tag',
-                            layout: data.subheader_layout,
-                            default: settings.defaultHeaderType,
-                            positionClass: '{f:if(condition: data.header_position, then: \'ce-headline-{data.header_position}\')}'}" />
-                    </f:if>
+                    <f:render partial="Headliner/SubHeader" arguments="{
+                        subheader: subheader,
+                        tag: data.header_tag,
+                        subheaderTag: data.subheader_tag,
+                        edit: 'tt_content:{editUid}:subheader_tag',
+                        layout: data.header_layout,
+                        default: settings.defaultHeaderType,
+                        positionClass: '{f:if(condition: data.header_position, then: \'ce-headline-{data.header_position}\')}'}" />
                 </f:then>
                 <f:else>
                     <f:render partial="Headliner/SubHeader" arguments="{

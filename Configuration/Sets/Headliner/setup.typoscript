@@ -1,5 +1,5 @@
 # Overrides the header partial of fluid_styled_content (higher key = later = wins over the core paths)
 lib.contentElement.partialRootPaths.200 = EXT:headliner/Resources/Private/Partials
 
-# Site setting "headliner.subheader.enabled": use the fields subheader_tag and subheader_layout
+# Site setting "headliner.subheader.enabled": use the field subheader_tag
 lib.contentElement.settings.headliner.subheaderFields = {$headliner.subheader.enabled}

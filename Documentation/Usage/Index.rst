@@ -48,11 +48,11 @@ The fields of a content element
 :guilabel:`Subheader tag` (`subheader_tag`)
     Like :guilabel:`Tag`, for the subheader. Default H3.
 
-:guilabel:`Subheader type` (`subheader_layout`)
-    Like :guilabel:`Type`, for the subheader. "Hidden" hides the subheader.
+The subheader has no layout of its own: it has the layout class of its header, and the layout "Hidden" of the header
+hides both.
 
-If the subheader fields are switched off for a site (see :ref:`configuration`), the subheader follows the header: one
-level below its tag, with the layout class of the header.
+If the subheader tag is switched off for a site (see :ref:`configuration`), the subheader follows the header: one
+level below its tag.
 
 ..  _usage-languages:
 

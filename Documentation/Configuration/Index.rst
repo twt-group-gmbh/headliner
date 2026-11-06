@@ -17,10 +17,10 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
     :type: bool
     :Default: true
 
-    Show the fields :guilabel:`Subheader tag` and :guilabel:`Subheader type` in content elements.
+    Show the field :guilabel:`Subheader tag` in content elements.
 
-    If switched off for a site, the two fields are hidden in the backend of that site, and the subheader follows the
-    tag and layout of the header: one level below the header, with the layout class of the header.
+    If switched off for a site, the field is hidden in the backend of that site, and the subheader follows the tag of
+    the header: one level below it.
 
 ..  code-block:: yaml
     :caption: config/sites/<identifier>/settings.yaml

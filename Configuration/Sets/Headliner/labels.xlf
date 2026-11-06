@@ -10,10 +10,10 @@
 				<source>Headliner</source>
 			</trans-unit>
 			<trans-unit id="settings.headliner.subheader.enabled">
-				<source>Subheader tag and layout</source>
+				<source>Subheader tag</source>
 			</trans-unit>
 			<trans-unit id="settings.description.headliner.subheader.enabled">
-				<source>Show the fields "Subheader tag" and "Subheader type" in content elements. If switched off, the subheader follows the tag and layout of the header.</source>
+				<source>Show the field "Subheader tag" in content elements. If switched off, the subheader follows the tag of the header (one level below).</source>
 			</trans-unit>
 			<trans-unit id="settings.headliner.contentSelector">
 				<source>Content of the page</source>

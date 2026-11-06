@@ -11,10 +11,6 @@
 				<source>Subheader tag</source>
 				<target>Untertitel-Tag</target>
 			</trans-unit>
-			<trans-unit id="tt_content.subheader_layout">
-				<source>Subheader type</source>
-				<target>Untertitel-Typ</target>
-			</trans-unit>
 			<trans-unit id="tt_content.header_tag.h1">
 				<source>H1</source>
 				<target>H1</target>

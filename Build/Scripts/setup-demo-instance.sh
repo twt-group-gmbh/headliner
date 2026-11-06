@@ -69,10 +69,10 @@ else
     sed -i 's#^dependencies:$#dependencies:\n  - twtgroup/headliner#' "${SITE_CONFIG}"
 fi
 mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
-    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, crdate, tstamp) VALUES
-        (1, 'header', 0, 512, 0, 'Our services', 2, 'h2', 'What we do', 'h3', 3, '', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (1, 'text', 0, 768, 0, 'Details', 2, 'h4', '', 'h3', 0, '<p>Tag H4 with the look of layout 2: the last heading was an H2, so a level is skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (1, 'text', 0, 1024, 0, 'Looks like a heading, is none', 2, 'div', '', 'h3', 0, '<p>Tag div chosen: styled like layout 2, but no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, bodytext, crdate, tstamp) VALUES
+        (1, 'header', 0, 512, 0, 'Our services', 2, 'h2', 'What we do', 'h3', '', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 768, 0, 'Details', 2, 'h4', '', 'h3', '<p>Tag H4 with the look of layout 2: the last heading was an H2, so a level is skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 1024, 0, 'Looks like a heading, is none', 2, 'div', '', 'h3', '<p>Tag div chosen: styled like layout 2, but no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 " 2>/dev/null
 
 # Subpages with different heading structures, so every case of the page module has something to show.
@@ -97,28 +97,27 @@ mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}
         (1, 'Legal notice', '/legal', 1, 1280, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
     SET @legal = LAST_INSERT_ID();
 
-    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, crdate, tstamp) VALUES
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, bodytext, crdate, tstamp) VALUES
         -- About us: a clean structure (H1, H2, H3, H2)
-        (@about, 'text', 0, 256, 0, 'About us', 1, 'h1', 'Who we are', 'h2', 0, '<p>A clean heading structure: nothing to fix here.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@about, 'text', 0, 512, 0, 'Our history', 2, 'h2', '', 'h3', 0, '<p>Founded a long time ago.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@about, 'text', 0, 768, 0, 'The early years', 3, 'h3', '', 'h3', 0, '<p>Small team, big ideas.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@about, 'text', 0, 1024, 0, 'Our team', 2, 'h2', '', 'h3', 0, '<p>Meet the people behind it.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@about, 'text', 0, 256, 0, 'About us', 1, 'h1', 'Who we are', 'h2', '<p>A clean heading structure: nothing to fix here.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@about, 'text', 0, 512, 0, 'Our history', 2, 'h2', '', 'h3', '<p>Founded a long time ago.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@about, 'text', 0, 768, 0, 'The early years', 3, 'h3', '', 'h3', '<p>Small team, big ideas.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@about, 'text', 0, 1024, 0, 'Our team', 2, 'h2', '', 'h3', '<p>Meet the people behind it.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
         -- Products: two H1 and a skipped level
-        (@products, 'text', 0, 256, 0, 'Products', 1, 'h1', '', 'h3', 0, '<p>The first H1.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@products, 'text', 0, 512, 0, 'Our bestsellers', 1, 'h1', '', 'h3', 0, '<p>A second H1 on the same page.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@products, 'text', 0, 768, 0, 'Product details', 2, 'h4', '', 'h3', 0, '<p>An H4 right after an H1: two levels skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@products, 'text', 0, 256, 0, 'Products', 1, 'h1', '', 'h3', '<p>The first H1.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@products, 'text', 0, 512, 0, 'Our bestsellers', 1, 'h1', '', 'h3', '<p>A second H1 on the same page.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@products, 'text', 0, 768, 0, 'Product details', 2, 'h4', '', 'h3', '<p>An H4 right after an H1: two levels skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
         -- Services: no H1, starts with an H2, and a header that is only a div
-        (@services, 'text', 0, 256, 0, 'What we offer', 2, 'h2', 'For every size of company', 'h3', 3, '<p>This page has no H1.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@services, 'text', 0, 512, 0, 'Consulting', 2, 'div', '', 'h3', 0, '<p>Styled like a heading, but a div: it is not part of the structure.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@services, 'text', 0, 768, 0, 'Support', 2, 'h2', '', 'h3', 0, '<p>Help when you need it.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        -- Web development (subpage of Services): header and subheader with their own tags and layouts
-        (@webdev, 'text', 0, 256, 0, 'Web development', 1, 'h1', 'Websites that work', 'h2', 2, '<p>Header H1 (layout 1), subheader H2 (layout 2).</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@webdev, 'text', 0, 512, 0, 'Technology', 2, 'h2', 'Our stack', 'div', 4, '<p>The subheader here is a div, so it is no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-        (@webdev, 'text', 0, 768, 0, 'Process', 2, 'h2', 'Hidden subheader', 'h3', 100, '<p>The subheader layout Hidden hides the subheader in the frontend.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@services, 'text', 0, 256, 0, 'What we offer', 2, 'h2', 'For every size of company', 'h3', '<p>This page has no H1.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@services, 'text', 0, 512, 0, 'Consulting', 2, 'div', '', 'h3', '<p>Styled like a heading, but a div: it is not part of the structure.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@services, 'text', 0, 768, 0, 'Support', 2, 'h2', '', 'h3', '<p>Help when you need it.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        -- Web development (subpage of Services): header and subheader with their own tags
+        (@webdev, 'text', 0, 256, 0, 'Web development', 1, 'h1', 'Websites that work', 'h2', '<p>Header H1 (layout 1), subheader H2 (layout 2).</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@webdev, 'text', 0, 512, 0, 'Technology', 2, 'h2', 'Our stack', 'div', '<p>The subheader here is a div, so it is no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
         -- Contact: headings that come from the text (RTE), which the page module shows but cannot edit
-        (@contact, 'text', 0, 256, 0, 'Contact', 1, 'h1', '', 'h3', 0, '<h2>Visit us</h2><p>Main street 1</p><h3>Opening hours</h3><p>Mon-Fri 9-17</p><h2>Write to us</h2><p>mail@example.com</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (@contact, 'text', 0, 256, 0, 'Contact', 1, 'h1', '', 'h3', '<h2>Visit us</h2><p>Main street 1</p><h3>Opening hours</h3><p>Mon-Fri 9-17</p><h2>Write to us</h2><p>mail@example.com</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
         -- Legal notice: no heading at all
-        (@legal, 'text', 0, 256, 0, '', 0, 'h2', '', 'h3', 0, '<p>A page without any heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        (@legal, 'text', 0, 256, 0, '', 0, 'h2', '', 'h3', '<p>A page without any heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
 " 2>/dev/null
 
 # German translation of the main pages and their content elements. Header tags and layouts are copied from the original.
@@ -135,7 +134,7 @@ mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}
     SELECT pid, 'Kontakt', '/kontakt', doktype, sorting, 1, uid, uid, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, UNIX_TIMESTAMP(), UNIX_TIMESTAMP() FROM pages WHERE slug = '/contact' AND sys_language_uid = 0;
 
     -- content elements: structure (type, column, tag, layouts) from the original, texts in German
-    INSERT INTO tt_content (pid, sys_language_uid, l18n_parent, l10n_source, CType, colPos, sorting, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, crdate, tstamp)
+    INSERT INTO tt_content (pid, sys_language_uid, l18n_parent, l10n_source, CType, colPos, sorting, header, header_layout, header_tag, subheader, subheader_tag, bodytext, crdate, tstamp)
     SELECT pid, 1, uid, uid, CType, colPos, sorting,
         CASE header
             WHEN 'Our services' THEN 'Unsere Leistungen'
@@ -153,7 +152,7 @@ mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}
         END,
         header_layout, header_tag,
         CASE subheader WHEN 'What we do' THEN 'Was wir tun' WHEN 'Who we are' THEN 'Wer wir sind' ELSE subheader END,
-        subheader_tag, subheader_layout,
+        subheader_tag,
         CASE
             WHEN header = 'Contact' THEN '<h2>Besuchen Sie uns</h2><p>Hauptstraße 1</p><h3>Öffnungszeiten</h3><p>Mo-Fr 9-17</p><h2>Schreiben Sie uns</h2><p>mail@example.com</p>'
             WHEN bodytext = '' OR bodytext IS NULL THEN bodytext
@@ -170,8 +169,8 @@ echo "› creating a workspace with a draft version"
 mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
     INSERT INTO sys_workspace (pid, title, adminusers, members, db_mountpoints, tstamp) VALUES (0, 'Review', '', '', '', UNIX_TIMESTAMP());
     SET @ws = LAST_INSERT_ID();
-    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, t3ver_oid, t3ver_wsid, t3ver_state, crdate, tstamp)
-    SELECT pid, CType, colPos, sorting, sys_language_uid, 'Our services (draft)', header_layout, 'h1', subheader, subheader_tag, subheader_layout, bodytext, uid, @ws, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, bodytext, t3ver_oid, t3ver_wsid, t3ver_state, crdate, tstamp)
+    SELECT pid, CType, colPos, sorting, sys_language_uid, 'Our services (draft)', header_layout, 'h1', subheader, subheader_tag, bodytext, uid, @ws, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
     FROM tt_content WHERE header = 'Our services' AND sys_language_uid = 0 AND t3ver_wsid = 0;
 " 2>/dev/null
 
