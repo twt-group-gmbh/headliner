@@ -4,7 +4,11 @@
 
 ### What does it do?
 
-_To be written._
+`headliner` shows the heading structure (H1-H6) of a page above the content in the TYPO3 page module and
+points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings.
+
+The headings are read from the rendered frontend of the page, so headings from content elements, RTE
+content and other extensions are included without any configuration. Only standard pages are checked.
 
 ## Installation
 

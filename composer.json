@@ -1,7 +1,7 @@
 {
     "name": "twtgroup/headliner",
     "type": "typo3-cms-extension",
-    "description": "",
+    "description": "Shows and validates the heading structure (H1-H6) of a page in the TYPO3 page module.",
     "keywords": [
         "TYPO3",
         "extension"

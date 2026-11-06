@@ -1,0 +1,42 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" data-namespace-typo3-fluid="true">
+<div class="headliner">
+    <h2 class="headliner__title"><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:title" /></h2>
+    <f:if condition="{loaded}">
+        <f:then>
+            <f:if condition="{headings}">
+                <f:then>
+                    <f:for each="{pageIssues}" as="issue">
+                        <div class="alert alert-warning">
+                            <f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:issue.{issue.type.value}" />
+                        </div>
+                    </f:for>
+                    <ol class="headliner__list">
+                        <f:for each="{headings}" as="heading">
+                            <li class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.issues, then: ' headliner__item--issue')}">
+                                <span class="headliner__level">H{heading.level}</span>
+                                <span class="headliner__text">
+                                    <f:if condition="{heading.text}">
+                                        <f:then>{heading.text}</f:then>
+                                        <f:else><em><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:empty" /></em></f:else>
+                                    </f:if>
+                                </span>
+                                <f:for each="{heading.issues}" as="issue">
+                                    <span class="badge badge-warning">
+                                        <f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:issue.{issue}" />
+                                    </span>
+                                </f:for>
+                            </li>
+                        </f:for>
+                    </ol>
+                </f:then>
+                <f:else>
+                    <div class="alert alert-info"><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:noHeadings" /></div>
+                </f:else>
+            </f:if>
+        </f:then>
+        <f:else>
+            <div class="alert alert-info"><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:notLoaded" /></div>
+        </f:else>
+    </f:if>
+</div>
+</html>

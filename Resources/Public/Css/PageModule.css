@@ -1,0 +1,37 @@
+.headliner {
+    margin-bottom: 1rem;
+}
+
+.headliner__title {
+    font-size: 1rem;
+    margin-bottom: .5rem;
+}
+
+.headliner__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.headliner__item {
+    align-items: baseline;
+    display: flex;
+    gap: .5rem;
+    padding: .125rem 0;
+}
+
+.headliner__item--h2 { padding-left: 1.5rem; }
+.headliner__item--h3 { padding-left: 3rem; }
+.headliner__item--h4 { padding-left: 4.5rem; }
+.headliner__item--h5 { padding-left: 6rem; }
+.headliner__item--h6 { padding-left: 7.5rem; }
+
+.headliner__item--issue .headliner__text {
+    text-decoration: underline wavy var(--typo3-state-warning-border-color, #f0ad4e);
+}
+
+.headliner__level {
+    font-family: monospace;
+    font-weight: bold;
+    min-width: 2rem;
+}

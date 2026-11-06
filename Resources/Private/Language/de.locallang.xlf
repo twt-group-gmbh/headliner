@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="EXT:headliner/Resources/Private/Language/locallang.xlf" date="2026-11-06T00:00:00Z" product-name="headliner">
+        <header/>
+        <body>
+            <trans-unit id="title"><source>Heading structure</source><target>Überschriftenstruktur</target></trans-unit>
+            <trans-unit id="empty"><source>(empty heading)</source><target>(leere Überschrift)</target></trans-unit>
+            <trans-unit id="noHeadings"><source>The page has no headings.</source><target>Die Seite hat keine Überschriften.</target></trans-unit>
+            <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source><target>Das Frontend dieser Seite konnte nicht geladen werden, daher können die Überschriften nicht angezeigt werden.</target></trans-unit>
+            <trans-unit id="issue.missingH1"><source>The page has no H1.</source><target>Die Seite hat keine H1.</target></trans-unit>
+            <trans-unit id="issue.multipleH1"><source>More than one H1</source><target>Mehr als eine H1</target></trans-unit>
+            <trans-unit id="issue.skippedLevel"><source>Skipped heading level</source><target>Überschriftenebene übersprungen</target></trans-unit>
+            <trans-unit id="issue.emptyHeading"><source>Empty heading</source><target>Leere Überschrift</target></trans-unit>
+        </body>
+    </file>
+</xliff>
