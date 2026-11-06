@@ -37,6 +37,7 @@ ddev demo               # (re)build the demo at https://headliner.ddev.site/ (.B
 ddev test [unit|functional|all]   # PHPUnit suites
 ddev lint               # PHPStan + php-cs-fixer (dry-run); `ddev cgl-fix` auto-fixes
 ddev scan-extension [--strict]    # TYPO3 Extension Scanner (Install Tool "Scan Extension Files") on CLI
+ddev docs               # render Documentation/ with the TYPO3 docs toolchain (Docker); fix every warning
 ```
 
 The demo has subpages with different heading structures (clean, two H1, no H1, div headers, RTE headings, no headings);
@@ -56,6 +57,11 @@ Tests split into two suites by what they need to boot:
 - **`Tests/Functional/`** — `typo3/testing-framework`, boots TYPO3 + DB. Used for anything touching
   FAL, middlewares, TCA, or ViewHelpers. They must restore request-related globals: the testing framework does not
   reset `$GLOBALS['TYPO3_REQUEST']` / `BE_USER`, so save them in `setUp()` and restore them in `tearDown()`.
+  The frontend tests extend `AbstractFrontendTestCase`: a site with the site sets (written with the core's `SiteWriter`)
+  and a few headers, rendered through the real frontend application (`executeFrontendSubRequest()`); mark the request
+  with `InspectRequest::ATTRIBUTE` to get the marks of the page module. The testing framework's own frontend middleware
+  needs the request attribute `typo3.testing.context`, which only its own way of requesting sets, so
+  `TestingContextRequestHandler` adds it when a test calls the real `PageHtmlFetcher`.
 
 ## Project decisions
 

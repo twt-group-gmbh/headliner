@@ -43,5 +43,13 @@ Tests
     ddev test functional
     ddev lint
 
-The unit tests need no TYPO3 bootstrap. The functional tests render the frontend with the site set and use the testing
-framework.
+The unit tests need no TYPO3 bootstrap. The functional tests render the frontend through the real application, with the
+site sets of `fluid_styled_content` and of the extension, and use the testing framework: the tag and layout of the
+headers, the subheader and its site setting, the marks for the page module (which a visitor and a request with a header
+from outside must never get), the page cache, the fields and the sub-request of the page module.
+
+..  code-block:: bash
+
+    ddev docs
+
+renders this documentation with the TYPO3 documentation toolchain (Docker). Fix every warning it prints.

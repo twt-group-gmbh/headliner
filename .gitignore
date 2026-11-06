@@ -6,3 +6,5 @@
 .phpunit.result.cache
 .php-cs-fixer.cache
 /.claude/
+# Output of the documentation rendering (docker run ghcr.io/typo3-documentation/render-guides)
+/Documentation-GENERATED-temp/
