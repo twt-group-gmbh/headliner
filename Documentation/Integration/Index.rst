@@ -267,9 +267,28 @@ the layout 1 to 6. Their subheader is always a `p`. The :guilabel:`Text Media Te
 the layout is, and the headers of its entries as `<header>`. The box lists headings (`h1` to `h6`), so these do not
 appear in it.
 
-To keep editors from setting a tag that does nothing, hide the two fields for the element types that ignore them. Use the
-page TSconfig of your site (for example `page.tsconfig` in the site package or site set), with the element type after
-`types`:
+To keep editors from setting a tag that does nothing, hide the two fields with the page TSconfig of your site (for
+example `page.tsconfig` in the site package or site set). A hidden field keeps its value, which is empty ("from the
+layout") for content that was never given a tag, so hiding it changes nothing in the frontend.
+
+**For all content elements.** Without a type the rule applies to every element type. This is the right choice if the
+site is built on a theme like this and you do not use the tag fields anywhere:
+
+..  code-block:: typoscript
+    :caption: page.tsconfig
+
+    TCEFORM.tt_content {
+        header_tag.disabled = 1
+        subheader_tag.disabled = 1
+    }
+
+The fields then also disappear from the element types for which they would work (`header`, `bullets` and the others that use
+the header partial of `fluid_styled_content`), and those headings can no longer get a tag in the form. The TSconfig
+only hides the fields in the form: the box does not read it, so it still offers the tag select for a heading that
+carries the mark of `headliner:headline`, if the backend user may edit the field.
+
+**For single element types.** Put the type after `types` to hide the fields only there, and keep them for the others.
+Add a block per type (`textpic`, `camino_hero`, and so on):
 
 ..  code-block:: typoscript
     :caption: page.tsconfig
@@ -279,13 +298,5 @@ page TSconfig of your site (for example `page.tsconfig` in the site package or s
         subheader_tag.types.text.disabled = 1
     }
 
-Add a line per type (`textpic`, `camino_hero`, and so on). A hidden field keeps its value, which is empty ("from the
-layout") for content that was never given a tag, so nothing changes in the frontend. To hide a field for every
-element type, leave out `types.<type>`:
-
-..  code-block:: typoscript
-
-    TCEFORM.tt_content.header_tag.disabled = 1
-
-The subheader tag can also be switched off for a whole site with the site setting
+The subheader tag can also be switched off alone, for a whole site, with the site setting
 :confval:`headliner.subheader.enabled`.
