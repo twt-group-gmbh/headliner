@@ -22,6 +22,12 @@ First release.
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
   (`data-headliner-edit`); that happens only for the request of the page module (signed header, no page cache), never
   for visitors.
+- Page module, language comparison: the box follows the page module. The layout view shows the structure of the one
+  language it shows; the language comparison shows one section per column, the default language and the selected
+  translations. With several languages the box has one section per language, side by side like the columns below (flag, name
+  and its own status). Every section has a minimum width; if they do not fit, the box scrolls sideways like the columns
+  below it. The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
+  that are opened from a translated page are the translations, not the original of the default language.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
 - Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default H2) decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The

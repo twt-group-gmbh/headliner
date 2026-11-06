@@ -7,6 +7,7 @@
 `headliner` shows the heading structure (H1-H6) of a page above the content in the TYPO3 page module and
 points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings.
 
+With the page module's language comparison the box has one section per selected language, side by side like the columns of the page module; if they do not fit, the box scrolls sideways.
 The structure is shown in a box that can be collapsed (the state is remembered per backend user). A subheader is
 marked with an arrow and named after its header. Headings from the text of a content element, such as RTE content, are
 marked the same way and open that element; they cannot be changed in the box. For headers of content elements the tag can be changed right there with a select

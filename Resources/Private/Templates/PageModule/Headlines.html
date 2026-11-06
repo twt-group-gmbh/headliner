@@ -1,9 +1,9 @@
-<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" data-namespace-typo3-fluid="true">
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:be="http://typo3.org/ns/TYPO3/CMS/Backend/ViewHelpers" xmlns:core="http://typo3.org/ns/TYPO3/CMS/Core/ViewHelpers" data-namespace-typo3-fluid="true">
 <f:variable name="l" value="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:" />
 <details class="headliner card card-size-large"{f:if(condition: collapsed, else: ' open')}>
     <summary class="card-header" title="{f:translate(key: '{l}toggle')}">
         <h2 class="card-title"><f:translate key="{l}title" /></h2>
-        <f:if condition="{loaded} && {headings}">
+        <f:if condition="{anyLoaded}">
             <f:if condition="{issueCount}">
                 <f:then><span class="badge badge-warning"><f:translate key="{l}summary.issues" arguments="{0: issueCount}" /></span></f:then>
                 <f:else><span class="badge badge-success"><f:translate key="{l}summary.ok" /></span></f:else>
@@ -11,76 +11,103 @@
         </f:if>
     </summary>
     <div class="card-body">
-        <f:if condition="{loaded}">
-            <f:then>
-                <f:if condition="{headings}">
+        <div class="headliner__sections" style="--headliner-columns: {columns}">
+        <f:for each="{sections}" as="section">
+            <section class="headliner__section">
+                <f:if condition="{multiple}">
+                    <h3 class="headliner__language">
+                        <core:icon identifier="{section.flag}" size="small" />
+                        {section.title}
+                        <f:if condition="{section.loaded}">
+                            <f:if condition="{section.hasHeadings}">
+                                <f:if condition="{section.issueCount}">
+                                    <f:then><span class="badge badge-warning"><f:translate key="{l}summary.issues" arguments="{0: section.issueCount}" /></span></f:then>
+                                    <f:else><span class="badge badge-success"><f:translate key="{l}summary.ok" /></span></f:else>
+                                </f:if>
+                            </f:if>
+                        </f:if>
+                    </h3>
+                </f:if>
+                <f:if condition="{section.untranslated}">
                     <f:then>
-                        <f:for each="{pageIssues}" as="issue">
-                            <div class="alert alert-warning">
-                                <f:translate key="{l}issue.{issue.type.value}" />
-                            </div>
-                        </f:for>
-                        <ol class="headliner__list">
-                            <f:for each="{headings}" as="heading">
-                                <li class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.issues, then: ' headliner__item--issue')}{f:if(condition: '{heading.level} == 0', then: ' headliner__item--nolevel')}{f:if(condition: '{heading.subheader} || {heading.fromText}', then: ' headliner__item--sub')}">
-                                    <span class="headliner__tag">
-                                        <f:if condition="{heading.edit}">
-                                            <f:then>
-                                                <select class="form-select form-select-sm headliner__select" data-headliner-edit="{heading.edit}" data-current="{heading.tag}"
-                                                        title="{f:translate(key: '{l}editTag')}">
-                                                    <f:for each="{tags}" as="tag">
-                                                        <option value="{tag}"{f:if(condition: '{tag} == {heading.tag}', then: ' selected="selected"')}>{tag -> f:format.case(mode: 'upper')}</option>
-                                                    </f:for>
-                                                </select>
-                                            </f:then>
-                                            <f:else><span class="headliner__pill" data-current="{heading.tag}">{heading.tag -> f:format.case(mode: 'upper')}</span></f:else>
-                                        </f:if>
-                                    </span>
-                                    <span class="headliner__text">
-                                        <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
-                                        <f:if condition="{heading.editUid}">
-                                            <f:then>
-                                                <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" class="headliner__link"
-                                                                    title="{f:translate(key: '{l}editElement')}">{label -> f:format.raw()}</be:link.editRecord>
-                                            </f:then>
-                                            <f:else>{label -> f:format.raw()}</f:else>
-                                        </f:if>
-                                    </span>
-                                    <f:if condition="{heading.subheader}">
-                                        <span class="badge badge-secondary">
-                                            <f:if condition="{heading.parentText}">
-                                                <f:then><f:translate key="{l}subheaderOf" arguments="{0: heading.parentText}" /></f:then>
-                                                <f:else><f:translate key="{l}subheader" /></f:else>
-                                            </f:if>
-                                        </span>
-                                    </f:if>
-                                    <f:if condition="{heading.fromText}">
-                                        <span class="badge badge-secondary">
-                                            <f:if condition="{heading.parentText}">
-                                                <f:then><f:translate key="{l}fromTextOf" arguments="{0: heading.parentText}" /></f:then>
-                                                <f:else><f:translate key="{l}fromText" /></f:else>
-                                            </f:if>
-                                        </span>
-                                    </f:if>
-                                    <f:if condition="{heading.level} == 0">
-                                        <span class="badge badge-secondary"><f:translate key="{l}noHeading" /></span>
-                                    </f:if>
-                                    <f:for each="{heading.issues}" as="issue">
-                                        <span class="badge badge-warning"><f:translate key="{l}issue.{issue}" /></span>
-                                    </f:for>
-                                </li>
-                            </f:for>
-                        </ol>
+                        <div class="alert alert-info"><f:translate key="{l}untranslated" /></div>
                     </f:then>
                     <f:else>
-                        <div class="alert alert-info"><f:translate key="{l}noHeadings" /></div>
+                        <f:if condition="{section.loaded}">
+                            <f:then>
+                                <f:if condition="{section.hasHeadings}">
+                                    <f:then>
+                                        <f:for each="{section.pageIssues}" as="issue">
+                                            <div class="alert alert-warning">
+                                                <f:translate key="{l}issue.{issue.type.value}" />
+                                            </div>
+                                        </f:for>
+                            <ol class="headliner__list">
+                                <f:for each="{section.headings}" as="heading">
+                                    <li class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.issues, then: ' headliner__item--issue')}{f:if(condition: '{heading.level} == 0', then: ' headliner__item--nolevel')}{f:if(condition: '{heading.subheader} || {heading.fromText}', then: ' headliner__item--sub')}">
+                                        <span class="headliner__tag">
+                                            <f:if condition="{heading.edit}">
+                                                <f:then>
+                                                    <select class="form-select form-select-sm headliner__select" data-headliner-edit="{heading.edit}" data-current="{heading.tag}"
+                                                            title="{f:translate(key: '{l}editTag')}">
+                                                        <f:for each="{tags}" as="tag">
+                                                            <option value="{tag}"{f:if(condition: '{tag} == {heading.tag}', then: ' selected="selected"')}>{tag -> f:format.case(mode: 'upper')}</option>
+                                                        </f:for>
+                                                    </select>
+                                                </f:then>
+                                                <f:else><span class="headliner__pill" data-current="{heading.tag}">{heading.tag -> f:format.case(mode: 'upper')}</span></f:else>
+                                            </f:if>
+                                        </span>
+                                        <span class="headliner__text">
+                                            <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
+                                            <f:if condition="{heading.editUid}">
+                                                <f:then>
+                                                    <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" class="headliner__link"
+                                                                        title="{f:translate(key: '{l}editElement')}">{label -> f:format.raw()}</be:link.editRecord>
+                                                </f:then>
+                                                <f:else>{label -> f:format.raw()}</f:else>
+                                            </f:if>
+                                        </span>
+                                        <f:if condition="{heading.subheader}">
+                                            <span class="badge badge-secondary">
+                                                <f:if condition="{heading.parentText}">
+                                                    <f:then><f:translate key="{l}subheaderOf" arguments="{0: heading.parentText}" /></f:then>
+                                                    <f:else><f:translate key="{l}subheader" /></f:else>
+                                                </f:if>
+                                            </span>
+                                        </f:if>
+                                        <f:if condition="{heading.fromText}">
+                                            <span class="badge badge-secondary">
+                                                <f:if condition="{heading.parentText}">
+                                                    <f:then><f:translate key="{l}fromTextOf" arguments="{0: heading.parentText}" /></f:then>
+                                                    <f:else><f:translate key="{l}fromText" /></f:else>
+                                                </f:if>
+                                            </span>
+                                        </f:if>
+                                        <f:if condition="{heading.level} == 0">
+                                            <span class="badge badge-secondary"><f:translate key="{l}noHeading" /></span>
+                                        </f:if>
+                                        <f:for each="{heading.issues}" as="issue">
+                                            <span class="badge badge-warning"><f:translate key="{l}issue.{issue}" /></span>
+                                        </f:for>
+                                    </li>
+                                </f:for>
+                            </ol>
+                                    </f:then>
+                                    <f:else>
+                                        <div class="alert alert-info"><f:translate key="{l}noHeadings" /></div>
+                                    </f:else>
+                                </f:if>
+                            </f:then>
+                            <f:else>
+                                <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
+                            </f:else>
+                        </f:if>
                     </f:else>
                 </f:if>
-            </f:then>
-            <f:else>
-                <div class="alert alert-info"><f:translate key="{l}notLoaded" /></div>
-            </f:else>
-        </f:if>
+            </section>
+        </f:for>
+        </div>
     </div>
 </details>
 </html>

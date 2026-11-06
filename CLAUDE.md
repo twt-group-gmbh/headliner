@@ -64,6 +64,10 @@ Tests split into two suites by what they need to boot:
   `{record -> f:render.text(field: ...)}` (that is how it marks editable text), prefer core ViewHelpers and core
   mechanisms. `Resources/Private/Partials/Header/All.fluid.html` is a copy of the core partial: keep it in sync with
   `fluid_styled_content` and keep its `f:render.text` calls.
+- Which languages the box shows follows the page module, see `SelectedLanguages`: the layout view shows its "primary"
+  language (the one translation if exactly one is selected, else the default language), the language comparison shows
+  the default language plus the selected translations. `languages` in the module data alone is not enough: in the
+  comparison it can be `[1]` while two columns are shown.
 - Opening a content element from the page module box uses the core's `be:link.editRecord contextual="true"` (custom
   element `typo3-backend-contextual-record-edit-trigger`), so it slides in from the right like the core's own edit
   buttons. Do not build edit URLs by hand.

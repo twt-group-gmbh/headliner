@@ -8,14 +8,17 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\Event\ModifyPageLayoutContentEvent;
 use TYPO3\CMS\Backend\Module\ModuleData;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Backend\View\PageViewMode;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Page\PageRenderer;
+use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Backend\SelectedLanguages;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
@@ -49,19 +52,22 @@ final readonly class PageModuleHeadlines
             return;
         }
 
-        $languageId = $this->getLanguageId($request);
         try {
-            $uri = $this->siteFinder->getSiteByPageId($pageId)->getRouter()->generateUri(
-                $pageId,
-                ['_language' => $languageId]
-            );
+            $site = $this->siteFinder->getSiteByPageId($pageId);
         } catch (SiteNotFoundException) {
             return;
         }
 
-        $html = $this->fetcher->fetch($uri);
-        $headings = $html === null ? [] : $this->extractor->extract($html);
-        $issues = $this->validator->validate($headings);
+        $sections = [];
+        foreach ($this->getLanguageIds($request) as $languageId) {
+            $section = $this->buildSection($site, $pageId, $languageId);
+            if ($section !== null) {
+                $sections[] = $section;
+            }
+        }
+        if ($sections === []) {
+            return;
+        }
 
         $this->pageRenderer->addCssFile('EXT:headliner/Resources/Public/Css/PageModule.css');
         $this->pageRenderer->loadJavaScriptModule('@twtgroup/headliner/headlines.js');
@@ -71,12 +77,14 @@ final readonly class PageModuleHeadlines
             request: $request,
         ));
         $view->assignMultiple([
-            'loaded' => $html !== null,
-            'headings' => $this->buildRows($headings, $issues),
+            'sections' => $sections,
+            // only with several languages the sections are labelled with their language
+            'multiple' => count($sections) > 1,
+            'columns' => count($sections),
             'collapsed' => $this->isCollapsed(),
             'tags' => HeaderTag::ALLOWED,
-            'issueCount' => count($issues),
-            'pageIssues' => array_values(array_filter($issues, static fn($issue) => $issue->index === null)),
+            'issueCount' => array_sum(array_column($sections, 'issueCount')),
+            'anyLoaded' => in_array(true, array_column($sections, 'hasHeadings'), true),
         ]);
         $event->addHeaderContent($view->render('PageModule/Headlines'));
     }
@@ -86,7 +94,7 @@ final readonly class PageModuleHeadlines
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
      * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, subheader: bool, fromText: bool, parentText: string}>
      */
-    private function buildRows(array $headings, array $issues): array
+    private function buildRows(array $headings, array $issues, int $languageId): array
     {
         $rows = [];
         // The text of the header of every content element, so a subheader or a heading from the text can say whose it is
@@ -103,7 +111,7 @@ final readonly class PageModuleHeadlines
             $isSubheader = $target !== null && $target['field'] === HeaderTag::SUBHEADER_FIELD;
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
             $fromText = $target === null && $heading->element !== null;
-            $elementUid = $target['uid'] ?? $heading->element;
+            $elementUid = $target['uid'] ?? $this->getTranslatedUid($heading->element, $languageId);
             $rows[] = [
                 'tag' => $heading->level === 0 ? 'div' : 'h' . $heading->level,
                 'level' => $heading->level,
@@ -136,12 +144,82 @@ final readonly class PageModuleHeadlines
         return (int) $setting === 1;
     }
 
-    private function getLanguageId(ServerRequestInterface $request): int
+    /**
+     * The frame of a content element carries the uid of the record of the default language. On a translated page the
+     * element to open is its translation.
+     */
+    private function getTranslatedUid(?int $uid, int $languageId): ?int
+    {
+        if ($uid === null || $languageId === 0) {
+            return $uid;
+        }
+        $translation = BackendUtility::getRecordLocalization('tt_content', $uid, $languageId);
+
+        return is_array($translation) && isset($translation[0]['uid']) ? (int) $translation[0]['uid'] : $uid;
+    }
+
+    /**
+     * One section of the box: the structure of the page in one language.
+     *
+     * @return array<string, mixed>|null NULL if the site has no such language
+     */
+    private function buildSection(Site $site, int $pageId, int $languageId): ?array
+    {
+        try {
+            $language = $site->getLanguageById($languageId);
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+
+        $section = [
+            'languageId' => $languageId,
+            'title' => $language->getTitle(),
+            'flag' => $language->getFlagIdentifier(),
+            'loaded' => false,
+            'untranslated' => false,
+            'hasHeadings' => false,
+            'headings' => [],
+            'pageIssues' => [],
+            'issueCount' => 0,
+        ];
+
+        // A page that is not translated into the language has no frontend there
+        $translation = $languageId > 0 ? BackendUtility::getRecordLocalization('pages', $pageId, $languageId) : [];
+        if ($languageId > 0 && (!is_array($translation) || $translation === [])) {
+            $section['untranslated'] = true;
+
+            return $section;
+        }
+
+        $html = $this->fetcher->fetch($site->getRouter()->generateUri($pageId, ['_language' => $languageId]));
+        if ($html === null) {
+            return $section;
+        }
+
+        $headings = $this->extractor->extract($html);
+        $issues = $this->validator->validate($headings);
+        $section['loaded'] = true;
+        $section['hasHeadings'] = $headings !== [];
+        $section['headings'] = $this->buildRows($headings, $issues, $languageId);
+        $section['pageIssues'] = array_values(array_filter($issues, static fn($issue) => $issue->index === null));
+        $section['issueCount'] = count($issues);
+
+        return $section;
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function getLanguageIds(ServerRequestInterface $request): array
     {
         $moduleData = $request->getAttribute('moduleData');
-        $languages = $moduleData instanceof ModuleData ? $moduleData->get('languages') : null;
-        $first = is_array($languages) ? reset($languages) : false;
+        if (!$moduleData instanceof ModuleData) {
+            return [0];
+        }
 
-        return $first !== false && (int) $first > 0 ? (int) $first : 0;
+        return SelectedLanguages::forView(
+            $moduleData->get('languages'),
+            PageViewMode::tryFrom((int) $moduleData->get('viewMode')) === PageViewMode::LanguageComparisonView
+        );
     }
 }

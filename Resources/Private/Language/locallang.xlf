@@ -14,6 +14,7 @@
             <trans-unit id="subheaderOf"><source>Subheader of “%s”</source></trans-unit>
             <trans-unit id="fromTextOf"><source>From the text of “%s”</source></trans-unit>
             <trans-unit id="fromText"><source>From the text of this element</source></trans-unit>
+            <trans-unit id="untranslated"><source>The page is not translated into this language.</source></trans-unit>
             <trans-unit id="empty"><source>(empty heading)</source></trans-unit>
             <trans-unit id="noHeadings"><source>The page has no headings.</source></trans-unit>
             <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source></trans-unit>

@@ -50,6 +50,38 @@
     margin: 0;
 }
 
+/* One section per language, side by side like the columns of the language comparison below. Every section has a
+   minimum width; if they do not fit, the box scrolls sideways, as the columns below do. */
+.headliner > .card-body {
+    container-type: inline-size;
+    overflow-x: auto;
+}
+
+.headliner__sections {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(var(--headliner-columns, 1), minmax(20rem, 1fr));
+}
+
+.headliner__section {
+    container: headliner-section / inline-size;
+    min-width: 0;
+}
+
+.headliner__section + .headliner__section {
+    border-left: 1px solid var(--typo3-component-border-color);
+    padding-left: 1.5rem;
+}
+
+/* The language of a section, shown when the page module compares several languages */
+.headliner__language {
+    align-items: center;
+    display: flex;
+    font-size: 1rem;
+    gap: .5rem;
+    margin: 0 0 .75rem;
+}
+
 .headliner__list {
     list-style: none;
     margin: 0;
@@ -83,6 +115,14 @@
 .headliner__item--h4 { padding-left: calc(.5rem + 3 * var(--headliner-step)); }
 .headliner__item--h5 { padding-left: calc(.5rem + 4 * var(--headliner-step)); }
 .headliner__item--h6 { padding-left: calc(.5rem + 5 * var(--headliner-step)); }
+
+@container headliner-section (max-width: 30rem) {
+    .headliner__item { --headliner-step: 1rem; }
+}
+
+@container headliner-section (max-width: 22rem) {
+    .headliner__item { --headliner-step: .5rem; }
+}
 
 .headliner__link {
     color: inherit;
