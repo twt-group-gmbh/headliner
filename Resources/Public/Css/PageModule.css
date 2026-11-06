@@ -107,11 +107,15 @@
     padding: .25rem .5rem;
 }
 
-.headliner__text {
-    /* the badges follow the text directly */
+.headliner__body {
+    /* text and badges flow as one line of inline content, so the badges follow the text directly and wrap with it */
     flex: 0 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
+}
+
+.headliner__body > .badge {
+    margin-inline-start: .5rem;
 }
 
 .headliner__item:hover {
@@ -129,7 +133,7 @@
     .headliner__item { --headliner-step: 1rem; }
 
     /* in a narrow section the text may use the room next to the pill and wrap, instead of moving below it */
-    .headliner__text { flex: 1 1 4rem; }
+    .headliner__body { flex: 1 1 4rem; }
 }
 
 @container headliner-section (max-width: 22rem) {

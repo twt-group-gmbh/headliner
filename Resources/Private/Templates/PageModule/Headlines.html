@@ -94,6 +94,7 @@
                                                 <f:else><span class="headliner__pill" data-current="{heading.tag}">{heading.tag -> f:format.case(mode: 'upper')}</span></f:else>
                                             </f:if>
                                         </span>
+                                        <span class="headliner__body">
                                         <span class="headliner__text">
                                             <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
                                             <f:if condition="{heading.canOpen}">
@@ -129,6 +130,7 @@
                                         <f:for each="{heading.issues}" as="issue">
                                             <span class="badge badge-warning"><f:translate key="{l}issue.{issue}" /></span>
                                         </f:for>
+                                        </span>
                                     </li>
                                 </f:for>
                             </ol>

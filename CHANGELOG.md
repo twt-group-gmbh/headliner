@@ -26,7 +26,7 @@ First release.
   language it shows; the language comparison shows one section per column, the default language and the selected
   translations. With several languages the box has one section per language, side by side like the columns below (flag, name
   and its own status). Every section has a minimum width; if they do not fit, the box scrolls sideways like the columns
-  below it. All sections have the same width (the divider sits in the gap, not in the padding of a section). The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
+  below it. All sections have the same width (the divider sits in the gap, not in the padding of a section), and the badges of a row follow its text directly, also in narrow sections. The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
   that are opened from a translated page are the translations, not the original of the default language.
 - Page module, hidden pages: a hidden page is rendered too, so its structure can be checked before it is published. The
   box says that the page is hidden. Hidden content elements stay out, as they do for a visitor. A request from outside
