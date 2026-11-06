@@ -99,7 +99,7 @@
                                             <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
                                             <f:if condition="{heading.canOpen}">
                                                 <f:then>
-                                                    <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" class="headliner__link"
+                                                    <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" returnUrl="{returnUrl}" class="headliner__link"
                                                                         title="{f:translate(key: '{l}editElement')}">{label -> f:format.raw()}</be:link.editRecord>
                                                 </f:then>
                                                 <f:else>{label -> f:format.raw()}</f:else>

@@ -25,6 +25,9 @@ whole page is checked.
 The select and the link appear only for backend users who may edit the element; changing the tag also needs the
 permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).
 
+The page module shows the box at once and loads the structure afterwards (also while it is collapsed, so the summary
+shows the problems), so checking the page does not delay the page module.
+
 The headings are read from the rendered frontend of the page, which is rendered inside the running PHP process.
 There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter. Headings
 from content elements, RTE content and other extensions are included without any configuration. Only standard pages are checked.

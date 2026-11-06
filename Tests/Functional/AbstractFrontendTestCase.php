@@ -4,10 +4,22 @@ declare(strict_types=1);
 
 namespace Twtgroup\Headliner\Tests\Functional;
 
+use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
 use TYPO3\CMS\Core\Core\Environment;
+use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
+use TYPO3\CMS\Core\Http\NormalizedParams;
+use TYPO3\CMS\Core\Http\RequestHandler;
+use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Backend\StructureBox;
+use Twtgroup\Headliner\Structure\HeadingExtractor;
+use Twtgroup\Headliner\Structure\HeadingValidator;
+use Twtgroup\Headliner\Structure\PageHtmlFetcher;
+use Twtgroup\Headliner\Tests\Functional\Fixtures\TestingContextRequestHandler;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
@@ -74,5 +86,30 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
         self::assertSame(200, $response->getStatusCode());
 
         return (string) $response->getBody();
+    }
+
+    /**
+     * The box of the page module, with the real fetcher and the real request handler of the core, only wrapped for the
+     * testing framework.
+     */
+    protected function structureBox(): StructureBox
+    {
+        return new StructureBox(
+            $this->get(SiteFinder::class),
+            new PageHtmlFetcher(new TestingContextRequestHandler($this->get(RequestHandler::class))),
+            new HeadingExtractor(),
+            new HeadingValidator(),
+            $this->get(ViewFactoryInterface::class),
+            $this->get(LocalizationRepository::class),
+        );
+    }
+
+    /** A request as the backend gives it to the AJAX route of the box */
+    protected function backendRequest(): ServerRequest
+    {
+        $request = (new ServerRequest('https://website.local/typo3/ajax/headliner/structure', 'GET'))
+            ->withAttribute('applicationType', SystemEnvironmentBuilder::REQUESTTYPE_BE);
+
+        return $request->withAttribute('normalizedParams', NormalizedParams::createFromRequest($request));
     }
 }

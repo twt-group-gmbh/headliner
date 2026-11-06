@@ -9,8 +9,12 @@ Developer
 How the structure is checked
 ============================
 
-#.  `PageModuleHeadlines` listens to the PSR-14 event `ModifyPageLayoutContentEvent` of the page module. For every
-    language that the page module shows (`SelectedLanguages`, which follows the page module) it renders the page.
+#.  `PageModuleHeadlines` listens to the PSR-14 event `ModifyPageLayoutContentEvent` of the page module. It only adds a
+    placeholder (the template :file:`Resources/Private/Templates/PageModule/Placeholder.html`), so the page module is not
+    delayed. :file:`headlines.js` then loads the box from the AJAX route `headliner_structure`
+    (`StructureController`, which checks that the backend user may see the page), also while the box is collapsed.
+    `StructureBox` does the work: for every language that the page module shows (`SelectedLanguages`, which follows
+    the page module, passed as `languages` to the route) it renders the page.
 #.  `PageHtmlFetcher` renders the page with a sub-request through the core's `RequestHandler`, in the running PHP
     process. The frontend middleware changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
     `PageRenderer`; the fetcher puts them back.
@@ -34,7 +38,7 @@ JavaScript
 ==========
 
 :file:`Resources/Public/JavaScript/headlines.js` saves the collapsed state with `Persistent` and changes tags with
-`@typo3/backend/ajax-data-handler.js`, then reloads the page module. Opening an element uses the core's
+`@typo3/backend/ajax-data-handler.js`, then loads the box again. It also loads the box when the page module is shown (see above). Opening an element uses the core's
 `be:link.editRecord` with `contextual="true"`; nothing builds edit URLs by hand.
 
 ..  _developer-tests:

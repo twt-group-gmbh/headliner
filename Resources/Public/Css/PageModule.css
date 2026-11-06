@@ -264,3 +264,9 @@
     background: var(--typo3-component-bg);
     color: var(--typo3-component-color);
 }
+
+/* The box is checked after the page module has been shown: until then it holds a short note */
+.headliner__loading {
+    color: var(--typo3-component-color);
+    opacity: .7;
+}

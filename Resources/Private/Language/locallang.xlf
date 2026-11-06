@@ -78,6 +78,12 @@
 			<trans-unit id="notLoaded">
 				<source>The frontend of this page could not be loaded, so the headings cannot be shown.</source>
 			</trans-unit>
+			<trans-unit id="loading">
+				<source>Checking the page...</source>
+			</trans-unit>
+			<trans-unit id="loadFailed">
+				<source>The heading structure could not be loaded.</source>
+			</trans-unit>
 			<trans-unit id="issue.missingH1">
 				<source>The page has no H1.</source>
 			</trans-unit>

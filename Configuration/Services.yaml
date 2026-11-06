@@ -7,3 +7,7 @@ services:
   Twtgroup\Headliner\:
     resource: '../Classes/*'
     exclude: '../Classes/Structure/{Heading,Issue,IssueType}.php'
+
+  # the AJAX route of the backend gets its controller from the container
+  Twtgroup\Headliner\Controller\StructureController:
+    public: true

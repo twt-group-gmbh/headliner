@@ -77,6 +77,12 @@ Tests split into two suites by what they need to boot:
   `{record -> f:render.text(field: ...)}` (that is how it marks editable text), prefer core ViewHelpers and core
   mechanisms. `Resources/Private/Partials/Header/All.fluid.html` is a copy of the core partial: keep it in sync with
   `fluid_styled_content` and keep its `f:render.text` calls.
+- The page module only holds a placeholder (`Placeholder.html`); `headlines.js` loads the box from the AJAX route
+  `ajax_headliner_structure` (`StructureController` -> `StructureBox`, which does the checking and draws
+  `Headlines.html`), also while it is collapsed, so the summary shows the problems. Lazy loading instead of a cache: the
+  content is edited in the backend, so a cache would have to be invalidated by every change. The controller is a public
+  service (the route gets it from the container) and checks the right to see the page. `returnUrl` of the edit links is
+  the page module's URL, passed by the JavaScript (the AJAX request itself is not a place to return to).
 - Which languages the box shows follows the page module, see `SelectedLanguages`: the layout view shows its "primary"
   language (the one translation if exactly one is selected, else the default language), the language comparison shows
   the default language plus the selected translations. `languages` in the module data alone is not enough: in the

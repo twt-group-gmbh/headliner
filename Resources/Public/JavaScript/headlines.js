@@ -1,9 +1,12 @@
 import AjaxDataHandler from '@typo3/backend/ajax-data-handler.js';
+import AjaxRequest from '@typo3/core/ajax/ajax-request.js';
 import Persistent from '@typo3/backend/storage/persistent.js';
+
+const SELECTOR = 'details.headliner';
 
 // Remember in the settings of the backend user whether the box is collapsed. The PHP side reads it, so the box
 // is rendered closed right away.
-let wasOpen = document.querySelector('details.headliner')?.open ?? true;
+let wasOpen = document.querySelector(SELECTOR)?.open ?? true;
 document.addEventListener('toggle', (event) => {
   const box = event.target;
   // The browser also fires "toggle" for the state the box was rendered with; only a real change is saved.
@@ -13,8 +16,52 @@ document.addEventListener('toggle', (event) => {
   }
 }, true);
 
-// Changes the tag of a header through the core's DataHandler, then reloads the page module so the structure
-// and its problems are checked again.
+// The page module only holds a placeholder: the page is checked here, afterwards, so the rendering of the frontend
+// does not delay the page module. This also happens while the box is collapsed, so its summary shows the problems.
+const url = document.querySelector(SELECTOR)?.dataset.headlinerUrl;
+const errorText = document.querySelector(SELECTOR)?.dataset.headlinerError ?? '';
+
+// Gets the box from the server and puts it in the place of the current one. Keeps what the user did meanwhile: an
+// open or closed box.
+async function load() {
+  const current = document.querySelector(SELECTOR);
+  if (!url || !current) {
+    return false;
+  }
+  try {
+    const response = await new AjaxRequest(url)
+      .withQueryArguments({ returnUrl: window.location.pathname + window.location.search })
+      .get();
+    const html = (await response.resolve()).trim();
+    if (html === '') {
+      // nothing to show for this page
+      current.remove();
+      return true;
+    }
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    const box = template.content.firstElementChild;
+    box.open = current.open;
+    wasOpen = box.open;
+    current.replaceWith(box);
+    return true;
+  } catch {
+    const body = current.querySelector('.card-body');
+    if (body) {
+      body.replaceChildren(Object.assign(document.createElement('div'), {
+        className: 'alert alert-warning',
+        textContent: errorText,
+      }));
+    }
+    current.querySelector('.headliner__loading-badge')?.remove();
+    return false;
+  }
+}
+
+load();
+
+// Changes the tag of a header through the core's DataHandler, then loads the box again so the structure and its
+// problems are checked again.
 document.addEventListener('change', (event) => {
   const select = event.target;
   if (!(select instanceof HTMLSelectElement) || !select.matches('.headliner select[data-headliner-edit]')) {
@@ -23,18 +70,19 @@ document.addEventListener('change', (event) => {
 
   const [table, uid, field] = select.dataset.headlinerEdit.split(':');
   select.disabled = true;
+  const restore = () => {
+    select.value = select.dataset.current;
+    select.disabled = false;
+  };
 
   AjaxDataHandler.process({ data: { [table]: { [uid]: { [field]: select.value } } } })
     .then((result) => {
       if (result.hasErrors) {
-        select.value = select.dataset.current;
-        select.disabled = false;
+        restore();
         return;
       }
-      window.location.reload();
+      // a failed load shows its message in the box; the old box stays until the new one has arrived
+      return load().then((loaded) => loaded || restore());
     })
-    .catch(() => {
-      select.value = select.dataset.current;
-      select.disabled = false;
-    });
+    .catch(restore);
 });

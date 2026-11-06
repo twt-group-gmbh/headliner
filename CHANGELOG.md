@@ -22,6 +22,12 @@ First release.
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
   (`data-headliner-edit`); that happens only for the request of the page module (a mark that only exists inside the PHP process, no page cache), never
   for visitors.
+- Page module, loading: the page module shows the box as a placeholder right away and loads the structure afterwards
+  from an AJAX route of the backend (`StructureController`), so rendering the frontend does not delay the page module.
+  This also happens while the box is collapsed, so its summary shows the problems. A page that cannot be checked shows
+  a message in the box instead of an error page for the whole page module. After a tag was changed only the box is
+  loaded again, not the whole page module. The route needs the same right as the page module (the user must be
+  allowed to see the page).
 - Page module, language comparison: the box follows the page module. The layout view shows the structure of the one
   language it shows; the language comparison shows one section per column, the default language and the selected
   translations. With several languages the box has one section per language, side by side like the columns below (flag, name

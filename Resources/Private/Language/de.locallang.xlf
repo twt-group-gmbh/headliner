@@ -103,6 +103,14 @@
 				<source>The frontend of this page could not be loaded, so the headings cannot be shown.</source>
 				<target>Das Frontend dieser Seite konnte nicht geladen werden, daher können die Überschriften nicht angezeigt werden.</target>
 			</trans-unit>
+			<trans-unit id="loading">
+				<source>Checking the page...</source>
+				<target>Seite wird geprüft ...</target>
+			</trans-unit>
+			<trans-unit id="loadFailed">
+				<source>The heading structure could not be loaded.</source>
+				<target>Die Überschriftenstruktur konnte nicht geladen werden.</target>
+			</trans-unit>
 			<trans-unit id="issue.missingH1">
 				<source>The page has no H1.</source>
 				<target>Die Seite hat keine H1.</target>
