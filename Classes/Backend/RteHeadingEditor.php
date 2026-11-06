@@ -133,7 +133,7 @@ final readonly class RteHeadingEditor
         if (!is_array($record) || $page === null || !$this->isRichTextField($table, $field, $record)) {
             return RteChange::NotFound;
         }
-        if (!$this->isEnabledFor((int) $page['uid']) || !$this->canEditText(new EditAccess($backendUser, $page), $table, $record, $field)) {
+        if (!$this->isEnabledFor((int) $page['uid']) || !$this->canEditText(new EditAccess($backendUser, $page, new HiddenFields(BackendUtility::getPagesTSconfig((int) $page['uid']))), $table, $record, $field)) {
             return RteChange::NotAllowed;
         }
 

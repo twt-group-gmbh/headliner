@@ -111,6 +111,69 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         self::assertStringNotContainsString('<select', $html);
     }
 
+    private function pageTsConfig(int $pageId, string $tsConfig): void
+    {
+        $this->get(\TYPO3\CMS\Core\Database\ConnectionPool::class)->getConnectionForTable('pages')
+            ->update('pages', ['TSconfig' => $tsConfig], ['uid' => $pageId]);
+        \TYPO3\CMS\Core\Utility\GeneralUtility::makeInstance(\TYPO3\CMS\Core\Cache\CacheManager::class)->flushCaches();
+    }
+
+    #[Test]
+    public function aTagFieldThatThePageTsConfigHidesIsNotChangedInTheBox(): void
+    {
+        $this->writeSite(['headliner' => ['editRteHeadings' => true]]);
+        $this->pageTsConfig(8, 'TCEFORM.tt_content.header_tag.disabled = 1');
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        // the form has no field for it, so the box has no select; the headings of the text are not affected
+        self::assertStringNotContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+        self::assertStringContainsString('data-headliner-rte="tt_content:21:bodytext:0"', $html);
+    }
+
+    #[Test]
+    public function aTagFieldHiddenForTheTypeOfTheElementIsNotChangedInTheBox(): void
+    {
+        $this->pageTsConfig(8, 'TCEFORM.tt_content.header_tag.types.text.disabled = 1');
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringNotContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+    }
+
+    #[Test]
+    public function aTagFieldHiddenForAnotherTypeIsStillChangedInTheBox(): void
+    {
+        $this->pageTsConfig(8, 'TCEFORM.tt_content.header_tag.types.textpic.disabled = 1');
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+    }
+
+    #[Test]
+    public function aTypeCanShowAgainATagFieldThatIsHiddenForAllTypes(): void
+    {
+        $this->pageTsConfig(8, "TCEFORM.tt_content.header_tag.disabled = 1\nTCEFORM.tt_content.header_tag.types.text.disabled = 0");
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+    }
+
+    #[Test]
+    public function theHeadingsOfTheTextAreNotChangedInTheBoxIfThePageTsConfigHidesTheTextField(): void
+    {
+        $this->writeSite(['headliner' => ['editRteHeadings' => true]]);
+        $this->pageTsConfig(8, 'TCEFORM.tt_content.bodytext.disabled = 1');
+
+        $html = $this->structureBox()->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringNotContainsString('data-headliner-rte="tt_content:21:bodytext', $html);
+        // the tag field of the header is not affected
+        self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $html);
+    }
+
     #[Test]
     public function aHeadingFromTheTextIsOnlyALabelWhileTheSiteSettingIsOff(): void
     {

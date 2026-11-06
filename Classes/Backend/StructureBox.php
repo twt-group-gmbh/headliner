@@ -88,7 +88,8 @@ final readonly class StructureBox
         }
         $backendUser = $GLOBALS['BE_USER'] ?? null;
         $backendUser = $backendUser instanceof BackendUserAuthentication ? $backendUser : null;
-        $editAccess = new EditAccess($backendUser, $page);
+        // The page TSconfig hides fields in the form (TCEFORM): a field the form does not show is not changed in the box
+        $editAccess = new EditAccess($backendUser, $page, new HiddenFields(BackendUtility::getPagesTSconfig($pageId)));
         // The workspace the backend user works in (0 is live): the page module shows its versions, so the structure does too
         $workspaceId = max(0, (int) ($backendUser->workspace ?? 0));
         if ($workspaceId > 0) {

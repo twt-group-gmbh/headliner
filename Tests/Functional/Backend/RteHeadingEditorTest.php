@@ -94,6 +94,22 @@ final class RteHeadingEditorTest extends AbstractFrontendTestCase
     }
 
     #[Test]
+    public function refusesAFieldThatThePageTsConfigHidesInTheForm(): void
+    {
+        $this->enableTheSetting();
+        $this->setUpBackendUser(1);
+        // the page of element 21: the form has no text field for it, so the box does not change it either (also not by a
+        // request that was made by hand)
+        $this->getConnectionPool()->getConnectionForTable('pages')
+            ->update('pages', ['TSconfig' => 'TCEFORM.tt_content.bodytext.types.text.disabled = 1'], ['uid' => 8]);
+
+        $result = $this->editor()->change('tt_content', 21, 'bodytext', 1, 'h2', 'Opening hours');
+
+        self::assertSame('notAllowed', $result->value);
+        self::assertStringContainsString('<h3>Opening', $this->bodytext());
+    }
+
+    #[Test]
     public function refusesAUserWhoMayNotEditTheElement(): void
     {
         $this->enableTheSetting();

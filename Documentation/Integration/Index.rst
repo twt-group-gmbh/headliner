@@ -283,12 +283,11 @@ site is built on a theme like this and you do not use the tag fields anywhere:
     }
 
 The fields then also disappear from the element types for which they would work (`header`, `bullets` and the others that use
-the header partial of `fluid_styled_content`), and those headings can no longer get a tag in the form. The TSconfig
-only hides the fields in the form: the box does not read it, so it still offers the tag select for a heading that
-carries the mark of `headliner:headline`, if the backend user may edit the field.
+the header partial of `fluid_styled_content`), and those headings can no longer get a tag, neither in the form nor in the
+box.
 
 **For single element types.** Put the type after `types` to hide the fields only there, and keep them for the others.
-Add a block per type (`textpic`, `camino_hero`, and so on):
+Add a line per type (`textpic`, `camino_hero`, and so on):
 
 ..  code-block:: typoscript
     :caption: page.tsconfig

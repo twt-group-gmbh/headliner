@@ -8,6 +8,7 @@ use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Twtgroup\Headliner\Backend\EditAccess;
+use Twtgroup\Headliner\Backend\HiddenFields;
 use TYPO3\CMS\Core\Authentication\AccessCheckResult;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
@@ -148,5 +149,36 @@ final class EditAccessTest extends TestCase
         self::assertTrue($access->canEditFieldOf('cards', ['uid' => 7, 'pid' => 2], 'tag', false));
         // an "exclude" field needs its own permission, named by table and field
         self::assertFalse($access->canEditFieldOf('cards', ['uid' => 7, 'pid' => 2], 'tag', true));
+    }
+
+    #[Test]
+    public function aFieldThatThePageTsConfigHidesCannotBeChangedEvenByAnAdmin(): void
+    {
+        $hidden = new HiddenFields(['TCEFORM.' => ['tt_content.' => ['header_tag.' => ['disabled' => '1']]]]);
+        $admin = new EditAccess($this->user(admin: true), ['uid' => 2], $hidden);
+        $editor = new EditAccess($this->user(), ['uid' => 2], $hidden);
+
+        foreach ([$admin, $editor] as $access) {
+            self::assertFalse($access->canEditTag(self::CONTENT, 'header_tag'));
+            // only that field: the element can still be opened and the other field changed
+            self::assertTrue($access->canOpen(self::CONTENT));
+        }
+    }
+
+    #[Test]
+    public function aFieldThatIsHiddenForOneTypeCanStillBeChangedInTheOthers(): void
+    {
+        $hidden = new HiddenFields(['TCEFORM.' => ['tt_content.' => ['header_tag.' => ['types.' => ['camino_hero.' => ['disabled' => '1']]]]]]);
+        $access = new EditAccess($this->user(), ['uid' => 2], $hidden);
+        $tca = $GLOBALS['TCA'] ?? null;
+        // the type of a record is the field the TCA names
+        $GLOBALS['TCA']['tt_content']['ctrl']['type'] = 'CType';
+
+        try {
+            self::assertTrue($access->canEditTag(self::CONTENT, 'header_tag'));
+            self::assertFalse($access->canEditTag(['uid' => 13, 'pid' => 2, 'CType' => 'camino_hero'], 'header_tag'));
+        } finally {
+            $GLOBALS['TCA'] = $tca;
+        }
     }
 }

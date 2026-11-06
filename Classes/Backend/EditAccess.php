@@ -11,7 +11,8 @@ use TYPO3\CMS\Core\Type\Bitmask\Permission;
  * What the backend user may do with a content element of the page, with the same rules the page module itself uses
  * for its edit buttons: an admin may do everything; an editor needs the right to modify content, edit rights for the
  * content of the page (which is not locked) and edit access to the record. Changing a tag also needs the permission
- * for that field, as it is an "exclude" field.
+ * for that field, as it is an "exclude" field. A field that the page TSconfig hides in the form (`TCEFORM`) is not changed
+ * in the box either.
  */
 final readonly class EditAccess
 {
@@ -21,6 +22,7 @@ final readonly class EditAccess
     public function __construct(
         private ?BackendUserAuthentication $backendUser,
         private array $pageRecord,
+        private ?HiddenFields $hiddenFields = null,
     ) {}
 
     /**
@@ -76,12 +78,27 @@ final readonly class EditAccess
      */
     public function canEditFieldOf(string $table, array $record, string $field, bool $excludeField): bool
     {
-        if (!$this->canEditRecord($table, $record)) {
+        if (!$this->canEditRecord($table, $record) || $this->isHidden($table, $record, $field)) {
             return false;
         }
 
         return $this->backendUser?->isAdmin() === true
             || !$excludeField
             || $this->backendUser?->check('non_exclude_fields', $table . ':' . $field) === true;
+    }
+
+    /**
+     * @param array<string, mixed> $record
+     */
+    private function isHidden(string $table, array $record, string $field): bool
+    {
+        if ($this->hiddenFields === null) {
+            return false;
+        }
+        // the type of the record: the field named in the TCA ("CType" for a content element)
+        $typeField = $GLOBALS['TCA'][$table]['ctrl']['type'] ?? '';
+        $type = is_string($typeField) && !str_contains($typeField, ':') ? (string) ($record[$typeField] ?? '') : '';
+
+        return $this->hiddenFields->isHidden($table, $field, $type);
     }
 }

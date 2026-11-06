@@ -135,7 +135,9 @@ Tests split into two suites by what they need to boot:
   not found where the order says.
 - What a backend user may do in the box is decided by `EditAccess`, with the rules of the page module's own edit buttons
   (`GridColumnItem::isEditable()`); the fields `header_tag` and `subheader_tag` are "exclude" fields, so they also need
-  the field permission. Never show the select or the link on the basis of the markup alone.
+  the field permission. Never show the select or the link on the basis of the markup alone. A field that the page TSconfig
+  hides in the form (`TCEFORM`, also per type: `HiddenFields`) is not changed in the box either: `EditAccess::canEditFieldOf()`
+  says no, in the box and in `RteHeadingEditor::change()` (which builds its own `EditAccess`: give it the same `HiddenFields`).
 - `PageHtmlFetcher` renders the frontend in the same PHP process (a sub-request through the core's `RequestHandler`),
   not over HTTP. The frontend middleware stack changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
   shared `PageRenderer`, so the fetcher puts them back (unit-tested); if you add state the sub-request touches, restore
