@@ -9,9 +9,16 @@
     "authors": [
         {
             "name": "twtgroup",
+            "homepage": "https://twt.de",
             "role": "Developer"
         }
     ],
+    "homepage": "https://extensions.typo3.org/extension/headliner",
+    "support": {
+        "issues": "https://github.com/twt-group-gmbh/headliner/issues",
+        "source": "https://github.com/twt-group-gmbh/headliner",
+        "docs": "https://docs.typo3.org/p/twtgroup/headliner/main/en-us/"
+    },
     "license": "GPL-2.0-or-later",
     "require": {
         "php": ">=8.3",
