@@ -24,7 +24,7 @@ headings of the page as a hierarchy. Every heading has a pill with its tag; its 
     order of the headings says, with the same level and text. If it is not (the text was changed meanwhile, or the
     heading comes from somewhere else), the box says so and loads the structure again; headings that cannot be found
     are only a label. The user needs the rights to edit the element.
-*   A header that an editor turned into a `div` is listed too, as :guilabel:`Not a heading`, so it can be turned back.
+*   A header that an editor turned into a `div` is listed too (its text is paler), so it can be turned back.
 *   The headings of one content element (its header, its subheader and the headings of its text) form a **group**: a
     coloured bar runs along the left edge of their rows, and hovering one of them marks the others and outlines the
     element in the page module below.

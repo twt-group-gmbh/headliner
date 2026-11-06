@@ -27,9 +27,6 @@
 			<trans-unit id="rteFailed">
 				<source>The heading could not be changed. The text may have been changed in the meantime; the structure is loaded again.</source>
 			</trans-unit>
-			<trans-unit id="noHeading">
-				<source>Not a heading</source>
-			</trans-unit>
 			<trans-unit id="toggle">
 				<source>Show or hide the heading structure</source>
 			</trans-unit>

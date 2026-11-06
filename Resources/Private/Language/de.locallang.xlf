@@ -35,10 +35,6 @@
 				<source>The heading could not be changed. The text may have been changed in the meantime; the structure is loaded again.</source>
 				<target>Die Überschrift konnte nicht geändert werden. Vielleicht wurde der Text inzwischen geändert; die Struktur wird neu geladen.</target>
 			</trans-unit>
-			<trans-unit id="noHeading">
-				<source>Not a heading</source>
-				<target>Keine Überschrift</target>
-			</trans-unit>
 			<trans-unit id="toggle">
 				<source>Show or hide the heading structure</source>
 				<target>Überschriftenstruktur ein- oder ausklappen</target>

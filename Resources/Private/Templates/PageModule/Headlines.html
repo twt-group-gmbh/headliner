@@ -114,9 +114,6 @@
                                         <f:if condition="{heading.fromText}">
                                             <span class="badge badge-secondary"><f:translate key="{l}rte" /></span>
                                         </f:if>
-                                        <f:if condition="{heading.level} == 0">
-                                            <span class="badge badge-secondary"><f:translate key="{l}noHeading" /></span>
-                                        </f:if>
                                         <f:for each="{heading.issues}" as="issue">
                                             <span class="badge badge-warning"><f:translate key="{l}issue.{issue}" /></span>
                                         </f:for>

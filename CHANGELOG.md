@@ -22,8 +22,7 @@ First release.
   its rights, by the AJAX route `headliner_rte_tag`. The heading is found by its place among the headings of the text and
   must have the same level and text there, so nothing is changed at a wrong place if the text was edited meanwhile or the
   heading comes from somewhere else; then it is only a label. The content element is
-  found by the frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as
-  "not a heading". The text of a header opens the edit form of its content element in the side panel, like the edit
+  found by the frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, with a paler text. The text of a header opens the edit form of its content element in the side panel, like the edit
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
   (`data-headliner-edit`); that happens only for the request of the page module (a mark that only exists inside the PHP process, no page cache), never
   for visitors.
