@@ -105,6 +105,10 @@ First release.
   (`subheader`, `subheader_tag`) in `ContentBlocks/Basics/`. A block names them with `type: Basic` and needs nothing else for
   the tag fields (Content Blocks does not know the fields that an extension adds in its TCA overrides, so a block that uses
   `header_tag` alone fails to compile without a `type`). Content Blocks stays no requirement.
+- Upgrade wizard `headlinerMigrateSemantilizerFields`: takes the field of the Semantilizer (z7_semantilizer), `header_type`
+  (0 to 6), into the tag of the header (`header_tag`). It keeps tags that were chosen already, leaves the layout and the
+  subheader alone (the Semantilizer has no field for it), and can run again. See the chapter "Migration" of the
+  documentation.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
 

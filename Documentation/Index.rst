@@ -71,4 +71,5 @@ choose the HTML tag of the headers of content elements separately from their loo
     Usage/Index
     Configuration/Index
     Integration/Index
+    Migration/Index
     Developer/Index

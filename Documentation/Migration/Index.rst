@@ -1,0 +1,49 @@
+..  _migration:
+
+=========
+Migration
+=========
+
+..  _migration-semantilizer:
+
+From the Semantilizer (z7_semantilizer)
+=======================================
+
+The Semantilizer keeps the type of a header in one field, `header_type` (0 to 6), and leaves `header_layout` for the look.
+Headliner does the same with two fields, `header_tag` for the tag and `header_layout` for the look, so the content can be
+taken over.
+
+The upgrade wizard :guilabel:`Headliner: take the heading types of the Semantilizer (z7_semantilizer) into the tags of
+headliner` does that:
+
+..  code-block:: bash
+
+    vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields
+
+You can also run it in :guilabel:`Admin Tools > Upgrade > Upgrade Wizard`. It is listed when the column `header_type` is
+still in the database and there is something to change.
+
+=============  ============
+`header_type`  `header_tag`
+=============  ============
+1 to 6         `h1` to `h6`
+0 (none)       `div`
+=============  ============
+
+- The layout (`header_layout`) is the same field in both extensions and is not changed.
+- The Semantilizer has no field for the subheader (it renders it one level below its header), so there is nothing to take
+  over and the subheader is not touched.
+- It fills only what is empty or still the default of the field (`h2`). A tag that somebody has chosen since headliner was
+  installed is kept.
+- The wizard works on the column `header_type` of the database. That stays after the Semantilizer is removed, until the
+  unused columns are deleted (:guilabel:`Analyze Database Structure`), so run the wizard before that.
+- It can run again, and changes nothing the second time.
+
+What is left to do by hand:
+
+#.  Remove the Semantilizer (`composer remove zeroseven/z7-semantilizer`) and add the site set of headliner after
+    `fluid_styled_content` (see :ref:`installation`).
+#.  Change the templates that use `<semantilizer:headline>` to `<headliner:headline>` (see :ref:`integration-own-templates`).
+    The arguments are `tag="{data.header_tag}"` instead of `type="{data.header_type}"`, and the mark `edit` is not needed
+    any more.
+#.  Check the CSS: headliner puts the class `ce-headline-layout-N` on a header, the Semantilizer `ce__header--N`.

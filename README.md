@@ -78,6 +78,12 @@ existing pages do not change until an editor chooses a tag.
 | `headliner.editRteHeadings`   | off     | Allow the tag of a heading in the rich text of a content element to be changed in the box (only to the headings the RTE offers). The text of the element is changed, so it is off by default. |
 | `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
 
+## Migration
+
+Coming from the Semantilizer (`z7_semantilizer`)? The upgrade wizard `headlinerMigrateSemantilizerFields` takes its field
+`header_type` into the tags of headliner (`vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields`). See the
+documentation for what is left to do by hand.
+
 ## Requirements
 
 - PHP **8.3+**
