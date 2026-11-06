@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Core\SystemEnvironmentBuilder;
 use TYPO3\CMS\Core\Http\NormalizedParams;
 use TYPO3\CMS\Core\Http\RequestHandler;
 use TYPO3\CMS\Core\Http\ServerRequest;
+use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
@@ -101,6 +102,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             new HeadingValidator(),
             $this->get(ViewFactoryInterface::class),
             $this->get(LocalizationRepository::class),
+            $this->get(TcaSchemaFactory::class),
         );
     }
 

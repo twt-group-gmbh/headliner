@@ -54,6 +54,10 @@ First release.
 - Page module, workspaces: in a workspace the box shows the versions of that workspace, like the page module itself, and
   says which workspace it is. The versions of the page, its translation and its parents count for the hidden state, the
   times and the groups. A tag changed in the box changes the version, not the live record.
+- Page module, `l10n_mode = exclude`: if a project sets that for `header_tag` (or `subheader_tag`), a translation has no
+  tag of its own (the DataHandler copies it from the original and drops what is saved on the translation). In the box
+  such a tag is a label with a tooltip, not a select, so a change is not lost silently; it is changed on the original
+  of the default language. A freely translated record is not connected to an original and keeps its select.
 - Page module, rights: the select and the edit link appear only if the backend user may use them, with the rules of the
   page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
   content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the

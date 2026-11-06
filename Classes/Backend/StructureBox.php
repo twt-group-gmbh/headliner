@@ -10,6 +10,9 @@ use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Site\Entity\Site;
+use TYPO3\CMS\Core\Schema\Capability\TcaSchemaCapability;
+use TYPO3\CMS\Core\Schema\Field\FieldTranslationBehaviour;
+use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
@@ -39,6 +42,7 @@ final readonly class StructureBox
         private HeadingValidator $validator,
         private ViewFactoryInterface $viewFactory,
         private LocalizationRepository $localizationRepository,
+        private TcaSchemaFactory $tcaSchemaFactory,
     ) {}
 
     /**
@@ -114,7 +118,7 @@ final readonly class StructureBox
     /**
      * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
-     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, canOpen: bool, canEditTag: bool, outside: bool, subheader: bool, fromText: bool, parentText: string}>
+     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, canOpen: bool, canEditTag: bool, tagInherited: bool, outside: bool, subheader: bool, fromText: bool, parentText: string}>
      */
     private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess): array
     {
@@ -136,6 +140,8 @@ final readonly class StructureBox
             $elementUid = $target['uid'] ?? $this->getTranslatedUid($heading->element, $languageId);
             $contentRecord = $elementUid !== null ? BackendUtility::getRecord('tt_content', $elementUid) : null;
             $canOpen = $contentRecord !== null && $editAccess->canOpen($contentRecord);
+            // l10n_mode "exclude" on the field: a translation has the value of its original, it cannot be changed there
+            $tagInherited = $contentRecord !== null && $target !== null && $this->tagComesFromOriginal($contentRecord, $target['field']);
             $rows[] = [
                 'tag' => $heading->level === 0 ? 'div' : 'h' . $heading->level,
                 'level' => $heading->level,
@@ -150,7 +156,8 @@ final readonly class StructureBox
                 'canOpen' => $canOpen,
                 // the tag can be changed only if it belongs to this element and the user may change that field
                 'outside' => $heading->outside,
-                'canEditTag' => $canOpen && !$heading->outside && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field']),
+                'canEditTag' => $canOpen && !$tagInherited && !$heading->outside && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field']),
+                'tagInherited' => $tagInherited,
                 'subheader' => $isSubheader,
                 'fromText' => $fromText,
                 'parentText' => ($isSubheader || $fromText) && $elementUid !== null ? ($headerTexts[$elementUid] ?? '') : '',
@@ -158,6 +165,27 @@ final readonly class StructureBox
         }
 
         return $rows;
+    }
+
+    /**
+     * @param array<string, mixed> $contentRecord
+     */
+    private function tagComesFromOriginal(array $contentRecord, string $field): bool
+    {
+        if (!$this->tcaSchemaFactory->has('tt_content')) {
+            return false;
+        }
+        $schema = $this->tcaSchemaFactory->get('tt_content');
+        if (!$schema->isLanguageAware() || !$schema->hasField($field)) {
+            return false;
+        }
+        $pointer = $schema->getCapability(TcaSchemaCapability::Language)->getTranslationOriginPointerField()->getName();
+
+        return TranslationSync::inheritsFromOriginal(
+            $schema->getField($field)->getTranslationBehaviour() === FieldTranslationBehaviour::Excluded,
+            $contentRecord,
+            $pointer
+        );
     }
 
     private function getWorkspaceTitle(?BackendUserAuthentication $backendUser, int $workspaceId): string

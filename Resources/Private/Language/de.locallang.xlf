@@ -27,6 +27,10 @@
 				<source>Subheader</source>
 				<target>Unterüberschrift</target>
 			</trans-unit>
+			<trans-unit id="tagInherited">
+				<source>The tag comes from the original of the default language and is changed there.</source>
+				<target>Der Tag stammt vom Original der Standardsprache und wird dort geändert.</target>
+			</trans-unit>
 			<trans-unit id="noHeading">
 				<source>Not a heading</source>
 				<target>Keine Überschrift</target>

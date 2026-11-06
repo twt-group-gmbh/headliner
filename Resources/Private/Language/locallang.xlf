@@ -21,6 +21,9 @@
 			<trans-unit id="subheader">
 				<source>Subheader</source>
 			</trans-unit>
+			<trans-unit id="tagInherited">
+				<source>The tag comes from the original of the default language and is changed there.</source>
+			</trans-unit>
 			<trans-unit id="noHeading">
 				<source>Not a heading</source>
 			</trans-unit>

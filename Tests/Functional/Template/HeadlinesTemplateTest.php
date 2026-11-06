@@ -37,7 +37,10 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
         parent::tearDown();
     }
 
-    private function render(int $issueCount, string $language): string
+    /**
+     * @param list<array<string, mixed>> $headings
+     */
+    private function render(int $issueCount, string $language, array $headings = []): string
     {
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->create($language);
         $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(templateRootPaths: ['EXT:headliner/Resources/Private/Templates']));
@@ -62,7 +65,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
                 'access' => 'open',
                 'accessGroups' => '',
                 'hasHeadings' => true,
-                'headings' => [],
+                'headings' => $headings,
                 'pageIssues' => [],
                 'issueCount' => $issueCount,
             ]],
@@ -108,5 +111,36 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
         self::assertSame('1 Hinweis', $label('summary.issue'));
         self::assertSame('3 Hinweise', sprintf($label('summary.issues'), 3));
         self::assertSame('Struktur in Ordnung', $label('summary.ok'));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private static function heading(bool $canEditTag, bool $tagInherited): array
+    {
+        return [
+            'tag' => 'h2', 'level' => 2, 'text' => 'Title', 'issues' => [], 'edit' => 'tt_content:5:header_tag', 'editUid' => 5,
+            'canOpen' => true, 'canEditTag' => $canEditTag, 'outside' => false, 'subheader' => false, 'fromText' => false,
+            'parentText' => '', 'tagInherited' => $tagInherited,
+        ];
+    }
+
+    #[Test]
+    public function aTagTakenFromTheOriginalIsALabelWithATooltip(): void
+    {
+        $html = $this->render(0, 'default', [self::heading(false, true)]);
+
+        self::assertStringNotContainsString('<select', $html);
+        self::assertMatchesRegularExpression('#<span class="headliner__pill"[^>]*data-current="h2"#', $html);
+        self::assertStringContainsString('title="The tag comes from the original of the default language and is changed there."', $html);
+    }
+
+    #[Test]
+    public function anEditableTagIsASelectWithoutThatTooltip(): void
+    {
+        $html = $this->render(0, 'default', [self::heading(true, false)]);
+
+        self::assertStringContainsString('<select', $html);
+        self::assertStringNotContainsString('comes from the original', $html);
     }
 }

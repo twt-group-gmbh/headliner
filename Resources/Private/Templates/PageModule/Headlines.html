@@ -92,7 +92,7 @@
                                                         </f:for>
                                                     </select>
                                                 </f:then>
-                                                <f:else><span class="headliner__pill" data-current="{heading.tag}">{heading.tag -> f:format.case(mode: 'upper')}</span></f:else>
+                                                <f:else><span class="headliner__pill" data-current="{heading.tag}"{f:if(condition: heading.tagInherited, then: ' title="{f:translate(key: \'{l}tagInherited\')}"')}>{heading.tag -> f:format.case(mode: 'upper')}</span></f:else>
                                             </f:if>
                                         </span>
                                         <span class="headliner__body">
