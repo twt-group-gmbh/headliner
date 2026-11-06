@@ -152,8 +152,8 @@ Tests split into two suites by what they need to boot:
   `Simulation` (time, groups, workspace).
 - The upgrade wizard `MigrateSemantilizerFields` (`headlinerMigrateSemantilizerFields`, in `Classes/Upgrades/`, the interface is
   in EXT:core, so EXT:install is no requirement) takes `tt_content.header_type` of z7_semantilizer into `header_tag`
-  (`SemantilizerMapping`; the subheader is not touched, there is no source field). It only fills empty or default tags
-  (h2), works on the leftover column (no TCA for it), checks that the column exists, and can run again. The functional test adds and drops the column itself.
+  (`SemantilizerMapping`; the subheader is not touched, there is no source field). It only fills empty tags (an explicit
+  h2 is kept; the DB default of the tag fields is empty), works on the leftover column (no TCA for it), checks that the column exists, and can run again. The functional test adds and drops the column itself.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

@@ -55,7 +55,9 @@ The fields of a content element
     "Default" and "Hidden" set no class; "Hidden" hides the header.
 
 :guilabel:`Subheader tag` (`subheader_tag`)
-    Like :guilabel:`Tag`, for the subheader. The default is :guilabel:`One level below the header`.
+    Like :guilabel:`Tag`, for the subheader. The default is :guilabel:`One level below the header`: an H1 header
+    has an `h2` subheader, H2 an `h3`, and so on; below H6 and under a `div` it is a `div`. `fluid_styled_content` always
+    renders the subheader as `h3`, so choose :guilabel:`H3` if a subheader has to stay as it was.
 
 The subheader has no layout of its own: it has the layout class of its header, and the layout "Hidden" of the header
 hides both.

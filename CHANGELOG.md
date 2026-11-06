@@ -79,7 +79,9 @@ First release.
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The
   subheader is rendered one level below the header. Provided as a partial override for `fluid_styled_content`
   through the site set `twtgroup/headliner`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6). The field is empty by default, in the TCA and as the
-  default of the database column, so installing the extension changes nothing in existing content.
+  default of the database column, so installing the extension changes nothing in existing content. The exception is the
+  subheader: `fluid_styled_content` renders it as `h3` always, headliner one level below the header (documented in the
+  installation notes).
 - Content elements with a subheader: the field "Subheader tag" (`subheader_tag`, default "one level below the header") inherits the choices of
   `header_tag`. The subheader has no layout of its own: it looks like its header (the CSS class `ce-headline-layout-N`
   of `header_layout`), and the layout "Hidden" hides the header and the subheader.

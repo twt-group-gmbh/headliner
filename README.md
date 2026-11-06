@@ -68,7 +68,9 @@ via the Extension Manager.
 
 Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
 header partial of `fluid_styled_content`. Content without a Tag (the field is empty by default, also in the database) keeps the old
-behaviour (layout 1-6 = H1-H6), so existing pages do not change until an editor chooses a tag.
+behaviour (layout 1-6 = H1-H6), so existing pages do not change until an editor chooses a tag. The
+subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header (an `h2`
+under an H1, a `div` below H6), so check pages with subheaders after the installation or choose H3 in *Subheader tag*.
 
 ### Site setting
 

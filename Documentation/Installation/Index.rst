@@ -40,6 +40,11 @@ You can also select the set in :guilabel:`Sites > Setup`.
     means H1 to H6), so existing pages do not change until an editor chooses a tag. The database column has an empty
     default for this, so adding it changes nothing in the existing content.
 
+    The subheader is the exception. `fluid_styled_content` renders it as an `h3` whatever the header is; headliner
+    renders it one level below the header (H1 gives an `h2`, H3 gives an `h4`, below H6 and in a `div` it is a `div`).
+    Only under an H2 the tag stays the same. Check the CSS and the heading structure of pages that have subheaders, or
+    choose :guilabel:`H3` in :guilabel:`Subheader tag` for them.
+
 ..  _installation-database:
 
 Database
