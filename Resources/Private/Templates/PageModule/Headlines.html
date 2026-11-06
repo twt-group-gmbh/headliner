@@ -46,7 +46,7 @@
                                 <f:for each="{section.headings}" as="heading">
                                     <li class="headliner__item headliner__item--h{heading.level}{f:if(condition: heading.issues, then: ' headliner__item--issue')}{f:if(condition: '{heading.level} == 0', then: ' headliner__item--nolevel')}{f:if(condition: '{heading.subheader} || {heading.fromText}', then: ' headliner__item--sub')}">
                                         <span class="headliner__tag">
-                                            <f:if condition="{heading.edit}">
+                                            <f:if condition="{heading.canEditTag}">
                                                 <f:then>
                                                     <select class="form-select form-select-sm headliner__select" data-headliner-edit="{heading.edit}" data-current="{heading.tag}"
                                                             title="{f:translate(key: '{l}editTag')}">
@@ -60,7 +60,7 @@
                                         </span>
                                         <span class="headliner__text">
                                             <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
-                                            <f:if condition="{heading.editUid}">
+                                            <f:if condition="{heading.canOpen}">
                                                 <f:then>
                                                     <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" class="headliner__link"
                                                                         title="{f:translate(key: '{l}editElement')}">{label -> f:format.raw()}</be:link.editRecord>

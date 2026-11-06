@@ -18,6 +18,7 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Backend\EditAccess;
 use Twtgroup\Headliner\Backend\SelectedLanguages;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Structure\Heading;
@@ -47,10 +48,12 @@ final readonly class PageModuleHeadlines
     {
         $request = $event->getRequest();
         $pageId = (int) ($request->getQueryParams()['id'] ?? 0);
-        $page = $pageId > 0 ? BackendUtility::getRecord('pages', $pageId, 'doktype') : null;
+        $page = $pageId > 0 ? BackendUtility::getRecord('pages', $pageId) : null;
         if ($page === null || (int) $page['doktype'] !== self::DOKTYPE_STANDARD) {
             return;
         }
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+        $editAccess = new EditAccess($backendUser instanceof BackendUserAuthentication ? $backendUser : null, $page);
 
         try {
             $site = $this->siteFinder->getSiteByPageId($pageId);
@@ -60,7 +63,7 @@ final readonly class PageModuleHeadlines
 
         $sections = [];
         foreach ($this->getLanguageIds($request) as $languageId) {
-            $section = $this->buildSection($site, $pageId, $languageId);
+            $section = $this->buildSection($site, $pageId, $languageId, $editAccess);
             if ($section !== null) {
                 $sections[] = $section;
             }
@@ -92,9 +95,9 @@ final readonly class PageModuleHeadlines
     /**
      * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
-     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, subheader: bool, fromText: bool, parentText: string}>
+     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, canOpen: bool, canEditTag: bool, subheader: bool, fromText: bool, parentText: string}>
      */
-    private function buildRows(array $headings, array $issues, int $languageId): array
+    private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess): array
     {
         $rows = [];
         // The text of the header of every content element, so a subheader or a heading from the text can say whose it is
@@ -112,6 +115,8 @@ final readonly class PageModuleHeadlines
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
             $fromText = $target === null && $heading->element !== null;
             $elementUid = $target['uid'] ?? $this->getTranslatedUid($heading->element, $languageId);
+            $contentRecord = $elementUid !== null ? BackendUtility::getRecord('tt_content', $elementUid) : null;
+            $canOpen = $contentRecord !== null && $editAccess->canOpen($contentRecord);
             $rows[] = [
                 'tag' => $heading->level === 0 ? 'div' : 'h' . $heading->level,
                 'level' => $heading->level,
@@ -123,6 +128,9 @@ final readonly class PageModuleHeadlines
                 'edit' => $heading->edit,
                 // opens the content element: its own header, or the element the heading is rendered in
                 'editUid' => $elementUid,
+                'canOpen' => $canOpen,
+                // the tag can be changed only if it belongs to this element and the user may change that field
+                'canEditTag' => $canOpen && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field']),
                 'subheader' => $isSubheader,
                 'fromText' => $fromText,
                 'parentText' => ($isSubheader || $fromText) && $elementUid !== null ? ($headerTexts[$elementUid] ?? '') : '',
@@ -163,7 +171,7 @@ final readonly class PageModuleHeadlines
      *
      * @return array<string, mixed>|null NULL if the site has no such language
      */
-    private function buildSection(Site $site, int $pageId, int $languageId): ?array
+    private function buildSection(Site $site, int $pageId, int $languageId, EditAccess $editAccess): ?array
     {
         try {
             $language = $site->getLanguageById($languageId);
@@ -200,7 +208,7 @@ final readonly class PageModuleHeadlines
         $issues = $this->validator->validate($headings);
         $section['loaded'] = true;
         $section['hasHeadings'] = $headings !== [];
-        $section['headings'] = $this->buildRows($headings, $issues, $languageId);
+        $section['headings'] = $this->buildRows($headings, $issues, $languageId, $editAccess);
         $section['pageIssues'] = array_values(array_filter($issues, static fn($issue) => $issue->index === null));
         $section['issueCount'] = count($issues);
 

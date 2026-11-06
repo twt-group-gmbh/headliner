@@ -28,6 +28,10 @@ First release.
   and its own status). Every section has a minimum width; if they do not fit, the box scrolls sideways like the columns
   below it. The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
   that are opened from a translated page are the translations, not the original of the default language.
+- Page module, rights: the select and the edit link appear only if the backend user may use them, with the rules of the
+  page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
+  content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the
+  permission for the field (`header_tag`, `subheader_tag` are "exclude" fields). Otherwise the tag is shown as a label.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
 - Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default H2) decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The

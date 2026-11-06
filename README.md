@@ -14,6 +14,8 @@ marked the same way and open that element; they cannot be changed in the box. Fo
 (H1-H6 or div): it is saved with the rights of the backend user and the structure is checked again. Clicking the text of a header opens the edit form of its content element in the side panel, as the edit button of
 the page module does. Headings from
 other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
+The select and the link appear only for backend users who may edit the element; changing the tag also needs the
+permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).
 
 The headings are read from the rendered frontend of the page, which is rendered inside the running PHP process.
 There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter. Headings
