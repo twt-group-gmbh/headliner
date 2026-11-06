@@ -6,6 +6,7 @@ namespace Twtgroup\Headliner\Tests\Functional;
 
 use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -101,7 +102,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
      * The box of the page module, with the real fetcher and the real request handler of the core, only wrapped for the
      * testing framework.
      */
-    protected function structureBox(?string $pageHtml = null): StructureBox
+    protected function structureBox(?string $pageHtml = null, ?EventDispatcherInterface $dispatcher = null): StructureBox
     {
         // with a page html the page is not rendered: the box gets what the ViewHelpers would have put there
         $handler = $pageHtml !== null
@@ -126,6 +127,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             $this->get(UriBuilder::class),
             $this->rteEditor(),
             new TagField($this->get(TcaSchemaFactory::class)),
+            $dispatcher ?? $this->get(EventDispatcherInterface::class),
         );
     }
 

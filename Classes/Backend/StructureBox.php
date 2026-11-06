@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Twtgroup\Headliner\Backend;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Domain\Repository\Localization\LocalizationRepository;
 use TYPO3\CMS\Backend\Routing\UriBuilder;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
 use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
+use TYPO3\CMS\Core\Localization\LanguageService;
 use TYPO3\CMS\Core\Site\Entity\Site;
 use TYPO3\CMS\Core\Schema\Capability\TcaSchemaCapability;
 use TYPO3\CMS\Core\Schema\Field\FieldTranslationBehaviour;
@@ -17,10 +19,12 @@ use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
+use Twtgroup\Headliner\Structure\Issue;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
 use Twtgroup\Headliner\Structure\RteHeadings;
 use Twtgroup\Headliner\Structure\Simulation;
@@ -55,6 +59,7 @@ final readonly class StructureBox
         private UriBuilder $uriBuilder,
         private RteHeadingEditor $rteEditor,
         private TagField $tagField,
+        private EventDispatcherInterface $eventDispatcher,
     ) {}
 
     /**
@@ -207,9 +212,8 @@ final readonly class StructureBox
                 'level' => $heading->level,
                 'text' => $heading->text,
                 'issues' => array_values(array_map(
-                    // @extensionScannerIgnoreLine the type of our validation issue (an enum), not that of the TypoScriptFrontendController
-                    static fn($issue): string => $issue->type->value,
-                    array_filter($issues, static fn($issue): bool => $issue->index === $index)
+                    fn(Issue $issue): array => $this->issueRow($issue),
+                    array_filter($issues, static fn(Issue $issue): bool => $issue->index === $index)
                 )),
                 'edit' => $target !== null ? $target['table'] . ':' . $target['uid'] . ':' . $target['field'] : null,
                 'childLabel' => $target !== null && !$isElementTarget ? $this->tableTitle($target['table']) : '',
@@ -520,13 +524,70 @@ final readonly class StructureBox
         }
 
         $headings = $this->extractor->extract($html, (string) $site->getSettings()->get('headliner.contentSelector', ''));
-        $issues = $this->validator->validate($headings);
+        $issues = $this->checkedByListeners($headings, $this->validator->validate($headings), $pageId, $languageId);
         $section['loaded'] = true;
         $section['hasHeadings'] = $headings !== [];
         $section['headings'] = $this->buildRows($headings, $issues, $languageId, $editAccess, $editRteHeadings, $pageId);
-        $section['pageIssues'] = array_values(array_filter($issues, static fn($issue) => $issue->index === null));
+        $section['pageIssues'] = array_values(array_map(
+            fn(Issue $issue): array => $this->issueRow($issue),
+            array_filter($issues, static fn(Issue $issue): bool => $issue->index === null)
+        ));
         $section['issueCount'] = count($issues);
 
         return $section;
+    }
+
+    /**
+     * The rules of a project: listeners add issues or take the ones of the built-in rules away. What they give back is
+     * checked here, not trusted: an issue needs a name and, if it names a heading, a heading that is there.
+     *
+     * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
+     * @param list<Issue> $issues
+     * @return list<Issue> The page's issues first, then by heading
+     */
+    private function checkedByListeners(array $headings, array $issues, int $pageId, int $languageId): array
+    {
+        // the dispatcher hands the same object back, with what the listeners did to it
+        $event = new ModifyHeadingIssuesEvent($headings, $issues, $pageId, $languageId);
+        $this->eventDispatcher->dispatch($event);
+        $valid = array_values(array_filter(
+            $event->getIssues(),
+            static fn(mixed $issue): bool => $issue instanceof Issue && self::isUsable($issue, count($headings))
+        ));
+        // the sort is stable: the issues of one place stay in the order they were found in
+        usort($valid, static fn(Issue $a, Issue $b): int => ($a->index ?? -1) <=> ($b->index ?? -1));
+
+        return $valid;
+    }
+
+    /**
+     * Whether an issue of a listener can be shown: it has a name and, if it names a heading, a heading that is there.
+     */
+    private static function isUsable(Issue $issue, int $headingCount): bool
+    {
+        // @extensionScannerIgnoreLine the name of our issue (a string), not the type property of the TypoScriptFrontendController
+        $named = $issue->type !== '';
+
+        return $named && ($issue->index === null || ($issue->index >= 0 && $issue->index < $headingCount));
+    }
+
+    /**
+     * What the template needs of an issue: its name and, for a rule of a listener, the text. The built-in rules have none
+     * here, the template takes their text from the language file of the extension.
+     *
+     * @return array{type: string, label: string}
+     */
+    private function issueRow(Issue $issue): array
+    {
+        if ($issue->label === null) {
+            // @extensionScannerIgnoreLine the name of our issue (a string), not the type property of the TypoScriptFrontendController
+            return ['type' => $issue->type, 'label' => ''];
+        }
+        $language = $GLOBALS['LANG'] ?? null;
+        $label = $language instanceof LanguageService ? $language->sL($issue->label) : $issue->label;
+
+        // an `LLL:` reference that does not resolve shows the name rather than nothing
+        // @extensionScannerIgnoreLine the name of our issue (a string), not the type property of the TypoScriptFrontendController
+        return ['type' => $issue->type, 'label' => $label !== '' ? $label : $issue->type];
     }
 }

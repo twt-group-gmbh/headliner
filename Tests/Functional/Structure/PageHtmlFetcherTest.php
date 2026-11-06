@@ -58,7 +58,7 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
 
         self::assertNotSame([], $headings);
         // the fixture has an h4, a div header and no h1
-        $issueTypes = array_map(static fn($issue): string => $issue->type->value, (new HeadingValidator())->validate($headings));
+        $issueTypes = array_map(static fn($issue): string => $issue->type, (new HeadingValidator())->validate($headings));
         self::assertContains('missingH1', $issueTypes);
         // the editable div is listed as a heading with level 0, with the record behind it
         $levels = array_map(static fn($heading): int => $heading->level, $headings);
@@ -137,7 +137,7 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
         $html = (string) $this->fetcher()->fetch(new Uri('https://website.local/'));
         $headings = (new HeadingExtractor())->extract($html, $selector);
 
-        return array_map(static fn($issue): string => $issue->type->value, (new HeadingValidator())->validate($headings));
+        return array_map(static fn($issue): string => $issue->type, (new HeadingValidator())->validate($headings));
     }
 
     #[Test]

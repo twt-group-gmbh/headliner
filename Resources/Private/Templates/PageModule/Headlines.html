@@ -75,7 +75,7 @@
                                     <f:then>
                                         <f:for each="{section.pageIssues}" as="issue">
                                             <div class="alert alert-warning">
-                                                <f:translate key="{l}issue.{issue.type.value}" />
+                                                <f:render section="IssueText" arguments="{issue: issue}" />
                                             </div>
                                         </f:for>
                             <ol class="headliner__list">
@@ -115,7 +115,7 @@
                                             <span class="badge badge-secondary"><f:translate key="{l}rte" /></span>
                                         </f:if>
                                         <f:for each="{heading.issues}" as="issue">
-                                            <span class="badge badge-warning"><f:translate key="{l}issue.{issue}" /></span>
+                                            <span class="badge badge-warning"><f:render section="IssueText" arguments="{issue: issue}" /></span>
                                         </f:for>
                                         </span>
                                     </li>
@@ -158,5 +158,10 @@
     printed as a variable of the template. Do not collect it in a f:variable and print it raw: an entity in the page
     is a "<" in the text, and the text would be markup.
 </f:comment>
+<f:comment>
+    The text of an issue: the one a listener gave (already resolved, printed as a variable so Fluid escapes it), else the text
+    of the built-in rule of that name.
+</f:comment>
+<f:section name="IssueText"><f:if condition="{issue.label}"><f:then>{issue.label}</f:then><f:else><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:issue.{issue.type}" /></f:else></f:if></f:section>
 <f:section name="HeadingText"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:empty" /></em></f:else></f:if></f:section>
 </html>

@@ -28,7 +28,8 @@ How the structure is checked
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element
     each is rendered in (the frame `id="c12"`). It marks the headings that are not in the elements of the site setting
     `headliner.contentSelector` as outside; `symfony/css-selector` turns the CSS selector into the XPath the DOM needs.
-#.  `HeadingValidator` finds the problems.
+#.  `HeadingValidator` finds the problems. Then the event `ModifyHeadingIssuesEvent` is dispatched, so a project can add
+    rules of its own or take built-in ones away (see :ref:`developer-rules`).
 #.  A heading from the text is matched with its place in the field `bodytext` by `RteHeadings`: the n-th heading of the
     text, in the order the frontend renders them (the box counts the headings of an element, `data-headliner-rte="uid:n"`).
     The select sends the place, the new tag and the text it showed to the AJAX route `headliner_rte_tag`
@@ -38,6 +39,51 @@ How the structure is checked
     the same, nothing is changed.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.
+
+..  _developer-rules:
+
+Your own rules
+==============
+
+The box checks four things: a missing H1, more than one H1, a skipped level and an empty heading. A project can change
+that with the PSR-14 event `Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent`. It is dispatched after the built-in
+rules have run, once for each language the box shows, while the page module loads the box.
+
+The event gives you the headings of the page (`getHeadings()`, in the order of the page, each with `level`, `text` and
+`outside`), the page and the language (`getPageId()`, `getLanguageId()`) and the issues found so far (`getIssues()`). You
+can:
+
+*   **add** an issue: `addIssue(string $type, ?int $index, ?string $label)`. `$type` is a name, prefix it with your
+    extension key (`myext.tooLong`). `$index` is the position of the heading in `getHeadings()`, or `null` for a problem of
+    the page as a whole. `$label` is the text of the badge, plain text or an `LLL:` reference; the box prints it as text,
+    so markup in it is not interpreted. The issue is counted in the summary like the others.
+*   **remove** the issues of a rule: `removeIssues('multipleH1')` (the names of the built-in rules are `missingH1`,
+    `multipleH1`, `skippedLevel` and `emptyHeading`). A site that uses more than one H1 on purpose switches that rule off this
+    way.
+*   **replace** all issues with `setIssues()`.
+
+..  code-block:: php
+    :caption: Classes/EventListener/HeadingTooLong.php
+
+    use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
+    use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+    #[AsEventListener]
+    final class HeadingTooLong
+    {
+        public function __invoke(ModifyHeadingIssuesEvent $event): void
+        {
+            foreach ($event->getHeadings() as $index => $heading) {
+                if (!$heading->outside && mb_strlen($heading->text) > 70) {
+                    $event->addIssue('myext.tooLong', $index, 'LLL:EXT:myext/Resources/Private/Language/locallang.xlf:headingTooLong');
+                }
+            }
+        }
+    }
+
+What comes back is checked: an issue without a name, or with an index that is not a heading of the page, is ignored. The
+listener runs every time somebody opens the page in the page module, so keep it quick: the headings are extracted already,
+do not render or fetch anything in it. A listener does not change what visitors see, only the box.
 
 ..  _developer-javascript:
 
@@ -57,9 +103,11 @@ Tests
 
     ddev test unit
     ddev test functional
+    ddev test js
     ddev lint
 
-The unit tests need no TYPO3 bootstrap. The functional tests render the frontend through the real application, with the
+The JavaScript tests (`ddev test js`, Vitest with jsdom) cover :file:`headlines.js`: loading the box, the reload after
+changes, collapsing, and changing a tag. The unit tests need no TYPO3 bootstrap. The functional tests render the frontend through the real application, with the
 site sets of `fluid_styled_content` and of the extension, and use the testing framework: the tag and layout of the
 headers, the subheader and its site setting, the marks for the page module (which a visitor and a request with a header
 from outside must never get), the page cache, the fields and the sub-request of the page module.

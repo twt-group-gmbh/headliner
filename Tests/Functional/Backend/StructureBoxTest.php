@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\Tests\Functional\Backend;
 
 use PHPUnit\Framework\Attributes\Test;
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
 use Twtgroup\Headliner\Tests\Functional\AbstractFrontendTestCase;
 use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
@@ -208,5 +210,102 @@ final class StructureBoxTest extends AbstractFrontendTestCase
         self::assertSame(1, substr_count($html, 'headliner__item--group-start'));
         self::assertSame(1, substr_count($html, 'headliner__item--group-end'));
         self::assertSame(0, substr_count($html, 'headliner__item--group-middle'));
+    }
+
+    /**
+     * A dispatcher that hands the event of the issues to the listener of the test.
+     *
+     * @param callable(ModifyHeadingIssuesEvent): void $listener
+     */
+    private function dispatcher(callable $listener): EventDispatcherInterface
+    {
+        return new class ($listener) implements EventDispatcherInterface {
+            /** @param callable(ModifyHeadingIssuesEvent): void $listener */
+            public function __construct(private $listener) {}
+
+            public function dispatch(object $event): object
+            {
+                if ($event instanceof ModifyHeadingIssuesEvent) {
+                    ($this->listener)($event);
+                }
+
+                return $event;
+            }
+        };
+    }
+
+    #[Test]
+    public function aListenerCanAddIssuesToTheBox(): void
+    {
+        $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            self::assertSame(1, $event->getPageId());
+            self::assertSame(0, $event->getLanguageId());
+            self::assertNotSame([], $event->getHeadings());
+            $event->addIssue('myext.noLead', null, 'No lead paragraph');
+            $event->addIssue('myext.tooLong', 0, 'Too long for a heading');
+        }))->render($this->backendRequest(), 1, [0], '');
+
+        // one of the page, one of the first heading: shown as the other issues are
+        self::assertStringContainsString('No lead paragraph', $html);
+        self::assertStringContainsString('Too long for a heading', $html);
+        self::assertSame(1, substr_count($html, 'Too long for a heading'));
+    }
+
+    #[Test]
+    public function aListenerCanTakeABuiltInRuleAway(): void
+    {
+        $withRule = $this->structureBox()->render($this->backendRequest(), 1, [0], '');
+        $without = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            $event->removeIssues('missingH1');
+        }))->render($this->backendRequest(), 1, [0], '');
+
+        // the fixture has no h1
+        self::assertStringContainsString('The page has no H1.', $withRule);
+        self::assertStringNotContainsString('The page has no H1.', $without);
+    }
+
+    #[Test]
+    public function theIssuesOfAListenerAreCountedInTheSummary(): void
+    {
+        $count = static fn(string $html): int => (int) (preg_match('/(\d+) issues?/', $html, $match) === 1 ? $match[1] : 0);
+
+        $before = $count($this->structureBox()->render($this->backendRequest(), 1, [0], ''));
+        $after = $count($this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            $event->addIssue('myext.a', null, 'A');
+            $event->addIssue('myext.b', 0, 'B');
+        }))->render($this->backendRequest(), 1, [0], ''));
+
+        self::assertSame($before + 2, $after);
+    }
+
+    #[Test]
+    public function aLabelCanBeAnLllReferenceAndIsEscapedAsText(): void
+    {
+        $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            $event->addIssue('myext.ref', null, 'LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:untranslated');
+            $event->addIssue('myext.markup', null, '<img src=x onerror=alert(1)>');
+        }))->render($this->backendRequest(), 1, [0], '');
+
+        self::assertStringNotContainsString('LLL:EXT:headliner', $html);
+        self::assertStringNotContainsString('<img src=x', $html);
+        self::assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $html);
+    }
+
+    #[Test]
+    public function anIssueThatNamesAHeadingThatIsNotThereIsIgnored(): void
+    {
+        $count = static fn(string $html): int => (int) (preg_match('/(\d+) issues?/', $html, $match) === 1 ? $match[1] : 0);
+
+        $before = $count($this->structureBox()->render($this->backendRequest(), 1, [0], ''));
+        $html = $this->structureBox(null, $this->dispatcher(static function (ModifyHeadingIssuesEvent $event): void {
+            $event->addIssue('myext.nowhere', 999, 'Nowhere');
+            $event->addIssue('myext.negative', -1, 'Negative');
+            $event->addIssue('', null, 'Without a name');
+        }))->render($this->backendRequest(), 1, [0], '');
+
+        self::assertStringNotContainsString('Nowhere', $html);
+        self::assertStringNotContainsString('Negative', $html);
+        self::assertStringNotContainsString('Without a name', $html);
+        self::assertSame($before, $count($html));
     }
 }

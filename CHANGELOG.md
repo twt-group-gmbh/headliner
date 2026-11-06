@@ -26,6 +26,10 @@ First release.
   button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
   (`data-headliner-edit`); that happens only for the request of the page module (a mark that only exists inside the PHP process, no page cache), never
   for visitors.
+- Event `ModifyHeadingIssuesEvent` (PSR-14): a project adds rules of its own to the box or takes built-in ones away
+  (`addIssue()`, `removeIssues()`, `setIssues()`). An issue has a name, the heading it belongs to (or none, for the page as a
+  whole) and a label (text or `LLL:` reference, printed as text). What a listener returns is checked: an issue without a
+  name or with an index that is no heading is ignored. See the documentation, Developer.
 - Page module, loading: the page module shows the box as a placeholder right away and loads the structure afterwards
   from an AJAX route of the backend (`StructureController`), so rendering the frontend does not delay the page module.
   This also happens while the box is collapsed, so its summary shows the problems. A page that cannot be checked shows
