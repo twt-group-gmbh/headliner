@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Backend\Controller\Event\ModifyPageLayoutContentEvent;
 use TYPO3\CMS\Backend\Module\ModuleData;
 use TYPO3\CMS\Backend\Utility\BackendUtility;
+use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Exception\SiteNotFoundException;
 use TYPO3\CMS\Core\Page\PageRenderer;
@@ -15,6 +16,8 @@ use TYPO3\CMS\Core\Site\SiteFinder;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use Twtgroup\Headliner\Frontend\HeaderTag;
+use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
@@ -46,10 +49,11 @@ final readonly class PageModuleHeadlines
             return;
         }
 
+        $languageId = $this->getLanguageId($request);
         try {
             $uri = $this->siteFinder->getSiteByPageId($pageId)->getRouter()->generateUri(
                 $pageId,
-                ['_language' => $this->getLanguageId($request)]
+                ['_language' => $languageId]
             );
         } catch (SiteNotFoundException) {
             return;
@@ -60,6 +64,7 @@ final readonly class PageModuleHeadlines
         $issues = $this->validator->validate($headings);
 
         $this->pageRenderer->addCssFile('EXT:headliner/Resources/Public/Css/PageModule.css');
+        $this->pageRenderer->loadJavaScriptModule('@twtgroup/headliner/headlines.js');
 
         $view = $this->viewFactory->create(new ViewFactoryData(
             templateRootPaths: ['EXT:headliner/Resources/Private/Templates'],
@@ -68,6 +73,9 @@ final readonly class PageModuleHeadlines
         $view->assignMultiple([
             'loaded' => $html !== null,
             'headings' => $this->buildRows($headings, $issues),
+            'collapsed' => $this->isCollapsed(),
+            'tags' => HeaderTag::ALLOWED,
+            'issueCount' => count($issues),
             'pageIssues' => array_values(array_filter($issues, static fn($issue) => $issue->index === null)),
         ]);
         $event->addHeaderContent($view->render('PageModule/Headlines'));
@@ -76,23 +84,56 @@ final readonly class PageModuleHeadlines
     /**
      * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
-     * @return list<array{level: int, text: string, issues: list<string>}>
+     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, subheader: bool, fromText: bool, parentText: string}>
      */
     private function buildRows(array $headings, array $issues): array
     {
         $rows = [];
+        // The text of the header of every content element, so a subheader or a heading from the text can say whose it is
+        $headerTexts = [];
+        foreach ($headings as $heading) {
+            $target = $heading->editTarget();
+            if ($target !== null && $target['field'] === HeaderTag::FIELD) {
+                $headerTexts[$target['uid']] = $heading->text;
+            }
+        }
+
         foreach ($headings as $index => $heading) {
+            $target = $heading->editTarget();
+            $isSubheader = $target !== null && $target['field'] === HeaderTag::SUBHEADER_FIELD;
+            // A heading without an editable tag that is rendered in a content element, for example from its RTE text
+            $fromText = $target === null && $heading->element !== null;
+            $elementUid = $target['uid'] ?? $heading->element;
             $rows[] = [
+                'tag' => $heading->level === 0 ? 'div' : 'h' . $heading->level,
                 'level' => $heading->level,
                 'text' => $heading->text,
                 'issues' => array_values(array_map(
                     static fn($issue): string => $issue->type->value,
                     array_filter($issues, static fn($issue): bool => $issue->index === $index)
                 )),
+                'edit' => $heading->edit,
+                // opens the content element: its own header, or the element the heading is rendered in
+                'editUid' => $elementUid,
+                'subheader' => $isSubheader,
+                'fromText' => $fromText,
+                'parentText' => ($isSubheader || $fromText) && $elementUid !== null ? ($headerTexts[$elementUid] ?? '') : '',
             ];
         }
 
         return $rows;
+    }
+
+    /**
+     * Whether the box is collapsed, saved by the JavaScript in the settings of the backend user. Read here, so the
+     * box is rendered closed right away instead of closing after the page has loaded.
+     */
+    private function isCollapsed(): bool
+    {
+        $backendUser = $GLOBALS['BE_USER'] ?? null;
+        $setting = $backendUser instanceof BackendUserAuthentication ? ($backendUser->uc['headliner']['collapsed'] ?? 0) : 0;
+
+        return (int) $setting === 1;
     }
 
     private function getLanguageId(ServerRequestInterface $request): int

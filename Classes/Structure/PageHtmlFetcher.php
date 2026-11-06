@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\Structure;
 
 use Psr\Http\Message\UriInterface;
+use Twtgroup\Headliner\Inspection\InspectToken;
 use TYPO3\CMS\Core\Http\RequestFactory;
 
 /**
@@ -15,7 +16,10 @@ final readonly class PageHtmlFetcher
 {
     private const TIMEOUT_SECONDS = 10;
 
-    public function __construct(private RequestFactory $requestFactory) {}
+    public function __construct(
+        private RequestFactory $requestFactory,
+        private InspectToken $inspectToken,
+    ) {}
 
     /**
      * @return string|null The HTML, NULL if the page could not be loaded
@@ -26,6 +30,7 @@ final readonly class PageHtmlFetcher
             $response = $this->requestFactory->request((string) $uri, 'GET', [
                 'http_errors' => false,
                 'timeout' => self::TIMEOUT_SECONDS,
+                'headers' => [InspectToken::HEADER => $this->inspectToken->create()],
             ]);
         } catch (\Throwable) {
             return null;

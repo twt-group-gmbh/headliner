@@ -4,6 +4,16 @@
         <header/>
         <body>
             <trans-unit id="title"><source>Heading structure</source><target>Überschriftenstruktur</target></trans-unit>
+            <trans-unit id="summary.ok"><source>Structure OK</source><target>Struktur in Ordnung</target></trans-unit>
+            <trans-unit id="summary.issues"><source>%d issue(s)</source><target>%d Hinweis(e)</target></trans-unit>
+            <trans-unit id="editTag"><source>Change the tag of this header</source><target>Tag dieser Überschrift ändern</target></trans-unit>
+            <trans-unit id="subheader"><source>Subheader</source><target>Unterüberschrift</target></trans-unit>
+            <trans-unit id="noHeading"><source>Not a heading</source><target>Keine Überschrift</target></trans-unit>
+            <trans-unit id="toggle"><source>Show or hide the heading structure</source><target>Überschriftenstruktur ein- oder ausklappen</target></trans-unit>
+            <trans-unit id="editElement"><source>Edit this content element</source><target>Dieses Inhaltselement bearbeiten</target></trans-unit>
+            <trans-unit id="subheaderOf"><source>Subheader of “%s”</source><target>Untertitel von „%s“</target></trans-unit>
+            <trans-unit id="fromTextOf"><source>From the text of “%s”</source><target>Aus dem Text von „%s“</target></trans-unit>
+            <trans-unit id="fromText"><source>From the text of this element</source><target>Aus dem Text dieses Elements</target></trans-unit>
             <trans-unit id="empty"><source>(empty heading)</source><target>(leere Überschrift)</target></trans-unit>
             <trans-unit id="noHeadings"><source>The page has no headings.</source><target>Die Seite hat keine Überschriften.</target></trans-unit>
             <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source><target>Das Frontend dieser Seite konnte nicht geladen werden, daher können die Überschriften nicht angezeigt werden.</target></trans-unit>

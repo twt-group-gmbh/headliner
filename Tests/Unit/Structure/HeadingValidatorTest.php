@@ -106,4 +106,21 @@ final class HeadingValidatorTest extends TestCase
             $issues
         );
     }
+
+    #[Test]
+    public function ignoresEditableHeadersThatAreNoHeading(): void
+    {
+        // level 0 = a div in place of a heading: no empty-heading, h1 or level problem, but the index counts
+        $issues = (new HeadingValidator())->validate($this->headings([1, '0:', 2, 0, 3]));
+
+        self::assertSame([], $issues);
+    }
+
+    #[Test]
+    public function keepsTheIndexOfLaterHeadingsWhenALevelZeroEntryIsInBetween(): void
+    {
+        $issues = (new HeadingValidator())->validate($this->headings([1, 0, 3]));
+
+        self::assertEquals([new Issue(IssueType::SkippedLevel, 2)], $issues);
+    }
 }

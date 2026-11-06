@@ -10,6 +10,17 @@ First release.
 ### Features
 - Page module: the heading structure (H1-H6) of the page is shown above the content, read from the rendered
   frontend, so headings of content elements, RTE content and other extensions are included.
+- Page module: the structure is shown in a collapsible box (the state is saved in the settings of the backend user and rendered right away, so the box does
+  not jump when the page is changed) with a summary
+  (structure OK / number of problems). The tag of a header
+  can be changed in place with a select styled as a coloured pill; it is saved through the core's DataHandler (with the rights of the
+  backend user) and the structure is checked again. A subheader is marked with an arrow and says whose subheader it is. A heading from the text of a content element
+  (for example RTE content) is marked the same way ("From the text of ...") and opens that content element, found by the
+  frame `id="c12"` that `fluid_styled_content` puts around it. A header an editor turned into a div is listed too, marked as
+  "not a heading". The text of a header opens the edit form of its content element in the side panel, like the edit
+  button of the page module itself (the core's `be:link.editRecord` with `contextual`). For this the page module marks the headers of the rendered page with the record they come from
+  (`data-headliner-edit`); that happens only for the request of the page module (signed header, no page cache), never
+  for visitors.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
 - Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default H2) decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The

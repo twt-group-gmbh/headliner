@@ -4,6 +4,16 @@
         <header/>
         <body>
             <trans-unit id="title"><source>Heading structure</source></trans-unit>
+            <trans-unit id="summary.ok"><source>Structure OK</source></trans-unit>
+            <trans-unit id="summary.issues"><source>%d issue(s)</source></trans-unit>
+            <trans-unit id="editTag"><source>Change the tag of this header</source></trans-unit>
+            <trans-unit id="subheader"><source>Subheader</source></trans-unit>
+            <trans-unit id="noHeading"><source>Not a heading</source></trans-unit>
+            <trans-unit id="toggle"><source>Show or hide the heading structure</source></trans-unit>
+            <trans-unit id="editElement"><source>Edit this content element</source></trans-unit>
+            <trans-unit id="subheaderOf"><source>Subheader of “%s”</source></trans-unit>
+            <trans-unit id="fromTextOf"><source>From the text of “%s”</source></trans-unit>
+            <trans-unit id="fromText"><source>From the text of this element</source></trans-unit>
             <trans-unit id="empty"><source>(empty heading)</source></trans-unit>
             <trans-unit id="noHeadings"><source>The page has no headings.</source></trans-unit>
             <trans-unit id="notLoaded"><source>The frontend of this page could not be loaded, so the headings cannot be shown.</source></trans-unit>

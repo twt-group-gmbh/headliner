@@ -1,10 +1,53 @@
 .headliner {
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
-.headliner__title {
-    font-size: 1rem;
-    margin-bottom: .5rem;
+/* Collapsible box: the header is the <summary> of a <details> element */
+.headliner > summary {
+    align-items: center;
+    cursor: pointer;
+    display: flex;
+    gap: .75rem;
+    list-style: none;
+    padding: .85rem 1rem;
+    user-select: none;
+}
+
+.headliner > summary::-webkit-details-marker {
+    display: none;
+}
+
+.headliner > summary::after {
+    border-bottom: 2px solid currentcolor;
+    border-right: 2px solid currentcolor;
+    content: '';
+    height: .5rem;
+    margin-left: auto;
+    opacity: .6;
+    transform: rotate(45deg);
+    transition: transform .15s ease;
+    width: .5rem;
+}
+
+.headliner[open] > summary::after {
+    transform: translateY(.2rem) rotate(-135deg);
+}
+
+.headliner:not([open]) > summary {
+    border-bottom: 0;
+}
+
+.headliner > summary:hover {
+    background: var(--typo3-component-hover-bg);
+}
+
+.headliner > summary:focus-visible {
+    outline: 2px solid var(--typo3-component-focus-border-color);
+    outline-offset: -2px;
+}
+
+.headliner .card-title {
+    margin: 0;
 }
 
 .headliner__list {
@@ -14,24 +57,138 @@
 }
 
 .headliner__item {
-    align-items: baseline;
+    --headliner-step: 1.5rem;
+
+    align-items: center;
+    border-radius: var(--typo3-component-border-radius);
     display: flex;
-    gap: .5rem;
-    padding: .125rem 0;
+    flex-wrap: wrap;
+    gap: .25rem .75rem;
+    padding: .25rem .5rem;
 }
 
-.headliner__item--h2 { padding-left: 1.5rem; }
-.headliner__item--h3 { padding-left: 3rem; }
-.headliner__item--h4 { padding-left: 4.5rem; }
-.headliner__item--h5 { padding-left: 6rem; }
-.headliner__item--h6 { padding-left: 7.5rem; }
+.headliner__text {
+    flex: 1 1 4rem;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.headliner__item:hover {
+    background: var(--typo3-component-hover-bg);
+}
+
+/* The hierarchy: every level is indented by one step; the step gets smaller in a narrow section */
+.headliner__item--h2 { padding-left: calc(.5rem + var(--headliner-step)); }
+.headliner__item--h3 { padding-left: calc(.5rem + 2 * var(--headliner-step)); }
+.headliner__item--h4 { padding-left: calc(.5rem + 3 * var(--headliner-step)); }
+.headliner__item--h5 { padding-left: calc(.5rem + 4 * var(--headliner-step)); }
+.headliner__item--h6 { padding-left: calc(.5rem + 5 * var(--headliner-step)); }
+
+.headliner__link {
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.headliner__link:hover,
+.headliner__link:focus-visible {
+    /* only underline: a state colour would be unreadable in the dark mode */
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: .2rem;
+}
 
 .headliner__item--issue .headliner__text {
     text-decoration: underline wavy var(--typo3-state-warning-border-color, #f0ad4e);
+    text-underline-offset: .2rem;
 }
 
-.headliner__level {
-    font-family: monospace;
-    font-weight: bold;
-    min-width: 2rem;
+.headliner__item--sub::before {
+    content: '\21B3';
+    flex: none;
+    margin-left: -1.25rem;
+    margin-right: -.5rem;
+    opacity: .55;
+    width: 1rem;
+}
+
+.headliner__item--sub .headliner__text {
+    font-style: italic;
+}
+
+.headliner__item--nolevel .headliner__text {
+    opacity: .6;
+}
+
+.headliner__tag {
+    flex: none;
+}
+
+/* The tag looks like a small pill; its colour tells the level. A select if it can be edited, else a label. */
+.headliner__select,
+.headliner__pill {
+    --headliner-tag-bg: var(--typo3-component-bg);
+    --headliner-tag-border: var(--typo3-component-border-color);
+    --headliner-tag-color: var(--typo3-component-color);
+
+    background-color: var(--headliner-tag-bg);
+    border: 1px solid var(--headliner-tag-border);
+    border-radius: 999px;
+    color: var(--headliner-tag-color);
+    font: 700 .8rem/1.5 var(--bs-font-monospace, monospace);
+    padding: .1rem .7rem;
+    width: 5.25rem;
+}
+
+.headliner__pill {
+    display: inline-block;
+}
+
+.headliner__select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right .55rem center;
+    background-repeat: no-repeat;
+    background-size: .6rem;
+    cursor: pointer;
+    padding-right: 1.6rem;
+    transition: box-shadow .15s ease;
+}
+
+.headliner__select:hover:not(:disabled) {
+    box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--headliner-tag-border) 35%, transparent);
+}
+
+.headliner__select:focus-visible {
+    outline: 2px solid var(--typo3-component-focus-border-color);
+    outline-offset: 1px;
+}
+
+.headliner__select:disabled {
+    cursor: progress;
+    opacity: .5;
+}
+
+.headliner__tag [data-current='h1'] {
+    --headliner-tag-bg: var(--typo3-state-primary-bg);
+    --headliner-tag-border: var(--typo3-state-primary-border-color);
+    --headliner-tag-color: var(--typo3-state-primary-color);
+}
+
+.headliner__tag [data-current='h2'],
+.headliner__tag [data-current='h3'] {
+    --headliner-tag-bg: var(--typo3-state-info-bg);
+    --headliner-tag-border: var(--typo3-state-info-border-color);
+    --headliner-tag-color: var(--typo3-state-info-color);
+}
+
+/* h4-h6 keep the neutral look; a div (no heading) is dashed */
+.headliner__tag [data-current='div'] {
+    border-style: dashed;
+    opacity: .85;
+}
+
+.headliner__select option {
+    background: var(--typo3-component-bg);
+    color: var(--typo3-component-color);
 }

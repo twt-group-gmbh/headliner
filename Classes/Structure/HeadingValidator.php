@@ -16,7 +16,7 @@ final class HeadingValidator
      */
     public function validate(array $headings): array
     {
-        if ($headings === []) {
+        if (array_filter($headings, static fn(Heading $heading): bool => $heading->level > 0) === []) {
             return [];
         }
 
@@ -25,6 +25,9 @@ final class HeadingValidator
         $previousLevel = null;
 
         foreach ($headings as $index => $heading) {
+            if ($heading->level === 0) {
+                continue;
+            }
             if ($heading->text === '') {
                 $issues[] = new Issue(IssueType::EmptyHeading, $index);
             }

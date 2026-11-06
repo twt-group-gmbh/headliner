@@ -60,6 +60,17 @@ Tests split into two suites by what they need to boot:
   The same workflow has a `ter` job (Tailor `ter:publish`, comment = `release-notes.sh --plain`) that is a no-op until the
   repo secret `TYPO3_API_TOKEN` exists and skips versions already in TER. On a tag push it first calls `ci.yml`
   (`workflow_call`) on the tagged commit and publishes only if it is green; a manual run for an existing tag skips CI.
+- Compatibility with `FriendsOfTYPO3/visual_editor` is a goal: always look at how it does things first. Texts stay
+  `{record -> f:render.text(field: ...)}` (that is how it marks editable text), prefer core ViewHelpers and core
+  mechanisms. `Resources/Private/Partials/Header/All.fluid.html` is a copy of the core partial: keep it in sync with
+  `fluid_styled_content` and keep its `f:render.text` calls.
+- Opening a content element from the page module box uses the core's `be:link.editRecord contextual="true"` (custom
+  element `typo3-backend-contextual-record-edit-trigger`), so it slides in from the right like the core's own edit
+  buttons. Do not build edit URLs by hand.
+- The page module loads the frontend with the header `X-Headliner-Inspect` (an HMAC, `InspectToken`). Only then
+  `InspectRequest` (frontend middleware) disables the page cache for that request and sets the attribute
+  `headliner.inspect`, and `headliner:headline` adds `data-headliner-edit="table:uid:field"`. That markup must never
+  be cached or shown to visitors.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

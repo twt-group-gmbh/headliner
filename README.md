@@ -7,6 +7,13 @@
 `headliner` shows the heading structure (H1-H6) of a page above the content in the TYPO3 page module and
 points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings.
 
+The structure is shown in a box that can be collapsed (the state is remembered per backend user). A subheader is
+marked with an arrow and named after its header. Headings from the text of a content element, such as RTE content, are
+marked the same way and open that element; they cannot be changed in the box. For headers of content elements the tag can be changed right there with a select
+(H1-H6 or div): it is saved with the rights of the backend user and the structure is checked again. Clicking the text of a header opens the edit form of its content element in the side panel, as the edit button of
+the page module does. Headings from
+other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
+
 The headings are read from the rendered frontend of the page, so headings from content elements, RTE
 content and other extensions are included without any configuration. Only standard pages are checked.
 
@@ -15,6 +22,12 @@ heading hierarchy can be fixed without touching the look: the layout (**Type**) 
 `ce-headline-layout-N`. The fields **Subheader tag** and **Subheader type** do the same for the subheader and offer
 the same choices; the layout "Hidden" hides the subheader. Without them (see below), the subheader is rendered one level
 below the header.
+
+## Compatibility
+
+The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
+[`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
+together. headliner needs no ViewHelper in your own templates.
 
 ## Installation
 
