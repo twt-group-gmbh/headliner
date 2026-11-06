@@ -60,6 +60,34 @@ async function load() {
 
 load();
 
+// The page module changes content without loading the page again: hiding or showing an element, moving or
+// dragging it. The structure changes with it, so the box is loaded again. Several changes in a row (or a change
+// that is followed by a reload of the page module) give one request; one that arrives while the box is loading
+// starts another load afterwards, as the first one may have read the page before the change.
+let reloadTimer;
+let loading = false;
+let reloadAgain = false;
+function reloadSoon() {
+  clearTimeout(reloadTimer);
+  reloadTimer = setTimeout(async () => {
+    if (loading) {
+      reloadAgain = true;
+      return;
+    }
+    loading = true;
+    await load();
+    loading = false;
+    if (reloadAgain) {
+      reloadAgain = false;
+      reloadSoon();
+    }
+  }, 200);
+}
+// an element is hidden or shown (the core's own route, which does not fire the event of the DataHandler)
+document.addEventListener('typo3:page-layout:hidden-content-count-changed', reloadSoon);
+// a record was changed with the core's DataHandler (drag and drop of an element)
+document.addEventListener('typo3:datahandler:process', reloadSoon);
+
 // Changes the tag of a header through the core's DataHandler, then loads the box again so the structure and its
 // problems are checked again.
 document.addEventListener('change', (event) => {

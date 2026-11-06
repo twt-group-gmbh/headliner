@@ -26,7 +26,8 @@ First release.
   from an AJAX route of the backend (`StructureController`), so rendering the frontend does not delay the page module.
   This also happens while the box is collapsed, so its summary shows the problems. A page that cannot be checked shows
   a message in the box instead of an error page for the whole page module. After a tag was changed only the box is
-  loaded again, not the whole page module. The route needs the same right as the page module (the user must be
+  loaded again, not the whole page module. The box is also loaded again when the page module changes content without
+  loading the page again: hiding or showing an element, and moving or dragging one (the DataHandler event). The route needs the same right as the page module (the user must be
   allowed to see the page).
 - Page module, language comparison: the box follows the page module. The layout view shows the structure of the one
   language it shows; the language comparison shows one section per column, the default language and the selected

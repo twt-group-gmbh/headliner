@@ -38,7 +38,7 @@ JavaScript
 ==========
 
 :file:`Resources/Public/JavaScript/headlines.js` saves the collapsed state with `Persistent` and changes tags with
-`@typo3/backend/ajax-data-handler.js`, then loads the box again. It also loads the box when the page module is shown (see above). Opening an element uses the core's
+`@typo3/backend/ajax-data-handler.js`, then loads the box again. It also loads the box when the page module is shown (see above), and again when the page module changes content without a reload: the event `typo3:page-layout:hidden-content-count-changed` (hide and show of an element) and `typo3:datahandler:process` (drag and drop). Opening an element uses the core's
 `be:link.editRecord` with `contextual="true"`; nothing builds edit URLs by hand.
 
 ..  _developer-tests:
