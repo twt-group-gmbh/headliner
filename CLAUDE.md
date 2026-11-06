@@ -67,7 +67,10 @@ Tests split into two suites by what they need to boot:
 - Opening a content element from the page module box uses the core's `be:link.editRecord contextual="true"` (custom
   element `typo3-backend-contextual-record-edit-trigger`), so it slides in from the right like the core's own edit
   buttons. Do not build edit URLs by hand.
-- The page module loads the frontend with the header `X-Headliner-Inspect` (an HMAC, `InspectToken`). Only then
+- `PageHtmlFetcher` renders the frontend in the same PHP process (a sub-request through the core's `RequestHandler`),
+  not over HTTP. The frontend middleware stack changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
+  shared `PageRenderer`, so the fetcher puts them back (unit-tested); if you add state the sub-request touches, restore
+  it there too. It sends the header `X-Headliner-Inspect` (an HMAC, `InspectToken`). Only then
   `InspectRequest` (frontend middleware) disables the page cache for that request and sets the attribute
   `headliner.inspect`, and `headliner:headline` adds `data-headliner-edit="table:uid:field"`. That markup must never
   be cached or shown to visitors.

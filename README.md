@@ -14,8 +14,9 @@ marked the same way and open that element; they cannot be changed in the box. Fo
 the page module does. Headings from
 other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
 
-The headings are read from the rendered frontend of the page, so headings from content elements, RTE
-content and other extensions are included without any configuration. Only standard pages are checked.
+The headings are read from the rendered frontend of the page, which is rendered inside the running PHP process.
+There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter. Headings
+from content elements, RTE content and other extensions are included without any configuration. Only standard pages are checked.
 
 Content elements get the field **Tag** (H1-H6 or div, default H2). It decides the HTML tag of the header, so the
 heading hierarchy can be fixed without touching the look: the layout (**Type**) only sets the CSS class

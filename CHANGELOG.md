@@ -8,8 +8,9 @@ All notable changes to this project are documented here. The format follows
 First release.
 
 ### Features
-- Page module: the heading structure (H1-H6) of the page is shown above the content, read from the rendered
-  frontend, so headings of content elements, RTE content and other extensions are included.
+- Page module: the heading structure (H1-H6) of the page is shown above the content, read from the frontend rendered
+  inside the running PHP process (no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the
+  site do not matter), so headings of content elements, RTE content and other extensions are included.
 - Page module: the structure is shown in a collapsible box (the state is saved in the settings of the backend user and rendered right away, so the box does
   not jump when the page is changed) with a summary
   (structure OK / number of problems). The tag of a header
