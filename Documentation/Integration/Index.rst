@@ -66,7 +66,8 @@ A subheader is rendered the same way, with `subheader`:
 ..  note::
 
     The page module finds the record behind a header by the mark `data-headliner-edit`. The ViewHelper adds it itself,
-    for the page module only, from the variable `data` of the content element: its uid (in a translation the uid of
+    for the page module only, from the variable `data` of the content element (an array, or a record object as a Content Block
+    has it): its uid (in a translation the uid of
     the translation, `data._LOCALIZED_UID`) and the field, `header_tag` or, with `subheader`, `subheader_tag`. You do not
     have to pass `edit`. Pass it only if the ViewHelper is used where there is no `data` (a partial gets only the
     arguments it is given, so pass `data` to it).

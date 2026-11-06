@@ -6,6 +6,9 @@ namespace Twtgroup\Headliner\Tests\Functional\Frontend;
 
 use PHPUnit\Framework\Attributes\Test;
 use Twtgroup\Headliner\Middleware\InspectRequest;
+use TYPO3\CMS\Core\Domain\RawRecord;
+use TYPO3\CMS\Core\Domain\Record;
+use TYPO3\CMS\Core\Domain\Record\ComputedProperties;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
@@ -19,9 +22,9 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     protected array $testExtensionsToLoad = ['twtgroup/headliner'];
 
     /**
-     * @param array<string, mixed> $data
+     * @param array<string, mixed>|Record $data
      */
-    private function render(bool $forThePageModule, array $data): string
+    private function render(bool $forThePageModule, array|Record $data): string
     {
         $request = new ServerRequest('https://website.local/', 'GET');
         $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
@@ -84,5 +87,18 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         self::assertStringNotContainsString('tt_content:0', $html);
         // only the explicit one
         self::assertSame(1, substr_count($html, 'data-headliner-edit'));
+    }
+
+    #[Test]
+    public function aRecordObjectAsADataIsNamedToo(): void
+    {
+        // a Content Block gets the content element as a record object, not as an array
+        $properties = self::content();
+        $record = new Record(new RawRecord(12, 1, $properties, new ComputedProperties(), 'tt_content.text'), $properties);
+
+        $html = $this->render(true, $record);
+
+        self::assertStringContainsString('data-headliner-edit="tt_content:12:header_tag">Header</h2>', $html);
+        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag">Subheader</h3>', $html);
     }
 }

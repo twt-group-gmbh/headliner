@@ -85,7 +85,7 @@ First release.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the
   backend of that site and the subheader follows the tag of the header (one level below).
 - ViewHelper `headliner:headline`: the argument `edit` is optional now. Without it the ViewHelper names the record behind
-  the header itself, for the page module only, from the variable `data` of the content element (in a translation the uid of
+  the header itself, for the page module only, from the variable `data` of the content element, an array or a record object as a Content Block has it (in a translation the uid of
   the translation). Own templates need nothing but `tag` and `layout`.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
