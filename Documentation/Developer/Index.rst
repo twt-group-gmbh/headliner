@@ -22,7 +22,8 @@ How the structure is checked
     resolved, which is where a hidden page is turned down), and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
     attribute exists only inside the process, so a request from outside cannot set it.
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element
-    each is rendered in (the frame `id="c12"`).
+    each is rendered in (the frame `id="c12"`). It marks the headings that are not in the elements of the site setting
+    `headliner.contentSelector` as outside; `symfony/css-selector` turns the CSS selector into the XPath the DOM needs.
 #.  `HeadingValidator` finds the problems.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.

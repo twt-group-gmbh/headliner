@@ -123,4 +123,36 @@ final class HeadingValidatorTest extends TestCase
 
         self::assertEquals([new Issue(IssueType::SkippedLevel, 2)], $issues);
     }
+
+    #[Test]
+    public function ignoresHeadingsOutsideOfTheContent(): void
+    {
+        // an h1 in the header and an h2 in the footer neither make a second h1 nor skip a level
+        $issues = (new HeadingValidator())->validate([
+            new Heading(1, 'Site name', outside: true),
+            new Heading(1, 'Title'),
+            new Heading(2, 'Section'),
+            new Heading(4, 'Footer', outside: true),
+        ]);
+
+        self::assertSame([], $issues);
+    }
+
+    #[Test]
+    public function keepsTheIndexOfTheHeadingsAfterOnesThatAreOutside(): void
+    {
+        $issues = (new HeadingValidator())->validate([
+            new Heading(3, 'Menu', outside: true),
+            new Heading(1, 'Title'),
+            new Heading(3, 'Skipped'),
+        ]);
+
+        self::assertEquals([new Issue(IssueType::SkippedLevel, 2)], $issues);
+    }
+
+    #[Test]
+    public function aContentWithoutHeadingsHasNoProblemEvenIfThePageAroundItHasSome(): void
+    {
+        self::assertSame([], (new HeadingValidator())->validate([new Heading(2, 'Menu', outside: true), new Heading(3, 'Footer', outside: true)]));
+    }
 }

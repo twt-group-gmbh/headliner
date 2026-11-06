@@ -39,6 +39,11 @@ First release.
   the groups of the page and of its parents that extend to their subpages ("any login" needs no group). A page for
   visitors who are not logged in is rendered as a visitor. The box names the groups; if the groups exclude each other
   it says that the page can never be shown.
+- Page module, content of the page: only the headings in the content of the page are checked, so an h1 in the header or
+  an h2 in the footer neither hides a missing h1 nor counts as a second one. The content is what the new site setting
+  `headliner.contentSelector` matches (default `main`); the headings around it are shown greyed with the badge "Outside
+  the content". If the page has no such element, the whole page is checked as before. The selector is translated by
+  `symfony/css-selector`, which is a requirement now.
 - Page module, workspaces: in a workspace the box shows the versions of that workspace, like the page module itself, and
   says which workspace it is. The versions of the page, its translation and its parents count for the hidden state, the
   times and the groups. A tag changed in the box changes the version, not the live record.

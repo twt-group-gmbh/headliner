@@ -16,7 +16,7 @@ final class HeadingValidator
      */
     public function validate(array $headings): array
     {
-        if (array_filter($headings, static fn(Heading $heading): bool => $heading->level > 0) === []) {
+        if (array_filter($headings, static fn(Heading $heading): bool => $heading->level > 0 && !$heading->outside) === []) {
             return [];
         }
 
@@ -25,7 +25,8 @@ final class HeadingValidator
         $previousLevel = null;
 
         foreach ($headings as $index => $heading) {
-            if ($heading->level === 0) {
+            // a div in place of a heading, or a heading outside of the content: listed, but not checked
+            if ($heading->level === 0 || $heading->outside) {
                 continue;
             }
             if ($heading->text === '') {

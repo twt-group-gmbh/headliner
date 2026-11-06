@@ -63,6 +63,9 @@
 			<trans-unit id="workspace">
 				<source>You work in the workspace "%s". The structure shows the versions of this workspace.</source>
 			</trans-unit>
+			<trans-unit id="outside">
+				<source>Outside the content</source>
+			</trans-unit>
 			<trans-unit id="empty">
 				<source>(empty heading)</source>
 			</trans-unit>

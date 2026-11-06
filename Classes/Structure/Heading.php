@@ -9,6 +9,8 @@ namespace Twtgroup\Headliner\Structure;
  * heading, but can be edited. $edit says where the tag can be edited ("table:uid:field"), if it can.
  * $element is the uid of the content element the heading is rendered in, if known (any heading, also one from
  * RTE content or a plugin).
+ * $outside says the heading is not in the content of the page (see HeadingExtractor): in the header, the menu, the footer.
+ * It is shown, but not checked.
  */
 final readonly class Heading
 {
@@ -17,6 +19,7 @@ final readonly class Heading
         public string $text,
         public ?string $edit = null,
         public ?int $element = null,
+        public bool $outside = false,
     ) {}
 
     /**

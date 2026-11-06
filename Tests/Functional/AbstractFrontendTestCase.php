@@ -49,8 +49,9 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
 
     /**
      * @param array<string, mixed> $settings Site settings
+     * @param string|null $pageTypoScript The TypoScript of the page; by default the content elements and nothing around them
      */
-    protected function writeSite(array $settings = []): void
+    protected function writeSite(array $settings = [], ?string $pageTypoScript = null): void
     {
         $siteWriter = GeneralUtility::makeInstance(SiteWriter::class);
         // The instance is shared by the tests: nothing of an earlier test may stay behind
@@ -62,7 +63,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
             $siteWriter->writeSettings('test', $settings);
         }
         // the page itself; everything else comes from the site sets
-        file_put_contents(Environment::getConfigPath() . '/sites/test/setup.typoscript', "page = PAGE\npage.10 < styles.content.get\n");
+        file_put_contents(Environment::getConfigPath() . '/sites/test/setup.typoscript', $pageTypoScript ?? "page = PAGE\npage.10 < styles.content.get\n");
         // the TypoScript and the rendered pages are cached
         GeneralUtility::makeInstance(CacheManager::class)->flushCaches();
     }

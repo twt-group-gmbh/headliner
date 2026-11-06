@@ -160,6 +160,14 @@
     font-style: italic;
 }
 
+.headliner__item--outside {
+    opacity: .55;
+}
+
+.headliner__item--outside:hover {
+    opacity: 1;
+}
+
 .headliner__item--nolevel .headliner__text {
     opacity: .6;
 }

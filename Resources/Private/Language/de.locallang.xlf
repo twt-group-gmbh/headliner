@@ -83,6 +83,10 @@
 				<source>You work in the workspace "%s". The structure shows the versions of this workspace.</source>
 				<target>Sie arbeiten im Workspace „%s“. Die Struktur zeigt die Versionen dieses Workspace.</target>
 			</trans-unit>
+			<trans-unit id="outside">
+				<source>Outside the content</source>
+				<target>Außerhalb des Inhalts</target>
+			</trans-unit>
 			<trans-unit id="empty">
 				<source>(empty heading)</source>
 				<target>(leere Überschrift)</target>

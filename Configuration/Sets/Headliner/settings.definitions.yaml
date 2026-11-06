@@ -6,3 +6,7 @@ settings:
     type: bool
     default: true
     category: headliner
+  headliner.contentSelector:
+    type: string
+    default: main
+    category: headliner

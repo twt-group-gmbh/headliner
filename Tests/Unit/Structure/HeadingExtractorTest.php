@@ -116,4 +116,86 @@ final class HeadingExtractorTest extends TestCase
 
         self::assertEquals([new Heading(2, 'Text', null, 5)], (new HeadingExtractor())->extract($html));
     }
+
+    private const PAGE = '<body><header><h1>Site name</h1></header><nav><h2>Menu</h2></nav>'
+        . '<main id="content" class="page"><h1>Title</h1><section><div><h2>Deep</h2></div></section></main>'
+        . '<footer><h2>Footer</h2></footer></body>';
+
+    #[Test]
+    public function marksHeadingsOutsideOfTheContentElement(): void
+    {
+        self::assertEquals(
+            [
+                new Heading(1, 'Site name', outside: true),
+                new Heading(2, 'Menu', outside: true),
+                new Heading(1, 'Title'),
+                new Heading(2, 'Deep'),
+                new Heading(2, 'Footer', outside: true),
+            ],
+            (new HeadingExtractor())->extract(self::PAGE, 'main')
+        );
+    }
+
+    #[Test]
+    public function readsTheWholePageWithoutASelector(): void
+    {
+        foreach ([null, '', '   '] as $selector) {
+            $headings = (new HeadingExtractor())->extract(self::PAGE, $selector);
+
+            self::assertCount(5, $headings);
+            self::assertSame([false], array_values(array_unique(array_map(static fn(Heading $heading): bool => $heading->outside, $headings))));
+        }
+    }
+
+    #[Test]
+    public function readsTheWholePageIfTheSelectorMatchesNothing(): void
+    {
+        $headings = (new HeadingExtractor())->extract('<body><h1>One</h1><div><h2>Two</h2></div></body>', 'main');
+
+        self::assertEquals([new Heading(1, 'One'), new Heading(2, 'Two')], $headings);
+    }
+
+    #[Test]
+    public function understandsIdsClassesAndCombinations(): void
+    {
+        foreach (['#content', '.page', 'main.page', 'main#content', 'body > main', 'section, main'] as $selector) {
+            $outside = array_map(
+                static fn(Heading $heading): string => $heading->text,
+                array_values(array_filter((new HeadingExtractor())->extract(self::PAGE, $selector), static fn(Heading $heading): bool => $heading->outside))
+            );
+
+            self::assertSame(['Site name', 'Menu', 'Footer'], $outside, $selector);
+        }
+    }
+
+    #[Test]
+    public function everyElementThatMatchesIsContent(): void
+    {
+        $html = '<body><h1>Outside</h1><article><h2>First</h2></article><article><h2>Second</h2></article></body>';
+
+        self::assertEquals(
+            [new Heading(1, 'Outside', outside: true), new Heading(2, 'First'), new Heading(2, 'Second')],
+            (new HeadingExtractor())->extract($html, 'article')
+        );
+    }
+
+    #[Test]
+    public function readsTheWholePageIfTheSelectorIsInvalid(): void
+    {
+        $headings = (new HeadingExtractor())->extract(self::PAGE, 'main[[[');
+
+        self::assertCount(5, $headings);
+        self::assertFalse($headings[0]->outside);
+    }
+
+    #[Test]
+    public function stillKnowsTheRecordBehindAHeadingInTheContent(): void
+    {
+        $html = '<body><h1>Menu</h1><main><div id="c12"><h2 data-headliner-edit="tt_content:12:header_tag">Title</h2></div></main></body>';
+
+        self::assertEquals(
+            [new Heading(1, 'Menu', outside: true), new Heading(2, 'Title', 'tt_content:12:header_tag', 12)],
+            (new HeadingExtractor())->extract($html, 'main')
+        );
+    }
 }

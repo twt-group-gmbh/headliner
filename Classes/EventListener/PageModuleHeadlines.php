@@ -107,7 +107,7 @@ final readonly class PageModuleHeadlines
     /**
      * @param list<\Twtgroup\Headliner\Structure\Heading> $headings
      * @param list<\Twtgroup\Headliner\Structure\Issue> $issues
-     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, canOpen: bool, canEditTag: bool, subheader: bool, fromText: bool, parentText: string}>
+     * @return list<array{tag: string, level: int, text: string, issues: list<string>, edit: string|null, editUid: int|null, canOpen: bool, canEditTag: bool, outside: bool, subheader: bool, fromText: bool, parentText: string}>
      */
     private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess): array
     {
@@ -142,7 +142,8 @@ final readonly class PageModuleHeadlines
                 'editUid' => $elementUid,
                 'canOpen' => $canOpen,
                 // the tag can be changed only if it belongs to this element and the user may change that field
-                'canEditTag' => $canOpen && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field']),
+                'outside' => $heading->outside,
+                'canEditTag' => $canOpen && !$heading->outside && $target !== null && $heading->edit !== null && $contentRecord !== null && $editAccess->canEditTag($contentRecord, $target['field']),
                 'subheader' => $isSubheader,
                 'fromText' => $fromText,
                 'parentText' => ($isSubheader || $fromText) && $elementUid !== null ? ($headerTexts[$elementUid] ?? '') : '',
@@ -277,7 +278,7 @@ final readonly class PageModuleHeadlines
             return $section;
         }
 
-        $headings = $this->extractor->extract($html);
+        $headings = $this->extractor->extract($html, (string) $site->getSettings()->get('headliner.contentSelector', 'main'));
         $issues = $this->validator->validate($headings);
         $section['loaded'] = true;
         $section['hasHeadings'] = $headings !== [];

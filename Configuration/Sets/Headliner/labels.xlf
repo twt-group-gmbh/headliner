@@ -15,6 +15,15 @@
 			<trans-unit id="settings.description.headliner.subheader.enabled">
 				<source>Show the fields "Subheader tag" and "Subheader type" in content elements. If switched off, the subheader follows the tag and layout of the header.</source>
 			</trans-unit>
+			<trans-unit id="settings.headliner.contentSelector">
+				<source>Content of the page</source>
+			</trans-unit>
+			<trans-unit id="settings.description.headliner.contentSelector">
+				<source>
+					CSS selector of the content of the page, for example "main" or "#content". Only the headings in it are checked; headings in the header, the menu and the footer are shown, but not
+					checked. Without a match, or if empty, the whole page is checked.
+				</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\Tests\Functional\Structure;
 
 use PHPUnit\Framework\Attributes\Test;
+use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
@@ -17,6 +18,7 @@ use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Http\RequestHandler;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\Http\Uri;
+use TYPO3\CMS\Core\Site\SiteFinder;
 
 /**
  * The sub-request of the page module, through the real frontend application.
@@ -122,5 +124,66 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
         self::assertNotNull($draft);
         self::assertStringContainsString('Chosen tag (draft)</h5>', $draft);
         self::assertSame(0, $context->getPropertyFromAspect('workspace', 'id'));
+    }
+
+    private const PAGE_WITH_SURROUNDINGS = "page = PAGE\npage.10 < styles.content.get\n"
+        . "page.10.stdWrap.wrap = <header><h1>Site name</h1></header><main>|</main><footer><h2>Footer</h2></footer>\n";
+
+    /**
+     * @return list<string> The problems of the page as the page module finds them, for a content selector
+     */
+    private function problems(?string $selector): array
+    {
+        $html = (string) $this->fetcher()->fetch(new Uri('https://website.local/'));
+        $headings = (new HeadingExtractor())->extract($html, $selector);
+
+        return array_map(static fn($issue): string => $issue->type->value, (new HeadingValidator())->validate($headings));
+    }
+
+    #[Test]
+    public function theHeadingsOfTheHeaderAndTheFooterAreNotChecked(): void
+    {
+        $this->writeSite([], self::PAGE_WITH_SURROUNDINGS);
+        $html = (string) $this->fetcher()->fetch(new Uri('https://website.local/'));
+
+        $outside = array_map(
+            static fn(Heading $heading): string => $heading->text,
+            array_values(array_filter((new HeadingExtractor())->extract($html, 'main'), static fn(Heading $heading): bool => $heading->outside))
+        );
+
+        self::assertSame(['Site name', 'Footer'], $outside);
+    }
+
+    #[Test]
+    public function onlyTheContentCountsForTheProblems(): void
+    {
+        $this->writeSite([], self::PAGE_WITH_SURROUNDINGS);
+
+        // the content has no h1; the h1 of the header must not hide that
+        self::assertContains('missingH1', $this->problems('main'));
+        // the whole page: the h1 of the header counts, so nothing seems to be missing
+        self::assertNotContains('missingH1', $this->problems(null));
+    }
+
+    #[Test]
+    public function aPageWithoutMainIsCheckedAsAWhole(): void
+    {
+        $this->writeSite();
+
+        // no <main> in the page: the selector matches nothing, the whole page is the content
+        self::assertSame($this->problems(null), $this->problems('main'));
+    }
+
+    #[Test]
+    public function theSiteSettingForTheContentIsMainByDefaultAndCanBeChanged(): void
+    {
+        $this->writeSite();
+        $default = $this->get(SiteFinder::class)->getSiteByIdentifier('test')->getSettings()->get('headliner.contentSelector');
+
+        $this->writeSite(['headliner' => ['contentSelector' => '#content']]);
+        $changed = $this->get(SiteFinder::class)->getSiteByIdentifier('test')->getSettings()->get('headliner.contentSelector');
+
+        self::assertSame('main', $default);
+        self::assertSame('#content', $changed);
     }
 }
