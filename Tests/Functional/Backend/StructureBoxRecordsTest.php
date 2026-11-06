@@ -183,4 +183,51 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
 
         return $matches[1];
     }
+
+    /**
+     * What a heading says is text, whatever it looks like: it comes from the page, which an editor writes.
+     */
+    #[Test]
+    public function aHeadingTextIsNeverTakenForMarkup(): void
+    {
+        $this->setUpBackendUser(1);
+        $html = '<html><body><main>'
+            . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">&lt;script&gt;alert(1)&lt;/script&gt; &lt;img src=x onerror=alert(2)&gt;</h2>'
+            . '<div data-headliner-record="tx_headlinertestcards_card:4" data-headliner-element="21"><h3>&lt;b onclick=x&gt;Evil &quot;q&quot; &amp; co</h3></div>'
+            . '</main></body></html>';
+
+        $box = $this->structureBox($html)->render($this->backendRequest(), 8, [0], '');
+
+        // nothing of it is markup: no tag, and no attribute that was opened by a quote in the text
+        self::assertStringNotContainsString('<script>alert', $box);
+        self::assertStringNotContainsString('<img src=x', $box);
+        self::assertStringNotContainsString('<b onclick', $box);
+        self::assertStringContainsString('&lt;script&gt;alert(1)&lt;/script&gt;', $box);
+        // also in the attribute with the text, which the select sends back to check the place
+        self::assertMatchesRegularExpression('#data-headliner-text="&lt;b onclick=x&gt;Evil &quot;q&quot; &amp; co"#', $box);
+    }
+
+    /**
+     * The marks are written into the page, which an editor writes. A mark that names a record of another page must not
+     * make the box change that record from the heading of this page.
+     */
+    #[Test]
+    public function aMarkForARecordOfAnotherPageIsOnlyALabel(): void
+    {
+        $this->setUpBackendUser(1);
+        $html = '<html><body><main>'
+            . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">Innocent</h2>'
+            . '<div data-headliner-record="tx_headlinertestcards_card:1" data-headliner-element="21"><h3>First card</h3></div>'
+            . '</main></body></html>';
+
+        // elements 21 and card 1 are on page 8; this is page 1
+        $elsewhere = $this->structureBox($html)->render($this->backendRequest(), 1, [0], '');
+        $here = $this->structureBox($html)->render($this->backendRequest(), 8, [0], '');
+
+        self::assertStringNotContainsString('<select', $elsewhere);
+        self::assertStringNotContainsString('data-headliner-edit="tt_content:21', $elsewhere);
+        // on its own page the same marks work
+        self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $here);
+        self::assertStringContainsString('data-headliner-edit="' . self::TABLE . ':1:tag"', $here);
+    }
 }

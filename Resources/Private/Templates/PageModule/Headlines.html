@@ -97,13 +97,12 @@
                                         </span>
                                         <span class="headliner__body">
                                         <span class="headliner__text">
-                                            <f:variable name="label"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="{l}empty" /></em></f:else></f:if></f:variable>
                                             <f:if condition="{heading.canOpen}">
                                                 <f:then>
                                                     <be:link.editRecord table="tt_content" uid="{heading.editUid}" contextual="true" returnUrl="{returnUrl}" class="headliner__link"
-                                                                        title="{f:translate(key: '{l}editElement')}">{label -> f:format.raw()}</be:link.editRecord>
+                                                                        title="{f:translate(key: '{l}editElement')}"><f:render section="HeadingText" arguments="{heading: heading}" /></be:link.editRecord>
                                                 </f:then>
-                                                <f:else>{label -> f:format.raw()}</f:else>
+                                                <f:else><f:render section="HeadingText" arguments="{heading: heading}" /></f:else>
                                             </f:if>
                                         </span>
                                         <f:if condition="{heading.subheader}">
@@ -156,4 +155,11 @@
         </div>
     </div>
 </details>
+
+<f:comment>
+    The text of a heading comes from the rendered page, which an editor writes: Fluid escapes it here, because it is
+    printed as a variable of the template. Do not collect it in a f:variable and print it raw: an entity in the page
+    is a "<" in the text, and the text would be markup.
+</f:comment>
+<f:section name="HeadingText"><f:if condition="{heading.text}"><f:then>{heading.text}</f:then><f:else><em><f:translate key="LLL:EXT:headliner/Resources/Private/Language/locallang.xlf:empty" /></em></f:else></f:if></f:section>
 </html>

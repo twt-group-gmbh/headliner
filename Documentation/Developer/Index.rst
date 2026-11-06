@@ -39,6 +39,38 @@ How the structure is checked
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.
 
+..  _developer-security:
+
+Security
+========
+
+The page module shows what the frontend renders, and an editor writes that. These are the rules the extension keeps, and
+where its limits are.
+
+**What the box trusts:**
+
+- *Nothing in the text of a heading.* It is output as text (Fluid escapes it; never print it with `f:format.raw`): an entity
+  in the page is a `<` in the text.
+- *Marks in the page* (`data-headliner-edit`, `data-headliner-record`, `data-headliner-element`) only for a field that is a
+  select of tags (`TagField`) or a rich text field of the record's type, and only for a record **on the page that is shown**.
+  A mark for a record of another page is a label, so a forged mark cannot make the box change something else. The rights
+  of the backend user for the table and the field are checked in the box (`EditAccess`) and again by the DataHandler.
+- *The request attributes `headliner.inspect…`* exist only inside the PHP process that renders the sub-request: no header or
+  parameter from outside sets them, so visitors never get marks.
+
+**The routes:** `headliner_structure` (GET) and `headliner_rte_tag` (POST) need a backend login and the request token of the
+core (a request without or with a wrong token gets `401`). The first also needs the right to see the page and the
+languages it asks for; the second changes a rich text only if the site setting `headliner.editRteHeadings` is on, the record
+and field are a rich text, the backend user may edit them, the tag is one the editor offers and the text at that place is the
+one the box showed.
+
+**Limits:**
+
+- A heading that an editor writes can still be *misleading* (its text is what the editor wrote). It cannot do more than that in the box.
+- The marks are only added for the page module's request. If a site caches a fragment of the page itself (`stdWrap.cache`,
+  or a cached plugin output) during that request, marks could end up in the cache and reach visitors: they name records and
+  fields, not their content. The page cache is switched off for the request.
+
 ..  _developer-javascript:
 
 JavaScript

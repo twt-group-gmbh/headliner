@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Twtgroup\Headliner\Backend\LanguageAccess;
 use Twtgroup\Headliner\Backend\StructureBox;
 
 /**
@@ -34,7 +35,8 @@ final readonly class StructureController
             return new Response(null, 403);
         }
 
-        $languageIds = array_values(array_unique(array_map(intval(...), (array) ($query['languages'] ?? [0]))));
+        // only the languages the user may use: the page module shows those, but this route takes them from the request
+        $languageIds = LanguageAccess::filter(array_values(array_map(intval(...), (array) ($query['languages'] ?? [0]))), $backendUser);
         // only a local URL: the edit forms return there
         $returnUrl = GeneralUtility::sanitizeLocalUrl((string) ($query['returnUrl'] ?? ''), $request);
 

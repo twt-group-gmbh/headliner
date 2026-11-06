@@ -39,20 +39,22 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
 
     /**
      * @param list<array<string, mixed>> $headings
+     * @param array<string, mixed> $page Values of the box
+     * @param array<string, mixed> $section Values of its section
      */
-    private function render(int $issueCount, string $language, array $headings = []): string
+    private function render(int $issueCount, string $language, array $headings = [], array $page = [], array $section = []): string
     {
         $GLOBALS['LANG'] = $this->get(LanguageServiceFactory::class)->create($language);
         $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(templateRootPaths: ['EXT:headliner/Resources/Private/Templates']));
         $view->assignMultiple([
             'collapsed' => false,
             'rteUrl' => '/typo3/ajax/headliner/rte-tag',
-            'workspace' => '',
+            'workspace' => $page['workspace'] ?? '',
             'multiple' => true,
             'columns' => 1,
             'issueCount' => $issueCount,
             'anyLoaded' => true,
-            'sections' => [[
+            'sections' => [array_replace([
                 'languageId' => 0,
                 'title' => 'English',
                 'flag' => 'flags-gb',
@@ -68,7 +70,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
                 'headings' => $headings,
                 'pageIssues' => [],
                 'issueCount' => $issueCount,
-            ]],
+            ], $section)],
         ]);
 
         return $view->render('PageModule/Headlines');
@@ -163,5 +165,71 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
 
         self::assertDoesNotMatchRegularExpression('#<span class="badge badge-secondary">\s*RTE\s*</span>#', $html);
         self::assertDoesNotMatchRegularExpression('#<span class="badge badge-secondary">\s*Subheader#', $html);
+    }
+
+    /** The strings that are no text if they are taken for markup */
+    private const EVIL = '<img src=x onerror=alert(1)> "q" \'a\' & <b>bold</b>';
+
+    private static function assertNoMarkup(string $html): void
+    {
+        self::assertStringNotContainsString('<img src=x', $html);
+        self::assertStringNotContainsString('onerror=alert(1)>', $html);
+        self::assertStringNotContainsString('<b>bold</b>', $html);
+        // it is there, as text
+        self::assertStringContainsString('&lt;img src=x onerror=alert(1)&gt;', $html);
+    }
+
+    #[Test]
+    public function theTextOfAHeadingIsEscapedWithAndWithoutALink(): void
+    {
+        // the text comes from the page, which an editor writes: an entity in the page is a "<" here
+        $withoutLink = self::heading(false, false);
+        $withLink = self::heading(true, false);
+        foreach ([$withoutLink, $withLink] as $heading) {
+            $heading['text'] = self::EVIL;
+            $heading['canOpen'] = $heading['canEditTag'];
+            self::assertNoMarkup($this->render(0, 'default', [$heading]));
+        }
+    }
+
+    #[Test]
+    public function theTextOfAnEmptyHeadingIsTheNoteAndNothingElse(): void
+    {
+        $heading = self::heading(false, false);
+        $heading['text'] = '';
+
+        self::assertStringContainsString('<em>(empty heading)</em>', $this->render(0, 'default', [$heading]));
+    }
+
+    #[Test]
+    public function theTitlesThatComeFromTheDatabaseAreEscaped(): void
+    {
+        $html = $this->render(
+            0,
+            'default',
+            [],
+            ['workspace' => self::EVIL],
+            [
+                'title' => self::EVIL,
+                'access' => 'restricted',
+                'accessGroups' => self::EVIL,
+                'publication' => 'notYet',
+                'publicationFrom' => self::EVIL,
+            ]
+        );
+
+        self::assertNoMarkup($html);
+        // and the other texts with a value
+        $html = $this->render(0, 'default', [], [], ['publication' => 'expired', 'publicationUntil' => self::EVIL]);
+        self::assertNoMarkup($html);
+    }
+
+    #[Test]
+    public function theBadgeOfATableIsEscaped(): void
+    {
+        $heading = self::heading(false, false);
+        $heading['childLabel'] = self::EVIL;
+
+        self::assertNoMarkup($this->render(0, 'default', [$heading]));
     }
 }

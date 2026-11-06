@@ -133,7 +133,7 @@ final readonly class StructureBox
      * @return list<array<string, mixed>> One row per heading: its tag, text, problems, what the user may do with it and
      *     the place in its group (see `markGroups()`)
      */
-    private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess, bool $editRteHeadings): array
+    private function buildRows(array $headings, array $issues, int $languageId, EditAccess $editAccess, bool $editRteHeadings, int $pageId): array
     {
         $rows = [];
         // The place of a heading from a text among the headings of that text, in the order of the text, per text
@@ -155,7 +155,7 @@ final readonly class StructureBox
             $textTarget = null;
             $recordTarget = $heading->recordTarget();
             if ($target === null && $recordTarget !== null) {
-                ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord);
+                ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord, $pageId);
             }
             $isElementTarget = $target !== null && $target['table'] === 'tt_content';
             $isSubheader = $isElementTarget && $target['field'] === HeaderTag::SUBHEADER_FIELD;
@@ -170,7 +170,10 @@ final readonly class StructureBox
             // l10n_mode "exclude" on the field: a translation has the value of its original, it cannot be changed there
             // The record behind the tag of a heading that is not the element: a card of a collection
             $childRecord = $target !== null && !$isElementTarget ? BackendUtility::getRecordWSOL($target['table'], $target['uid']) : null;
+            // A record is only changed from the box of its own page: the marks are part of the page, which an editor writes, so
+            // a mark for a record of another page must not make this box change it
             $tagRecord = $isElementTarget ? $contentRecord : $childRecord;
+            $tagRecord = $tagRecord !== null && $this->isOnPage($tagRecord, $pageId) ? $tagRecord : null;
             $tagInherited = $tagRecord !== null && $target !== null && $this->tagComesFromOriginal($target['table'], $tagRecord, $target['field']);
             // The rich text a heading from a text is in: the text a template marked (the text of a card, say), or the
             // text of the content element the frame names
@@ -193,7 +196,7 @@ final readonly class StructureBox
                     : BackendUtility::getRecordWSOL($textSource['table'], $textSource['uid'])
             );
             // A heading from a text is changed in the text itself, if it is where the order of the text says it is
-            $rte = $editRteHeadings && $textSource !== null && $textRecord !== null && $textOrdinal !== null && !$heading->outside
+            $rte = $editRteHeadings && $textSource !== null && $textRecord !== null && $this->isOnPage($textRecord, $pageId) && $textOrdinal !== null && !$heading->outside
                 && $this->rteEditor->canEditText($editAccess, $textSource['table'], $textRecord, $textSource['field'])
                 && $this->isHeadingInText($textRecord, $textSource['field'], $textOrdinal, $heading);
             $rows[] = [
@@ -255,6 +258,17 @@ final readonly class StructureBox
         return $rows;
     }
 
+    /**
+     * Whether the record is on the page: its content elements, and the records of their collections, have the page as their pid
+     * (in a workspace and in a translation as well).
+     *
+     * @param array<string, mixed> $record
+     */
+    private function isOnPage(array $record, int $pageId): bool
+    {
+        return (int) ($record['pid'] ?? 0) === $pageId;
+    }
+
     private function isEditRteHeadings(Site $site): bool
     {
         return (bool) $site->getSettings()->get('headliner.editRteHeadings', false);
@@ -296,12 +310,12 @@ final readonly class StructureBox
      * @param array<string, array<string, array<int, true>>> $used
      * @return array{tag: array{table: string, uid: int, field: string}|null, text: array{table: string, uid: int, field: string, ordinal: int}|null}
      */
-    private function resolveInRecord(array $recordTarget, Heading $heading, array &$used): array
+    private function resolveInRecord(array $recordTarget, Heading $heading, array &$used, int $pageId): array
     {
         $none = ['tag' => null, 'text' => null];
         ['table' => $table, 'uid' => $uid] = $recordTarget;
         $record = $this->tcaSchemaFactory->has($table) ? BackendUtility::getRecordWSOL($table, $uid) : null;
-        if ($record === null) {
+        if ($record === null || !$this->isOnPage($record, $pageId)) {
             return $none;
         }
         $fields = array_map(static fn($field): string => $field->getName(), iterator_to_array($this->tcaSchemaFactory->get($table)->getFields(), false));
@@ -505,7 +519,7 @@ final readonly class StructureBox
         $issues = $this->validator->validate($headings);
         $section['loaded'] = true;
         $section['hasHeadings'] = $headings !== [];
-        $section['headings'] = $this->buildRows($headings, $issues, $languageId, $editAccess, $editRteHeadings);
+        $section['headings'] = $this->buildRows($headings, $issues, $languageId, $editAccess, $editRteHeadings, $pageId);
         $section['pageIssues'] = array_values(array_filter($issues, static fn($issue) => $issue->index === null));
         $section['issueCount'] = count($issues);
 
