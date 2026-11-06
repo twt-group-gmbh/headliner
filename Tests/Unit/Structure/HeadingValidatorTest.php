@@ -125,11 +125,46 @@ final class HeadingValidatorTest extends TestCase
     }
 
     #[Test]
-    public function ignoresHeadingsOutsideOfTheContent(): void
+    public function anH1OutsideOfTheContentCountsAsAnH1(): void
     {
-        // an h1 in the header and an h2 in the footer neither make a second h1 nor skip a level
+        // an h1 in the header and one in the content are two h1, although the editor cannot change the first one
         $issues = (new HeadingValidator())->validate([
             new Heading(1, 'Site name', outside: true),
+            new Heading(1, 'Title'),
+            new Heading(2, 'Section'),
+        ]);
+
+        self::assertEquals([new Issue(IssueType::MultipleH1, 1)], $issues);
+    }
+
+    #[Test]
+    public function anH1OutsideOfTheContentIsTheH1OfThePage(): void
+    {
+        $issues = (new HeadingValidator())->validate([
+            new Heading(1, 'Site name', outside: true),
+            new Heading(2, 'Section'),
+        ]);
+
+        self::assertSame([], $issues);
+    }
+
+    #[Test]
+    public function aSecondH1OutsideOfTheContentIsMarked(): void
+    {
+        $issues = (new HeadingValidator())->validate([
+            new Heading(1, 'Title'),
+            new Heading(2, 'Section'),
+            new Heading(1, 'Footer title', outside: true),
+        ]);
+
+        self::assertEquals([new Issue(IssueType::MultipleH1, 2)], $issues);
+    }
+
+    #[Test]
+    public function otherLevelsOutsideOfTheContentAreNotChecked(): void
+    {
+        // an h4 in the footer is no skipped level
+        $issues = (new HeadingValidator())->validate([
             new Heading(1, 'Title'),
             new Heading(2, 'Section'),
             new Heading(4, 'Footer', outside: true),

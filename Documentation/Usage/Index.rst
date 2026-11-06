@@ -89,10 +89,11 @@ What is checked, and what is not
 
 *   The page is rendered in the running PHP process, as a visitor would get it. There is no HTTP request, so a firewall,
     Basic Auth, TLS settings or a CDN in front of the site do not matter.
-*   Only the **content** of the page is checked: the elements the site setting :ref:`headliner.contentSelector
+*   The **content** of the page is checked: the elements the site setting :ref:`headliner.contentSelector
     <configuration-contentselector>` matches (`main` by default). Headings in the header, the menu and the footer are shown
-    greyed, marked :guilabel:`Outside the content`, and cause no problem, as an editor cannot change them. If the page has
-    no such element, the whole page is checked.
+    very pale (the tooltip says :guilabel:`Outside the content`). Only their H1 counts, also where an editor cannot change
+    it: an H1 in the header and one in the content are two H1, and an H1 in the header is the H1 of the page. Their other
+    levels cause no problem. If the page has no such element, the whole page is checked.
 *   A **hidden** page is rendered too, so you can check its structure before it is published. The box says
     :guilabel:`The page is hidden` and shows how the page will look when it is published. Hidden content elements are not
     part of it, a visitor would not see them either.

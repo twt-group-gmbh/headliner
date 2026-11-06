@@ -155,13 +155,12 @@ final class PageHtmlFetcherTest extends AbstractFrontendTestCase
     }
 
     #[Test]
-    public function onlyTheContentCountsForTheProblems(): void
+    public function anH1OutsideOfTheContentCountsAsTheH1OfThePage(): void
     {
         $this->writeSite([], self::PAGE_WITH_SURROUNDINGS);
 
-        // the content has no h1; the h1 of the header must not hide that
-        self::assertContains('missingH1', $this->problems('main'));
-        // the whole page: the h1 of the header counts, so nothing seems to be missing
+        // the content has no h1, the header has one: the page has an h1, although the editor cannot change it
+        self::assertNotContains('missingH1', $this->problems('main'));
         self::assertNotContains('missingH1', $this->problems(null));
     }
 

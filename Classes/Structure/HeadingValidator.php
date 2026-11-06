@@ -25,8 +25,16 @@ final class HeadingValidator
         $previousLevel = null;
 
         foreach ($headings as $index => $heading) {
-            // a div in place of a heading, or a heading outside of the content: listed, but not checked
-            if ($heading->level === 0 || $heading->outside) {
+            if ($heading->level === 0) {
+                // a div in place of a heading: listed, but not checked
+                continue;
+            }
+            // Every h1 counts, also one outside of the content (in the header, say) that the editor cannot change: the
+            // page has one h1 or it has not. The other levels outside of the content are listed, but not checked.
+            if ($heading->outside) {
+                if ($heading->level === 1 && ++$h1Count > 1) {
+                    $issues[] = new Issue(IssueType::MultipleH1, $index);
+                }
                 continue;
             }
             if ($heading->text === '') {

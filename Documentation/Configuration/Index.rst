@@ -36,9 +36,10 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
     :type: string
     :Default: main
 
-    A CSS selector for the content of the page, for example `main`, `#content` or `.page-content`. Only the headings in
-    the elements it matches are checked. Headings in the header, the menu and the footer are shown greyed with the badge
-    :guilabel:`Outside the content` and cause no problem.
+    A CSS selector for the content of the page, for example `main`, `#content` or `.page-content`. The headings in
+    the elements it matches are checked. Headings in the header, the menu and the footer are shown very pale (the
+    tooltip says :guilabel:`Outside the content`); only their H1 counts, because the page has that H1, and their other
+    levels cause no problem.
 
     If the page has no element that matches, or if the setting is empty or not a valid selector, the whole page is
     checked.

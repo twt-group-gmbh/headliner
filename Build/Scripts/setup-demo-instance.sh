@@ -54,11 +54,12 @@ echo "› configuring trusted hosts in settings.php"
 # deliberately uneven heading structure: an H2 followed by an H4 (skipped level) and a "div" header.
 echo "› enabling the site sets and seeding demo content"
 SITE_CONFIG="$(ls config/sites/*/config.yaml | head -1)"
-# A header with an h1 and a footer with an h2 around the content, which is in <main>, as in most themes: the box checks
-# only the content (site setting headliner.contentSelector) and shows the headings around it greyed.
+# A header and a footer with an h2 each around the content, which is in <main>, as in most themes: the box shows the
+# headings around the content (site setting headliner.contentSelector) very pale and does not check them. An h1 in the
+# header would count as the h1 of the page, so the pages with one h1 in their content would have two.
 cat >> "$(dirname "${SITE_CONFIG}")/setup.typoscript" <<'TYPOSCRIPT'
 
-page.10.stdWrap.wrap = <div style="max-width: 800px; margin: 2em auto;"><header><h1>Demo site</h1></header><main>|</main><footer><h2>Contact us</h2></footer></div>
+page.10.stdWrap.wrap = <div style="max-width: 800px; margin: 2em auto;"><header><h2>Demo site</h2></header><main>|</main><footer><h2>Contact us</h2></footer></div>
 TYPOSCRIPT
 # German as second language (base /de/), to test translations
 sed -i '/^    flag: us$/a\  -\n    title: Deutsch\n    enabled: true\n    languageId: 1\n    base: /de/\n    locale: de_DE.UTF-8\n    navigationTitle: Deutsch\n    flag: de\n    fallbackType: strict' "${SITE_CONFIG}"
