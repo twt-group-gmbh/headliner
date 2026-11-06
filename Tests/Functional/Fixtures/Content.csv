@@ -1,3 +1,6 @@
+"sys_workspace"
+,"uid","pid","title"
+,1,0,"Review"
 "fe_groups"
 ,"uid","pid","title"
 ,1,0,"Members"
@@ -11,16 +14,17 @@
 ,6,1,"Any login","/login-only",1,0,0,0,0,0,"-2"
 ,7,1,"Not logged in only","/guests",1,0,0,0,0,0,"-1"
 "tt_content"
-,"uid","pid","CType","colPos","sorting","header","header_layout","header_tag","subheader","subheader_tag","subheader_layout","bodytext"
-,1,1,"text",0,100,"Chosen tag",2,"h4","","h3",0,"text"
-,2,1,"text",0,200,"Only a div",3,"div","","h3",0,"text"
-,3,1,"text",0,300,"Older content",3,"","","",0,"text"
-,4,1,"text",0,400,"With subheader",2,"h2","Own subheader","h5",4,"text"
-,5,1,"text",0,500,"Hidden subheader",2,"h2","Gone","h3",100,"text"
-,6,1,"text",0,600,"Hidden header",100,"h2","Only the subheader","h3",0,"text"
-,7,2,"text",0,100,"On a hidden page",2,"h3","","h3",0,"text"
-,8,3,"text",0,100,"Starts later",2,"h2","","h3",0,"text"
-,9,4,"text",0,100,"Has ended",2,"h2","","h3",0,"text"
-,10,5,"text",0,100,"For members",2,"h2","","h3",0,"text"
-,11,6,"text",0,100,"For any login",2,"h2","","h3",0,"text"
-,12,7,"text",0,100,"For guests",2,"h2","","h3",0,"text"
+,"uid","pid","CType","colPos","sorting","header","header_layout","header_tag","subheader","subheader_tag","subheader_layout","bodytext","t3ver_oid","t3ver_wsid","t3ver_state"
+,1,1,"text",0,100,"Chosen tag",2,"h4","","h3",0,"text",0,0,0
+,2,1,"text",0,200,"Only a div",3,"div","","h3",0,"text",0,0,0
+,3,1,"text",0,300,"Older content",3,"","","",0,"text",0,0,0
+,4,1,"text",0,400,"With subheader",2,"h2","Own subheader","h5",4,"text",0,0,0
+,5,1,"text",0,500,"Hidden subheader",2,"h2","Gone","h3",100,"text",0,0,0
+,6,1,"text",0,600,"Hidden header",100,"h2","Only the subheader","h3",0,"text",0,0,0
+,7,2,"text",0,100,"On a hidden page",2,"h3","","h3",0,"text",0,0,0
+,8,3,"text",0,100,"Starts later",2,"h2","","h3",0,"text",0,0,0
+,9,4,"text",0,100,"Has ended",2,"h2","","h3",0,"text",0,0,0
+,10,5,"text",0,100,"For members",2,"h2","","h3",0,"text",0,0,0
+,11,6,"text",0,100,"For any login",2,"h2","","h3",0,"text",0,0,0
+,12,7,"text",0,100,"For guests",2,"h2","","h3",0,"text",0,0,0
+,20,1,"text",0,100,"Chosen tag (draft)",2,"h5","","h3",0,"text",1,1,0

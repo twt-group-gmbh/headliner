@@ -158,6 +158,17 @@ mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}
     WHERE sys_language_uid = 0 AND pid IN (SELECT uid FROM pages WHERE slug IN ('/', '/about', '/products', '/contact') AND sys_language_uid = 0);
 " 2>/dev/null
 
+# A workspace with a draft: in it the home page has an H1 (the live page has none). Done after the translation, which
+# would copy the version, too.
+echo "› creating a workspace with a draft version"
+mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
+    INSERT INTO sys_workspace (pid, title, adminusers, members, db_mountpoints, tstamp) VALUES (0, 'Review', '', '', '', UNIX_TIMESTAMP());
+    SET @ws = LAST_INSERT_ID();
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, subheader_layout, bodytext, t3ver_oid, t3ver_wsid, t3ver_state, crdate, tstamp)
+    SELECT pid, CType, colPos, sorting, sys_language_uid, 'Our services (draft)', header_layout, 'h1', subheader, subheader_tag, subheader_layout, bodytext, uid, @ws, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()
+    FROM tt_content WHERE header = 'Our services' AND sys_language_uid = 0 AND t3ver_wsid = 0;
+" 2>/dev/null
+
 echo "› finalising extensions and caches"
 "${TYPO3_BIN}" extension:setup
 "${TYPO3_BIN}" asset:publish || true

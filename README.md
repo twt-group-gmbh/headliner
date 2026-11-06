@@ -16,7 +16,7 @@ the page module does. Headings from
 other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
 A hidden page is rendered too, so you can check its structure before it is published; the box then says that the page
 is hidden. The same goes for a page with a start time that has not come yet or an end time that is over: it is
-rendered at a time when it is published, and the box says so. A page for frontend user groups is rendered as a member of them.
+rendered at a time when it is published, and the box says so. A page for frontend user groups is rendered as a member of them. In a workspace the box shows the versions of that workspace.
 
 The select and the link appear only for backend users who may edit the element; changing the tag also needs the
 permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).

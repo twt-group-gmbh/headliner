@@ -10,9 +10,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Twtgroup\Headliner\Middleware\InspectRequest;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
+use Twtgroup\Headliner\Structure\Simulation;
 use Twtgroup\Headliner\Tests\Unit\Structure\Fixtures\RecordingRequestHandler;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\UserAspect;
+use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Context\VisibilityAspect;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
@@ -154,7 +156,7 @@ final class PageHtmlFetcherTest extends TestCase
     {
         $handler = $this->handler(static fn(): ResponseInterface => new Response());
 
-        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), 1_800_000_000);
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), new Simulation(time: 1_800_000_000));
 
         self::assertSame(1_800_000_000, $handler->receivedRequest()->getAttribute(InspectRequest::TIME_ATTRIBUTE));
     }
@@ -182,7 +184,7 @@ final class PageHtmlFetcherTest extends TestCase
             return new Response();
         });
 
-        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), 1_800_000_000);
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), new Simulation(time: 1_800_000_000));
 
         self::assertSame(111, $GLOBALS['SIM_EXEC_TIME']);
         self::assertArrayNotHasKey('SIM_ACCESS_TIME', $GLOBALS);
@@ -193,7 +195,7 @@ final class PageHtmlFetcherTest extends TestCase
     {
         $handler = $this->handler(static fn(): ResponseInterface => new Response());
 
-        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), null, [0, -2, 3]);
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), new Simulation(groups: [0, -2, 3]));
 
         self::assertSame([0, -2, 3], $handler->receivedRequest()->getAttribute(InspectRequest::GROUPS_ATTRIBUTE));
         self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::TIME_ATTRIBUTE));
@@ -207,5 +209,43 @@ final class PageHtmlFetcherTest extends TestCase
         (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
 
         self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::GROUPS_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function passesTheWorkspaceOnToTheFrontend(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), new Simulation(workspace: 3));
+
+        self::assertSame(3, $handler->receivedRequest()->getAttribute(InspectRequest::WORKSPACE_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function sendsNoWorkspaceUnlessOneIsGiven(): void
+    {
+        $handler = $this->handler(static fn(): ResponseInterface => new Response());
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'));
+
+        self::assertNull($handler->receivedRequest()->getAttribute(InspectRequest::WORKSPACE_ATTRIBUTE));
+    }
+
+    #[Test]
+    public function putsBackTheWorkspaceTheFrontendSet(): void
+    {
+        $context = GeneralUtility::makeInstance(Context::class);
+        $workspace = new WorkspaceAspect(0);
+        $context->setAspect('workspace', $workspace);
+
+        $handler = $this->handler(static function () use ($context): ResponseInterface {
+            $context->setAspect('workspace', new WorkspaceAspect(3));
+
+            return new Response();
+        });
+
+        (new PageHtmlFetcher($handler))->fetch(new Uri('https://example.com/'), new Simulation(workspace: 3));
+
+        self::assertSame($workspace, $context->getAspect('workspace'));
     }
 }

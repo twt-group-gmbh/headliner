@@ -99,6 +99,11 @@ Tests split into two suites by what they need to boot:
   fetcher puts those globals back.
   With `headliner.inspect.groups` (from `FrontendGroupAccess`) it renders the page as a member of the page's frontend user
   groups by replacing the aspect `frontend.user`, so it has to run after `typo3/cms-frontend/authentication`.
+  With `headliner.inspect.workspace` (the workspace of the backend user) it replaces the aspect `workspace`, so the frontend
+  overlays the versions. The marks then name the *live* uid: that is what the DataHandler wants in a workspace, it writes
+  to the version. The page, translation and root line the listener computes with are the workspace versions
+  (`getRecordWSOL`, `workspaceOL`, `BEgetRootLine(..., true)`). What the page module simulates is passed as one
+  `Simulation` (time, groups, workspace).
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

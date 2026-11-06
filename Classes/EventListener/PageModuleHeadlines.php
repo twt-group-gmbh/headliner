@@ -29,6 +29,7 @@ use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;
+use Twtgroup\Headliner\Structure\Simulation;
 
 /**
  * Shows the heading structure of the page, with its problems, above the content of the page module.
@@ -57,7 +58,13 @@ final readonly class PageModuleHeadlines
             return;
         }
         $backendUser = $GLOBALS['BE_USER'] ?? null;
-        $editAccess = new EditAccess($backendUser instanceof BackendUserAuthentication ? $backendUser : null, $page);
+        $backendUser = $backendUser instanceof BackendUserAuthentication ? $backendUser : null;
+        $editAccess = new EditAccess($backendUser, $page);
+        // The workspace the backend user works in (0 is live): the page module shows its versions, so the structure does too
+        $workspaceId = max(0, (int) ($backendUser->workspace ?? 0));
+        if ($workspaceId > 0) {
+            $page = BackendUtility::getRecordWSOL('pages', $pageId) ?? $page;
+        }
 
         try {
             $site = $this->siteFinder->getSiteByPageId($pageId);
@@ -67,7 +74,7 @@ final readonly class PageModuleHeadlines
 
         $sections = [];
         foreach ($this->getLanguageIds($request) as $languageId) {
-            $section = $this->buildSection($site, $page, $languageId, $editAccess);
+            $section = $this->buildSection($site, $page, $languageId, $editAccess, $workspaceId);
             if ($section !== null) {
                 $sections[] = $section;
             }
@@ -88,6 +95,7 @@ final readonly class PageModuleHeadlines
             // only with several languages the sections are labelled with their language
             'multiple' => count($sections) > 1,
             'columns' => count($sections),
+            'workspace' => $workspaceId > 0 ? $this->getWorkspaceTitle($backendUser, $workspaceId) : '',
             'collapsed' => $this->isCollapsed(),
             'tags' => HeaderTag::ALLOWED,
             'issueCount' => array_sum(array_column($sections, 'issueCount')),
@@ -144,6 +152,13 @@ final readonly class PageModuleHeadlines
         return $rows;
     }
 
+    private function getWorkspaceTitle(?BackendUserAuthentication $backendUser, int $workspaceId): string
+    {
+        $title = $backendUser !== null ? (string) ($backendUser->workspaceRec['title'] ?? '') : '';
+
+        return $title !== '' ? $title : '#' . $workspaceId;
+    }
+
     private function getGroupTitle(int $groupId): string
     {
         $group = BackendUtility::getRecord('fe_groups', $groupId, 'title');
@@ -180,10 +195,11 @@ final readonly class PageModuleHeadlines
     /**
      * One section of the box: the structure of the page in one language.
      *
-     * @param array<string, mixed> $page The page record
+     * @param array<string, mixed> $page The page record (its version, in a workspace)
+     * @param int $workspaceId The workspace of the backend user, 0 for live
      * @return array<string, mixed>|null NULL if the site has no such language
      */
-    private function buildSection(Site $site, array $page, int $languageId, EditAccess $editAccess): ?array
+    private function buildSection(Site $site, array $page, int $languageId, EditAccess $editAccess, int $workspaceId): ?array
     {
         try {
             $language = $site->getLanguageById($languageId);
@@ -218,18 +234,25 @@ final readonly class PageModuleHeadlines
             return $section;
         }
 
+        // In a workspace the versions of the pages count: they can be hidden, have times or groups of their own
+        $translationRecord = $translation[0] ?? null;
+        if ($workspaceId > 0 && is_array($translationRecord)) {
+            BackendUtility::workspaceOL('pages', $translationRecord);
+        }
+        $translationRecord = is_array($translationRecord) ? $translationRecord : null;
+
         // The translation of a page can be hidden on its own
-        if (is_array($translation) && ($translation[0]['hidden'] ?? false)) {
+        if ($translationRecord !== null && ($translationRecord['hidden'] ?? false)) {
             $section['hidden'] = true;
         }
 
         // A page with a start or end time is rendered at a time when it is published
-        $rootLine = array_values(BackendUtility::BEgetRootLine($pageId));
+        $rootLine = array_values(BackendUtility::BEgetRootLine($pageId, '', $workspaceId > 0));
         $publication = PublicationTime::forRootLine(
             $rootLine,
             $pageId,
             (int) $GLOBALS['EXEC_TIME'],
-            $translation[0] ?? null
+            $translationRecord
         );
         $section['publication'] = $publication->state->value;
         $section['publicationFrom'] = $publication->start > 0 ? date('Y-m-d H:i', $publication->start) : '';
@@ -239,7 +262,7 @@ final readonly class PageModuleHeadlines
         }
 
         // A page for frontend user groups is rendered as a member of them
-        $access = FrontendGroupAccess::forRootLine($rootLine, $pageId, $translation[0] ?? null);
+        $access = FrontendGroupAccess::forRootLine($rootLine, $pageId, $translationRecord);
         $section['access'] = $access->state->value;
         $section['accessGroups'] = implode(', ', array_map($this->getGroupTitle(...), $access->groupIds));
         if ($access->state === AccessState::Never) {
@@ -248,8 +271,7 @@ final readonly class PageModuleHeadlines
 
         $html = $this->fetcher->fetch(
             $site->getRouter()->generateUri($pageId, ['_language' => $languageId]),
-            $publication->simulatedTime,
-            $access->simulatedGroups
+            new Simulation($publication->simulatedTime, $access->simulatedGroups, $workspaceId > 0 ? $workspaceId : null)
         );
         if ($html === null) {
             return $section;

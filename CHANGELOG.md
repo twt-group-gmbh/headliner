@@ -39,6 +39,9 @@ First release.
   the groups of the page and of its parents that extend to their subpages ("any login" needs no group). A page for
   visitors who are not logged in is rendered as a visitor. The box names the groups; if the groups exclude each other
   it says that the page can never be shown.
+- Page module, workspaces: in a workspace the box shows the versions of that workspace, like the page module itself, and
+  says which workspace it is. The versions of the page, its translation and its parents count for the hidden state, the
+  times and the groups. A tag changed in the box changes the version, not the live record.
 - Page module, rights: the select and the edit link appear only if the backend user may use them, with the rules of the
   page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
   content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the

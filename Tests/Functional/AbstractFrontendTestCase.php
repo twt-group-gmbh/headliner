@@ -16,7 +16,7 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
  */
 abstract class AbstractFrontendTestCase extends FunctionalTestCase
 {
-    protected array $coreExtensionsToLoad = ['fluid_styled_content'];
+    protected array $coreExtensionsToLoad = ['fluid_styled_content', 'workspaces'];
 
     protected array $testExtensionsToLoad = ['twtgroup/headliner'];
 

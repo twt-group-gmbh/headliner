@@ -11,6 +11,9 @@
         </f:if>
     </summary>
     <div class="card-body">
+        <f:if condition="{workspace}">
+            <div class="alert alert-info"><f:translate key="{l}workspace" arguments="{0: workspace}" /></div>
+        </f:if>
         <div class="headliner__sections" style="--headliner-columns: {columns}">
         <f:for each="{sections}" as="section">
             <section class="headliner__section">

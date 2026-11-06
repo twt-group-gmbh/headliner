@@ -212,4 +212,46 @@ final class InspectionTest extends AbstractFrontendTestCase
 
         self::assertNotSame(200, $this->statusOf('/members', marked: false));
     }
+
+    #[Test]
+    public function aVisitorSeesTheLiveVersionNotTheWorkspaceVersion(): void
+    {
+        $this->writeSite();
+        $html = $this->render();
+
+        self::assertStringContainsString('Chosen tag</h4>', $html);
+        self::assertStringNotContainsString('(draft)', $html);
+    }
+
+    #[Test]
+    public function aMarkedRequestWithAWorkspaceRendersTheWorkspaceVersion(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/'))
+            ->withAttribute(InspectRequest::ATTRIBUTE, true)
+            ->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, 1);
+
+        $html = $this->render($request);
+
+        // the mark names the live record: that is what the page module edits, the DataHandler works on the version
+        self::assertStringContainsString('<h5 class="ce-headline-layout-2" data-headliner-edit="tt_content:1:header_tag">Chosen tag (draft)</h5>', $html);
+    }
+
+    #[Test]
+    public function aWorkspaceWithoutTheMarkIsIgnored(): void
+    {
+        $this->writeSite();
+        $request = (new InternalRequest('https://website.local/'))->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, 1);
+
+        self::assertStringNotContainsString('(draft)', $this->render($request));
+    }
+
+    #[Test]
+    public function theNextVisitorStillSeesTheLiveVersion(): void
+    {
+        $this->writeSite();
+        $this->render((new InternalRequest('https://website.local/'))->withAttribute(InspectRequest::ATTRIBUTE, true)->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, 1));
+
+        self::assertStringNotContainsString('(draft)', $this->render());
+    }
 }

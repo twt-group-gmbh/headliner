@@ -11,6 +11,7 @@ use Twtgroup\Headliner\Tests\Unit\Structure\Fixtures\RecordingRequestHandler;
 use TYPO3\CMS\Core\Context\Context;
 use TYPO3\CMS\Core\Context\UserAspect;
 use TYPO3\CMS\Core\Context\VisibilityAspect;
+use TYPO3\CMS\Core\Context\WorkspaceAspect;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Frontend\Cache\CacheInstruction;
@@ -26,6 +27,7 @@ final class InspectRequestTest extends TestCase
         $this->context = new Context();
         $this->context->setAspect('visibility', VisibilityAspect::create());
         $this->context->setAspect('frontend.user', new UserAspect(null, [0, -1]));
+        $this->context->setAspect('workspace', new WorkspaceAspect(0));
     }
 
     private function handler(): RecordingRequestHandler
@@ -188,5 +190,49 @@ final class InspectRequestTest extends TestCase
         );
 
         self::assertSame([0, -1], $this->context->getPropertyFromAspect('frontend.user', 'groupIds'));
+    }
+
+    #[Test]
+    public function aMarkedRequestWithAWorkspaceRendersThatWorkspace(): void
+    {
+        (new InspectRequest($this->context))->process(
+            (new ServerRequest())
+                ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                ->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, 4),
+            $this->handler()
+        );
+
+        self::assertSame(4, $this->context->getPropertyFromAspect('workspace', 'id'));
+    }
+
+    #[Test]
+    public function withoutAWorkspaceTheLiveWorkspaceStays(): void
+    {
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::ATTRIBUTE, true), $this->handler());
+
+        self::assertSame(0, $this->context->getPropertyFromAspect('workspace', 'id'));
+    }
+
+    #[Test]
+    public function aWorkspaceWithoutTheMarkIsIgnored(): void
+    {
+        (new InspectRequest($this->context))->process((new ServerRequest())->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, 4), $this->handler());
+
+        self::assertSame(0, $this->context->getPropertyFromAspect('workspace', 'id'));
+    }
+
+    #[Test]
+    public function noWorkspaceThatIsNotAPositiveNumberIsUsed(): void
+    {
+        foreach ([0, -1, 'x', 1.5, null] as $workspace) {
+            (new InspectRequest($this->context))->process(
+                (new ServerRequest())
+                    ->withAttribute(InspectRequest::ATTRIBUTE, true)
+                    ->withAttribute(InspectRequest::WORKSPACE_ATTRIBUTE, $workspace),
+                $this->handler()
+            );
+
+            self::assertSame(0, $this->context->getPropertyFromAspect('workspace', 'id'), var_export($workspace, true));
+        }
     }
 }
