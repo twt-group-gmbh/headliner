@@ -49,6 +49,29 @@ If your templates render the header themselves, use the ViewHelper:
         {record -> f:render.text(field: 'header')}
     </headliner:headline>
 
+A subheader is rendered the same way, with `subheader`:
+
+..  code-block:: html
+
+    <headliner:headline subheader="1" tag="{data.header_tag}" subheaderTag="{data.subheader_tag}"
+                        layout="{data.header_layout}" default="{settings.defaultHeaderType}"
+                        edit="tt_content:{data.uid}:subheader_tag">
+        {record -> f:render.text(field: 'subheader')}
+    </headliner:headline>
+
+..  important::
+
+    Keep `{record -> f:render.text(field: ...)}` for the text, as in the examples. That is how
+    `visual_editor <https://github.com/FriendsOfTYPO3/visual_editor>`__ finds the text to edit; with a plain
+    `{data.header}` the heading is still rendered, but `visual_editor` cannot edit it.
+
+..  note::
+
+    In a translation, give `edit` the uid of the translated record: `data._LOCALIZED_UID` if it is set, else
+    `data.uid`. The partial of the extension does it like this:
+    `{f:if(condition: data._LOCALIZED_UID, then: data._LOCALIZED_UID, else: data.uid)}`.
+    The page module opens and changes the record the mark names.
+
 `tag`
     The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`.
 
