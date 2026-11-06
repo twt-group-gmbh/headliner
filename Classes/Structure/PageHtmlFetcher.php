@@ -51,6 +51,7 @@ final readonly class PageHtmlFetcher
         $languageService = $GLOBALS['LANG'] ?? null;
         // the simulated time of the frontend: set only if there was none, so what was not there is removed again
         $simulatedTimes = array_intersect_key($GLOBALS, array_flip(['SIM_EXEC_TIME', 'SIM_ACCESS_TIME']));
+        // @extensionScannerIgnoreLine our own getter, not the one of ModuleTemplate
         $pageRenderer = $this->getPageRenderer();
         $pageRendererState = $pageRenderer !== null ? clone $pageRenderer : null;
         $context = GeneralUtility::makeInstance(Context::class);

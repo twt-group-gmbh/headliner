@@ -160,9 +160,11 @@ final readonly class StructureBox
             $isElementTarget = $target !== null && $target['table'] === 'tt_content';
             $isSubheader = $isElementTarget && $target['field'] === HeaderTag::SUBHEADER_FIELD;
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
+            // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
             $fromText = $target === null && ($heading->element !== null || $textTarget !== null);
             // The content element: the record of the mark, or the one the heading says it is rendered in (the record
             // of a collection, a card of a Content Block, is not the element)
+            // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
             $elementUid = $isElementTarget ? $target['uid'] : $this->getTranslatedUid($heading->element, $languageId);
             // In a workspace the version: it has the text the frontend rendered
             $contentRecord = $elementUid !== null ? BackendUtility::getRecordWSOL('tt_content', $elementUid) : null;
@@ -204,6 +206,7 @@ final readonly class StructureBox
                 'level' => $heading->level,
                 'text' => $heading->text,
                 'issues' => array_values(array_map(
+                    // @extensionScannerIgnoreLine the type of our validation issue (an enum), not that of the TypoScriptFrontendController
                     static fn($issue): string => $issue->type->value,
                     array_filter($issues, static fn($issue): bool => $issue->index === $index)
                 )),
