@@ -74,6 +74,18 @@ jobs:
       - run: composer update --with="typo3/cms-core:${{ matrix.typo3 }}" --prefer-dist --no-progress --no-interaction
       - run: .Build/bin/phpunit -c Build/phpunit/UnitTests.xml
 
+  javascript:
+    name: javascript (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run test:js
+
   functional:
     name: functional (PHP ${{ matrix.php }}, TYPO3 ${{ matrix.typo3 }})
     runs-on: ubuntu-latest

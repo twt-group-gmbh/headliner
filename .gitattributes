@@ -19,6 +19,7 @@
 /CONTRIBUTING.md        export-ignore
 /package.json           export-ignore
 /package-lock.json      export-ignore
+/vitest.config.js       export-ignore
 /.prettierrc.json       export-ignore
 /.php-cs-fixer.cache    export-ignore
 /.php-cs-fixer.dist.php  export-ignore

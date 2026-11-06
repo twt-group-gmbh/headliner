@@ -3,11 +3,14 @@
   "private": true,
   "description": "Development tooling of the TYPO3 extension headliner (not part of the extension)",
   "scripts": {
+    "test:js": "vitest run",
     "lint:xlf": "prettier --check \"**/*.xlf\" --cache",
     "lint:xlf-fix": "prettier --write \"**/*.xlf\" --cache"
   },
   "devDependencies": {
     "@prettier/plugin-xml": "^3.4.2",
-    "prettier": "^3.6.2"
+    "jsdom": "^26.1.0",
+    "prettier": "^3.6.2",
+    "vitest": "^3.2.7"
   }
 }

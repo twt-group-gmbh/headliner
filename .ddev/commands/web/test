@@ -1,7 +1,7 @@
 #!/bin/bash
-## Description: Run the PHPUnit suites (unit | functional | all)
-## Usage: test [unit|functional|all]
-## Example: "ddev test", "ddev test unit", "ddev test functional"
+## Description: Run the test suites (unit | functional | js | all)
+## Usage: test [unit|functional|js|all]
+## Example: "ddev test", "ddev test unit", "ddev test functional", "ddev test js"
 
 set -e
 cd /var/www/html
@@ -20,9 +20,16 @@ run_functional() {
     php -d memory_limit=1G "${PHPUNIT}" -c Build/phpunit/FunctionalTests.xml
 }
 
+run_js() {
+    echo "=== JavaScript tests (Vitest) ==="
+    [ -d node_modules/vitest ] || npm ci --no-audit --no-fund
+    npm run test:js
+}
+
 case "${SUITE}" in
     unit) run_unit ;;
     functional|func) run_functional ;;
-    all) run_unit; run_functional ;;
-    *) echo "Unknown suite '${SUITE}' (expected: unit | functional | all)"; exit 1 ;;
+    js) run_js ;;
+    all) run_unit; run_functional; run_js ;;
+    *) echo "Unknown suite '${SUITE}' (expected: unit | functional | js | all)"; exit 1 ;;
 esac

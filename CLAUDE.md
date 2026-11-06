@@ -35,7 +35,7 @@ Composer dependencies and builds a ready-to-use TYPO3 on the first start (post-s
 ddev setup              # composer install into .Build/
 ddev demo               # (re)build the demo at https://headliner.ddev.site/ (.Build/)
 ddev demo --extras      # the same, after installing Content Blocks, the Visual Editor and the demo blocks (cards, slider)
-ddev test [unit|functional|all]   # PHPUnit suites
+ddev test [unit|functional|js|all]   # PHPUnit suites, and the Vitest tests of `headlines.js` (`js`)
 ddev lint               # PHPStan + php-cs-fixer (dry-run) + XLIFF lint (`Build/Scripts/xlf-lint.php`: valid XLIFF) + prettier
                         # (formatting of the *.xlf); `ddev cgl-fix` auto-fixes PHP,
                         # `ddev npm run lint:xlf-fix` fixes the XLIFF formatting
@@ -69,6 +69,9 @@ default lives in `Build/Scripts/setup-demo-instance.sh`, `ADMIN_PASS` overrides 
 Tests split into two suites by what they need to boot:
 - **`Tests/Unit/`** — pure PHPUnit `TestCase`, no TYPO3 bootstrap. Keep framework-free logic here so
   it runs fast.
+- **`Tests/JavaScript/`** — Vitest with jsdom (`npm run test:js`) for `Resources/Public/JavaScript/headlines.js`. The script has no
+  exports and runs when it is imported, so a test puts the DOM in place, calls `vi.resetModules()` and imports it again; the four
+  TYPO3 backend modules it imports are mocks (`Tests/JavaScript/Mocks`, aliased in `vitest.config.js`).
 - **`Tests/Functional/`** — `typo3/testing-framework`, boots TYPO3 + DB. Used for anything touching
   FAL, middlewares, TCA, or ViewHelpers. They must restore request-related globals: the testing framework does not
   reset `$GLOBALS['TYPO3_REQUEST']` / `BE_USER`, so save them in `setUp()` and restore them in `tearDown()`.
