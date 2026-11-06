@@ -160,12 +160,18 @@
     font-style: italic;
 }
 
-.headliner__item--outside {
-    opacity: .55;
+/* Headings outside of the content: not checked, so they look neutral and quiet instead of in the colour of their level */
+.headliner__item--outside .headliner__text {
+    opacity: .7;
 }
 
-.headliner__item--outside:hover {
-    opacity: 1;
+.headliner__item--outside .headliner__tag [data-current] {
+    --headliner-tag-bg: transparent;
+    --headliner-tag-border: var(--typo3-component-border-color);
+    --headliner-tag-color: var(--typo3-component-color);
+
+    border-style: dashed;
+    opacity: .8;
 }
 
 .headliner__item--nolevel .headliner__text {
