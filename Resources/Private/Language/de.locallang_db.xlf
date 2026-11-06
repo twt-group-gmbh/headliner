@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="de" datatype="plaintext" original="EXT:headliner/Resources/Private/Language/locallang_db.xlf" date="2026-11-06T00:00:00Z" product-name="headliner">
+        <header/>
+        <body>
+            <trans-unit id="tt_content.header_tag"><source>Tag</source><target>Tag</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h1"><source>H1</source><target>H1</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h2"><source>H2</source><target>H2</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h3"><source>H3</source><target>H3</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h4"><source>H4</source><target>H4</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h5"><source>H5</source><target>H5</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.h6"><source>H6</source><target>H6</target></trans-unit>
+            <trans-unit id="tt_content.header_tag.div"><source>No heading (div)</source><target>Keine Überschrift (div)</target></trans-unit>
+        </body>
+    </file>
+</xliff>

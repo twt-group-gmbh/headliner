@@ -1,0 +1,2 @@
+# Overrides the header partial of fluid_styled_content (higher key = later = wins over the core paths)
+lib.contentElement.partialRootPaths.200 = EXT:headliner/Resources/Private/Partials

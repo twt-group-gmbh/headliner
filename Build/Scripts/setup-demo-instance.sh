@@ -50,6 +50,23 @@ echo "› TYPO3 setup (database + admin user + site)"
 echo "› configuring trusted hosts in settings.php"
 "${TYPO3_BIN}" configuration:set SYS/trustedHostsPattern '.*'
 
+# Render the frontend with fluid_styled_content and EXT:headliner (site sets), and seed content with a
+# deliberately uneven heading structure: an H2 followed by an H4 (skipped level) and a "div" header.
+echo "› enabling the site sets and seeding demo content"
+SITE_CONFIG="$(ls config/sites/*/config.yaml | head -1)"
+if grep -q '^dependencies: {  }$' "${SITE_CONFIG}"; then
+    sed -i 's#^dependencies: {  }$#dependencies:\n  - typo3/fluid-styled-content\n  - twtgroup/headliner#' "${SITE_CONFIG}"
+else
+    # `typo3 setup` already lists the fluid_styled_content sets; add ours to that list
+    sed -i 's#^dependencies:$#dependencies:\n  - twtgroup/headliner#' "${SITE_CONFIG}"
+fi
+mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
+    INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, bodytext, crdate, tstamp) VALUES
+        (1, 'text', 0, 512, 0, 'Our services', 2, 'h2', '<p>Tag H2, layout 2.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 768, 0, 'Details', 2, 'h4', '<p>Tag H4 with the look of layout 2: the last heading was an H2, so a level is skipped.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+        (1, 'text', 0, 1024, 0, 'Looks like a heading, is none', 2, 'div', '<p>Tag div chosen: styled like layout 2, but no heading.</p>', UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+" 2>/dev/null
+
 echo "› finalising extensions and caches"
 "${TYPO3_BIN}" extension:setup
 "${TYPO3_BIN}" asset:publish || true
