@@ -35,6 +35,9 @@
                     <f:else>
                         <f:if condition="{section.loaded}">
                             <f:then>
+                                <f:if condition="{section.hidden}">
+                                    <div class="alert alert-info"><f:translate key="{l}hiddenPage" /></div>
+                                </f:if>
                                 <f:if condition="{section.hasHeadings}">
                                     <f:then>
                                         <f:for each="{section.pageIssues}" as="issue">

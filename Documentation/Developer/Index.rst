@@ -15,7 +15,8 @@ How the structure is checked
     process. The frontend middleware changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
     `PageRenderer`; the fetcher puts them back.
 #.  The request carries the request attribute `headliner.inspect`. The frontend middleware `InspectRequest` then switches
-    the page cache off for it, and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
+    the page cache off for it and includes hidden pages in the visibility of the request (it has to run before the page is
+    resolved, which is where a hidden page is turned down), and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
     attribute exists only inside the process, so a request from outside cannot set it.
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element
     each is rendered in (the frame `id="c12"`).

@@ -63,7 +63,7 @@ final readonly class PageModuleHeadlines
 
         $sections = [];
         foreach ($this->getLanguageIds($request) as $languageId) {
-            $section = $this->buildSection($site, $pageId, $languageId, $editAccess);
+            $section = $this->buildSection($site, $page, $languageId, $editAccess);
             if ($section !== null) {
                 $sections[] = $section;
             }
@@ -169,9 +169,10 @@ final readonly class PageModuleHeadlines
     /**
      * One section of the box: the structure of the page in one language.
      *
+     * @param array<string, mixed> $page The page record
      * @return array<string, mixed>|null NULL if the site has no such language
      */
-    private function buildSection(Site $site, int $pageId, int $languageId, EditAccess $editAccess): ?array
+    private function buildSection(Site $site, array $page, int $languageId, EditAccess $editAccess): ?array
     {
         try {
             $language = $site->getLanguageById($languageId);
@@ -179,12 +180,14 @@ final readonly class PageModuleHeadlines
             return null;
         }
 
+        $pageId = (int) $page['uid'];
         $section = [
             'languageId' => $languageId,
             'title' => $language->getTitle(),
             'flag' => $language->getFlagIdentifier(),
             'loaded' => false,
             'untranslated' => false,
+            'hidden' => (bool) ($page['hidden'] ?? false),
             'hasHeadings' => false,
             'headings' => [],
             'pageIssues' => [],
@@ -197,6 +200,11 @@ final readonly class PageModuleHeadlines
             $section['untranslated'] = true;
 
             return $section;
+        }
+
+        // The translation of a page can be hidden on its own
+        if (is_array($translation) && ($translation[0]['hidden'] ?? false)) {
+            $section['hidden'] = true;
         }
 
         $html = $this->fetcher->fetch($site->getRouter()->generateUri($pageId, ['_language' => $languageId]));

@@ -68,4 +68,35 @@ final class InspectionTest extends AbstractFrontendTestCase
         // the next visitor must not get the marks, whatever was rendered before
         self::assertStringNotContainsString('data-headliner-edit', $this->render());
     }
+
+    #[Test]
+    public function aVisitorGetsNothingOfAHiddenPage(): void
+    {
+        $this->writeSite();
+
+        $response = $this->executeFrontendSubRequest(new InternalRequest('https://website.local/not-published'));
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    #[Test]
+    public function thePageModuleCanRenderAHiddenPageToShowItsStructure(): void
+    {
+        $this->writeSite();
+
+        $html = $this->render((new InternalRequest('https://website.local/not-published'))->withAttribute(InspectRequest::ATTRIBUTE, true));
+
+        self::assertStringContainsString('<h3 class="ce-headline-layout-2" data-headliner-edit="tt_content:7:header_tag">On a hidden page</h3>', $html);
+    }
+
+    #[Test]
+    public function aHiddenPageIsStillGoneForTheNextVisitor(): void
+    {
+        $this->writeSite();
+        $this->render((new InternalRequest('https://website.local/not-published'))->withAttribute(InspectRequest::ATTRIBUTE, true));
+
+        $response = $this->executeFrontendSubRequest(new InternalRequest('https://website.local/not-published'));
+
+        self::assertSame(404, $response->getStatusCode());
+    }
 }

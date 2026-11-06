@@ -14,6 +14,9 @@ marked the same way and open that element; they cannot be changed in the box. Fo
 (H1-H6 or div): it is saved with the rights of the backend user and the structure is checked again. Clicking the text of a header opens the edit form of its content element in the side panel, as the edit button of
 the page module does. Headings from
 other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
+A hidden page is rendered too, so you can check its structure before it is published; the box then says that the page
+is hidden.
+
 The select and the link appear only for backend users who may edit the element; changing the tag also needs the
 permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).
 

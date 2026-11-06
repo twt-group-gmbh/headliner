@@ -28,6 +28,9 @@ First release.
   and its own status). Every section has a minimum width; if they do not fit, the box scrolls sideways like the columns
   below it. The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
   that are opened from a translated page are the translations, not the original of the default language.
+- Page module, hidden pages: a hidden page is rendered too, so its structure can be checked before it is published. The
+  box says that the page is hidden. Hidden content elements stay out, as they do for a visitor. A request from outside
+  still gets a 404 for a hidden page.
 - Page module, rights: the select and the edit link appear only if the backend user may use them, with the rules of the
   page module's own edit buttons (an admin always; an editor needs the right to modify content, edit rights for the
   content of the page, which must not be locked, and edit access to the record). Changing a tag also needs the

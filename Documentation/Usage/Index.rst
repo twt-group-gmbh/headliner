@@ -90,5 +90,9 @@ What is checked, and what is not
 *   The page is rendered in the running PHP process, as a visitor would get it. There is no HTTP request, so a firewall,
     Basic Auth, TLS settings or a CDN in front of the site do not matter.
 *   The **whole page** is read, including menus and footers.
-*   **Hidden or unpublished** pages cannot be rendered this way; the box then says that the frontend could not be loaded.
+*   A **hidden** page is rendered too, so you can check its structure before it is published. The box says
+    :guilabel:`The page is hidden` and shows how the page will look when it is published. Hidden content elements are not
+    part of it, a visitor would not see them either.
+*   Pages with a **start or end time** or a **frontend user group**, and workspace versions, are not simulated. The box
+    then says that the frontend could not be loaded.
 *   Only standard pages are checked.

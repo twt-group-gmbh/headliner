@@ -92,6 +92,8 @@ Tests split into two suites by what they need to boot:
   (frontend middleware) disables the page cache for that request, and `headliner:headline` adds
   `data-headliner-edit="table:uid:field"`. The attribute exists only inside the PHP process, a request from outside
   cannot set it (no header, no secret). That markup must never be cached or shown to visitors.
+  For such a request `InspectRequest` also includes hidden pages (not hidden content) in the visibility, so a page that is
+  not published yet can be checked; it must run before `page-resolver`, where a hidden page is turned down.
 - Extension Scanner: `Build/Scripts/extension-scan.php` must report no *strong* matches. Silence false positives (a
   method name that only looks like a core one) with a `// @extensionScannerIgnoreLine` comment above the line and say why.
 - Prefer TCA-derived DB columns over `ext_tables.sql` (the core derives columns from TCA via

@@ -9,7 +9,8 @@ return [
         'twtgroup/headliner/inspect-request' => [
             'target' => InspectRequest::class,
             'after' => ['typo3/cms-frontend/site'],
-            'before' => ['typo3/cms-frontend/page-argument-validator'],
+            // a hidden page is turned down when the page is resolved, so this has to come first
+            'before' => ['typo3/cms-frontend/page-resolver'],
         ],
     ],
 ];
