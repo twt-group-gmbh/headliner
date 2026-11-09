@@ -60,12 +60,8 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
                 'flag' => 'flags-gb',
                 'loaded' => true,
                 'untranslated' => false,
-                'hidden' => false,
                 'publication' => 'published',
-                'publicationFrom' => '',
-                'publicationUntil' => '',
                 'access' => 'open',
-                'accessGroups' => '',
                 'hasHeadings' => true,
                 'headings' => $headings,
                 'pageIssues' => [],
@@ -211,16 +207,9 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
             ['workspace' => self::EVIL],
             [
                 'title' => self::EVIL,
-                'access' => 'restricted',
-                'accessGroups' => self::EVIL,
-                'publication' => 'notYet',
-                'publicationFrom' => self::EVIL,
             ]
         );
 
-        self::assertNoMarkup($html);
-        // and the other texts with a value
-        $html = $this->render(0, 'default', [], [], ['publication' => 'expired', 'publicationUntil' => self::EVIL]);
         self::assertNoMarkup($html);
     }
 

@@ -49,17 +49,17 @@ First release.
   and its own status). Every section has a minimum width; if they do not fit, the box scrolls sideways like the columns
   below it. All sections have the same width (the divider sits in the gap, not in the padding of a section), and the badges of a row follow its text directly, also in narrow sections; a badge that wraps starts at the left edge of the text. The rows wrap and the indentation of the hierarchy gets smaller in a narrow section; the summary counts the problems of all of them. With one language it looks as before. Elements
   that are opened from a translated page are the translations, not the original of the default language.
-- Page module, hidden pages: a hidden page is rendered too, so its structure can be checked before it is published. The
-  box says that the page is hidden. Hidden content elements stay out, as they do for a visitor. A request from outside
+- Page module, hidden pages: a hidden page is rendered too, so its structure can be checked before it is published.
+  Hidden content elements stay out, as they do for a visitor. A request from outside
   still gets a 404 for a hidden page.
 - Page module, start and end time: a page whose start time is still to come, or whose end time is over, is rendered at
   a time when it is published (its start time, or a second before its end time), so its structure can be checked. Start
-  and end times of parent pages that extend to their subpages count too. The box says so; if the end time is not after
+  and end times of parent pages that extend to their subpages count too. If the end time is not after
   the start time it says that the page can never be shown.
 - Page module, frontend user groups: a page for frontend user groups is rendered as a logged-in user who is a member of
   the groups of the page and of its parents that extend to their subpages ("any login" needs no group). A page for
-  visitors who are not logged in is rendered as a visitor. The box names the groups; if the groups exclude each other
-  it says that the page can never be shown.
+  visitors who are not logged in is rendered as a visitor. If the groups exclude each other the box says that the page
+  can never be shown.
 - Page module, content of the page: the headings in the content of the page are checked; of the headings around it only
   the H1 counts, because the page has it even if an editor cannot change it (an h1 in the header and one in the content are
   two h1; an h1 in the header is the h1 of the page), while an h2 in the footer causes no problem. An empty heading is a problem wherever it is, also around the content, and gets the badge "Empty heading" like the other problems. The content is what the new site setting

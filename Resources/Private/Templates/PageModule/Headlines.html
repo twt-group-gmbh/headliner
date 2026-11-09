@@ -52,25 +52,6 @@
                     <f:else>
                         <f:if condition="{section.loaded}">
                             <f:then>
-                                <f:if condition="{section.hidden}">
-                                    <div class="alert alert-info"><f:translate key="{l}hiddenPage" /></div>
-                                </f:if>
-                                <f:if condition="{section.publication} == 'notYet'">
-                                    <div class="alert alert-info"><f:translate key="{l}publicationNotYet" arguments="{0: section.publicationFrom}" /></div>
-                                </f:if>
-                                <f:if condition="{section.publication} == 'expired'">
-                                    <div class="alert alert-info"><f:translate key="{l}publicationExpired" arguments="{0: section.publicationUntil}" /></div>
-                                </f:if>
-                                <f:if condition="{section.access} == 'restricted'">
-                                    <f:if condition="{section.accessGroups}">
-                                        <f:then>
-                                            <div class="alert alert-info"><f:translate key="{l}accessGroups" arguments="{0: section.accessGroups}" /></div>
-                                        </f:then>
-                                        <f:else>
-                                            <div class="alert alert-info"><f:translate key="{l}accessLogin" /></div>
-                                        </f:else>
-                                    </f:if>
-                                </f:if>
                                 <f:if condition="{section.hasHeadings}">
                                     <f:then>
                                         <f:for each="{section.pageIssues}" as="issue">

@@ -50,10 +50,9 @@ The full documentation is in [`Documentation/`](Documentation/Index.rst).
   There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter.
 - Headings from content elements, RTE content and other extensions are included without any configuration. Only
   standard pages are checked.
-- A hidden page is rendered too, so you can check its structure before it is published; the box then says that the page
-  is hidden.
+- A hidden page is rendered too, so you can check its structure before it is published.
 - A page with a start time that has not come yet or an end time that is over is rendered at a time when it is
-  published, and the box says so.
+  published.
 - A page for frontend user groups is rendered as a member of them.
 - In a workspace the box shows the versions of that workspace.
 

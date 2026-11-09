@@ -39,23 +39,8 @@
 			<trans-unit id="untranslated">
 				<source>The page is not translated into this language.</source>
 			</trans-unit>
-			<trans-unit id="hiddenPage">
-				<source>The page is hidden. The structure shows how it will look when the page is published.</source>
-			</trans-unit>
-			<trans-unit id="publicationNotYet">
-				<source>The page is not published yet (from %s). The structure shows how it will look from then on.</source>
-			</trans-unit>
-			<trans-unit id="publicationExpired">
-				<source>The page is no longer published (until %s). The structure shows how it looked shortly before it ended.</source>
-			</trans-unit>
 			<trans-unit id="publicationNever">
 				<source>The page can never be shown: its end time is not after its start time.</source>
-			</trans-unit>
-			<trans-unit id="accessGroups">
-				<source>The page is only visible to frontend users of the groups %s. The structure shows how it looks for them.</source>
-			</trans-unit>
-			<trans-unit id="accessLogin">
-				<source>The page is only visible to logged-in frontend users. The structure shows how it looks for them.</source>
 			</trans-unit>
 			<trans-unit id="accessNever">
 				<source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source>

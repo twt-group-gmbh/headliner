@@ -416,13 +416,6 @@ final readonly class StructureBox
         return $title !== '' ? $title : '#' . $workspaceId;
     }
 
-    private function getGroupTitle(int $groupId): string
-    {
-        $group = BackendUtility::getRecord('fe_groups', $groupId, 'title');
-
-        return is_array($group) && (string) $group['title'] !== '' ? (string) $group['title'] : '#' . $groupId;
-    }
-
     /**
      * Whether the box is collapsed, saved by the JavaScript in the settings of the backend user. Read here, so the
      * box is rendered closed right away instead of closing after the page has loaded.
@@ -471,12 +464,8 @@ final readonly class StructureBox
             'flag' => $language->getFlagIdentifier(),
             'loaded' => false,
             'untranslated' => false,
-            'hidden' => (bool) ($page['hidden'] ?? false),
             'publication' => PublicationState::Published->value,
-            'publicationFrom' => '',
-            'publicationUntil' => '',
             'access' => AccessState::Open->value,
-            'accessGroups' => '',
             'hasHeadings' => false,
             'headings' => [],
             'pageIssues' => [],
@@ -494,11 +483,6 @@ final readonly class StructureBox
             return $section;
         }
 
-        // The translation of a page can be hidden on its own
-        if ($translationRecord !== null && ($translationRecord['hidden'] ?? false)) {
-            $section['hidden'] = true;
-        }
-
         // A page with a start or end time is rendered at a time when it is published
         $rootLine = array_values(BackendUtility::BEgetRootLine($pageId, '', $workspaceId > 0));
         $publication = PublicationTime::forRootLine(
@@ -508,9 +492,6 @@ final readonly class StructureBox
             $translationRecord
         );
         $section['publication'] = $publication->state->value;
-        $locale = ($GLOBALS['LANG'] ?? null)?->getLocale();
-        $section['publicationFrom'] = $publication->start > 0 ? LocalizedDate::format($publication->start, $locale) : '';
-        $section['publicationUntil'] = $publication->end > 0 ? LocalizedDate::format($publication->end, $locale) : '';
         if ($publication->state === PublicationState::Never) {
             return $section;
         }
@@ -518,7 +499,6 @@ final readonly class StructureBox
         // A page for frontend user groups is rendered as a member of them
         $access = FrontendGroupAccess::forRootLine($rootLine, $pageId, $translationRecord);
         $section['access'] = $access->state->value;
-        $section['accessGroups'] = implode(', ', array_map($this->getGroupTitle(...), $access->groupIds));
         if ($access->state === AccessState::Never) {
             return $section;
         }
