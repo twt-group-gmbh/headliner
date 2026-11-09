@@ -3,7 +3,7 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [1.0.0] - 2026-10-28
+## [1.0.0] - 2026-11-09
 
 First release.
 
@@ -127,12 +127,17 @@ First release.
   must not run side by side. The documentation says in which order to switch (backup, remove, install, run the wizard,
   only then delete the unused column) and warns that a destructive schema update deletes the column `header_type` before
   the wizard has used it.
+- The `returnUrl` of the edit forms (the page module's URL, which the JavaScript sends) is checked by the extension itself
+  and accepted only as a path of the same host (no host, no scheme, no `//`, backslash, whitespace or `..`), so loading
+  the box does not trigger the deprecation of `GeneralUtility::resolveBackPath()` (removed in TYPO3 v15), which
+  `GeneralUtility::sanitizeLocalUrl()` calls for such a path.
 - Security: the box takes nothing in the page for markup. The text of a heading is output as text (an editor can write
   `&lt;img onerror=…&gt;` as a header, which is `<img onerror=…>` in the rendered text), a mark for a record that is not on
   the page shown makes a label and no select, and the route that loads the box checks the languages it is asked for. Both
   routes need the request token of the core.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
-- Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer).
+- Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer), with
+  screenshots of the box (language comparison, the select of a heading, a Content Block with its cards).
 
 ### Requirements
 - PHP 8.3 or newer

@@ -11,7 +11,6 @@ use TYPO3\CMS\Core\Authentication\BackendUserAuthentication;
 use TYPO3\CMS\Core\Http\HtmlResponse;
 use TYPO3\CMS\Core\Http\Response;
 use TYPO3\CMS\Core\Type\Bitmask\Permission;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Twtgroup\Headliner\Backend\LanguageAccess;
 use Twtgroup\Headliner\Backend\StructureBox;
 
@@ -38,9 +37,28 @@ final readonly class StructureController
         // only the languages the user may use: the page module shows those, but this route takes them from the request
         $languageIds = LanguageAccess::filter(array_values(array_map(intval(...), (array) ($query['languages'] ?? [0]))), $backendUser);
         // only a local URL: the edit forms return there
-        $returnUrl = GeneralUtility::sanitizeLocalUrl((string) ($query['returnUrl'] ?? ''), $request);
+        $returnUrl = self::localPath((string) ($query['returnUrl'] ?? ''));
 
         // an empty body: there is nothing to show, the placeholder goes away
         return new HtmlResponse($this->box->render($request, $pageId, $languageIds, $returnUrl));
+    }
+
+    /**
+     * The path of this host, or an empty string. The JavaScript only sends path and query of the page module, so nothing
+     * else is accepted: no host, no scheme (the core's sanitizeLocalUrl() resolves paths with a function that is
+     * deprecated in TYPO3 14).
+     */
+    private static function localPath(string $url): string
+    {
+        if (
+            !str_starts_with($url, '/')
+            || str_starts_with($url, '//')
+            || preg_match('/[\x00-\x20\x7f\\\\]/', $url) === 1
+            || preg_match('#(^|/)(\.|%2e){2}(/|\?|$)#i', $url) === 1
+        ) {
+            return '';
+        }
+
+        return $url;
     }
 }

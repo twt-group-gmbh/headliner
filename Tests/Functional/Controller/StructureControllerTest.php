@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Twtgroup\Headliner\Tests\Functional\Controller;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use Twtgroup\Headliner\Controller\StructureController;
 use Twtgroup\Headliner\Tests\Functional\AbstractFrontendTestCase;
@@ -64,6 +65,32 @@ final class StructureControllerTest extends AbstractFrontendTestCase
 
         self::assertStringContainsString('returnUrl=/typo3/module/web/layout?id%3D1', $local);
         self::assertStringNotContainsString('evil.example', $foreign);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function foreignReturnUrls(): array
+    {
+        return [
+            'another host' => ['https://evil.example/'],
+            'protocol-relative' => ['//evil.example/typo3'],
+            'backslash' => ['/\\evil.example'],
+            'parent segment' => ['/typo3/../evil'],
+            'encoded parent segment' => ['/typo3/%2e%2e/evil'],
+            'whitespace' => ["/typo3/ evil"],
+            'no leading slash' => ['evil/typo3'],
+            'javascript' => ['javascript:evil()'],
+        ];
+    }
+
+    #[Test]
+    #[DataProvider('foreignReturnUrls')]
+    public function theEditFormsDoNotReturnToAnyOtherUrl(string $returnUrl): void
+    {
+        $body = (string) $this->load(1, 'id=1&returnUrl=' . rawurlencode($returnUrl))->getBody();
+
+        self::assertStringNotContainsString('evil', $body);
     }
 
     #[Test]
