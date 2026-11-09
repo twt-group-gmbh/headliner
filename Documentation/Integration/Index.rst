@@ -133,6 +133,12 @@ records of tables of their own. Wrap what is rendered for each record in `headli
 
 The wrapper is all it takes: no `edit`, and nothing for the rich text.
 
+..  figure:: /Images/content-blocks-cards.png
+    :alt: The box with the headings of a Content Block and of its cards
+    :class: with-shadow
+
+    The headings of a block and of its cards: the cards have the title of their table as badge, the heading in a text has the badge RTE.
+
 - For a visitor the wrapper changes nothing. For the page module it marks the record (`data-headliner-record`) and the
   content element it belongs to (`data-headliner-element`, taken from `{data}`), so a Content Block, which has no frame
   `id="c12"` around its element, still gets the group and the badges.

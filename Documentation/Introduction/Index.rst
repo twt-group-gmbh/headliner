@@ -8,6 +8,12 @@ A heading structure that makes sense helps readers, search engines and assistive
 header (`<h1>` to `<h6>`) is usually tied to its layout, so changing how a heading looks changes where it stands in the
 hierarchy. Headliner separates the two and shows the result.
 
+..  figure:: /Images/page-module-comparison.png
+    :alt: The box in the language comparison of the page module
+    :class: with-shadow
+
+    The box in the language comparison of the page module: one section per language, each with its own problems.
+
 ..  _introduction-features:
 
 Features

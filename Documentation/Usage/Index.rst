@@ -29,6 +29,10 @@ headings of the page as a hierarchy. Every heading has a pill with its tag; its 
     coloured bar runs along the left edge of their rows, and hovering one of them marks the others and outlines the
     element in the page module below.
 *   The box can be **collapsed**. The state is saved for the backend user and the box is rendered that way right away.
+    A collapsed box stays collapsed on every page, and its structure is loaded all the same, so the summary still shows
+    the problems of the page.
+*   The box **updates itself** when content changes in the page module: if an element is hidden or shown, or moved by drag
+    and drop, the structure is loaded and checked again.
 
 ..  _usage-edit:
 
@@ -37,6 +41,12 @@ Changing a tag
 
 For headers of content elements the pill is a select. Choose another tag: it is saved with the rights of the backend
 user and the box is checked again.
+
+..  figure:: /Images/change-tag.png
+    :alt: The select of a heading in the box with the tags H1 to H6 and DIV
+    :class: with-shadow
+
+    The select of a heading: H1 to H6 and DIV.
 
 The text of a header is a link. It opens the edit form of its content element in the side panel, like the edit button of
 the page module itself. For a heading from the text of an element, it opens that element.

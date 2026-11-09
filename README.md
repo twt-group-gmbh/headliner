@@ -10,6 +10,8 @@
 and points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings. The tag
 of a header can be changed right there, without touching the look of the page.
 
+![The heading structure in the language comparison of the page module](Documentation/Images/page-module-comparison.png)
+
 The full documentation is in [`Documentation/`](Documentation/Index.rst).
 
 **Contents:** [Features](#features) · [Installation](#installation) · [Setup](#setup) ·
@@ -20,11 +22,14 @@ The full documentation is in [`Documentation/`](Documentation/Index.rst).
 
 ### The box in the page module
 
-- A box above the content that can be collapsed (the state is remembered per backend user).
+- A box above the content that can be collapsed (the state is remembered per backend user, so it stays collapsed on
+  other pages).
 - It loads after the page module, also while collapsed, so the summary shows the problems and checking the page does
   not delay the page module.
 - The headings of one content element are drawn as a group (a coloured bar on the left; hovering one marks the others
   and the element below). A subheader has the badge "Subheader".
+- It updates itself when content changes in the page module: hide or show an element, or move it by drag and drop, and
+  the structure is checked again.
 - With the language comparison of the page module the box has one section per selected language, side by side like the
   columns of the page module; if they do not fit, it scrolls sideways.
 
@@ -36,6 +41,8 @@ The full documentation is in [`Documentation/`](Documentation/Index.rst).
 | Text of a content element (RTE)               | `RTE`            | Open the element. With the site setting `headliner.editRteHeadings` (off by default) also change the tag, to the headings the RTE preset offers (`heading.options`, H2 and H3 in the default preset), at the place of the heading in the stored text. If the heading is not found there with the same text, it stays a label. |
 | Field of a child record (a card of a block)   | name of the table | Change the tag, see [Content Blocks](#content-blocks). |
 | Menu, footer and other sources                |                  | Shown only. |
+
+![The select of a heading in the box](Documentation/Images/change-tag.png)
 
 The select and the link appear only for backend users who may edit the element. Changing the tag also needs the
 permission for the field *Tag* / *Subheader tag* (*Allowed excludefields* in the backend user group).
@@ -149,6 +156,8 @@ the headings in their rich text, if you wrap a record in `headliner:headline.chi
     </headliner:headline.children>
 </f:for>
 ```
+
+![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 
 The same works for child records made with the means of the core. See the documentation (Integration).
 
