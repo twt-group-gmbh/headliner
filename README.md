@@ -1,86 +1,163 @@
-# TYPO3 Extension `headliner`
+# headliner
 
-## Introduction
+**See the heading structure of every page right in the TYPO3 page module, and fix it in place.**
 
-### What does it do?
+[![TYPO3 14.3](https://img.shields.io/badge/TYPO3-14.3_LTS-ff8700)](https://typo3.org)
+[![PHP 8.3+](https://img.shields.io/badge/PHP-8.3%2B-777bb4)](https://www.php.net)
+[![License GPL-2.0-or-later](https://img.shields.io/badge/license-GPL--2.0--or--later-blue)](LICENSE)
 
-`headliner` shows the heading structure (H1-H6) of a page above the content in the TYPO3 page module and
-points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings.
+`headliner` (`twtgroup/headliner`) shows the heading structure (H1-H6) of a page above the content in the page module
+and points out problems: a missing or repeated H1, skipped levels (an H2 followed by an H4) and empty headings. The tag
+of a header can be changed right there, without touching the look of the page.
 
 The full documentation is in [`Documentation/`](Documentation/Index.rst).
 
+**Contents:** [Features](#features) · [Installation](#installation) · [Setup](#setup) ·
+[Extending](#extending-with-your-own-rules) · [Compatibility](#compatibility) · [Migration](#migration) ·
+[Requirements](#requirements) · [Contributing](#contributing)
+
+## Features
+
 ### The box in the page module
 
-- The structure is shown in a box that can be collapsed (the state is remembered per backend user).
-- The page module shows the box at once and loads the structure afterwards (also while it is collapsed, so the summary
-  shows the problems), so checking the page does not delay the page module.
-- A subheader has the badge "Subheader".
+- A box above the content that can be collapsed (the state is remembered per backend user).
+- It loads after the page module, also while collapsed, so the summary shows the problems and checking the page does
+  not delay the page module.
 - The headings of one content element are drawn as a group (a coloured bar on the left; hovering one marks the others
-  and the element below).
-- With the page module's language comparison the box has one section per selected language, side by side like the
-  columns of the page module; if they do not fit, the box scrolls sideways.
+  and the element below). A subheader has the badge "Subheader".
+- With the language comparison of the page module the box has one section per selected language, side by side like the
+  columns of the page module; if they do not fit, it scrolls sideways.
 
 ### Changing and opening headings
 
-- For headers of content elements the tag can be changed right there with a select (H1-H6 or div): it is saved with the
-  rights of the backend user and the structure is checked again.
-- Clicking the text of a header opens the edit form of its content element in the side panel, as the edit button of the
-  page module does.
-- Headings from the text of a content element, such as RTE content, have the badge "RTE" and open that element. If the
-  site setting `headliner.editRteHeadings` is on (off by default), their tag can be changed with a select too. It offers
-  the headings the editor of the text offers (`heading.options` of the RTE preset, H2 and H3 in the default preset) and
-  is changed in the text of the element, at the place of the heading, with the rights of the backend user. This works
-  where the heading is found in the stored text at the place the order of the headings says, with the same text;
-  otherwise it is only a label.
-- Headings from other sources, such as a menu or the footer, are shown but can be neither changed nor opened there.
-- The select and the link appear only for backend users who may edit the element; changing the tag also needs the
-  permission for the field *Tag* / *Subheader tag* (allow it in the backend user group under *Allowed excludefields*).
+| Heading                                       | Badge            | What you can do in the box |
+|-----------------------------------------------|------------------|----------------------------|
+| Header or subheader of a content element      |                  | Change the tag with a select (H1-H6 or div); it is saved with the rights of the backend user and the structure is checked again. A click on the text opens the element in the side panel, as the edit button of the page module does. |
+| Text of a content element (RTE)               | `RTE`            | Open the element. With the site setting `headliner.editRteHeadings` (off by default) also change the tag, to the headings the RTE preset offers (`heading.options`, H2 and H3 in the default preset), at the place of the heading in the stored text. If the heading is not found there with the same text, it stays a label. |
+| Field of a child record (a card of a block)   | name of the table | Change the tag, see [Content Blocks](#content-blocks). |
+| Menu, footer and other sources                |                  | Shown only. |
+
+The select and the link appear only for backend users who may edit the element. Changing the tag also needs the
+permission for the field *Tag* / *Subheader tag* (*Allowed excludefields* in the backend user group).
 
 ### Which headings are checked
 
 - The content of the page is the elements of the site setting `headliner.contentSelector` (empty by default: the whole
-  page). Without such an element the whole page is checked.
+  page). Without a matching element the whole page is checked.
 - Headings in the header, the menu and the footer are shown very pale, and only their H1 counts: an H1 outside of the
-  content is an H1 of the page, even if the editor cannot change it, so it can make a second H1 or be the one H1 of the
-  page. Their other levels cause no problem, but an empty heading is a problem wherever it is.
+  content is an H1 of the page, even if the editor cannot change it. Their other levels cause no problem, but an empty
+  heading is a problem wherever it is.
 
 ### How the page is read
 
-- The headings are read from the rendered frontend of the page, which is rendered inside the running PHP process.
-  There is no HTTP request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter.
-- Headings from content elements, RTE content and other extensions are included without any configuration. Only
-  standard pages are checked.
-- A hidden page is rendered too, so you can check its structure before it is published.
-- A page with a start time that has not come yet or an end time that is over is rendered at a time when it is
-  published.
-- A page for frontend user groups is rendered as a member of them.
-- In a workspace the box shows the versions of that workspace.
+- The headings come from the rendered frontend of the page, rendered inside the running PHP process. There is no HTTP
+  request, so a firewall, Basic Auth, TLS settings or a CDN in front of the site do not matter.
+- Content elements, RTE content and other extensions are included without any configuration. Only standard pages are
+  checked.
+- A hidden page is rendered too, so you can check it before it is published.
+- A page with a start or end time is rendered at a time when it is published; a page for frontend user groups is rendered
+  as a member of them; in a workspace the box shows the versions of that workspace.
 
 ### Fields of the content elements
 
-Content elements get two fields:
+- **Tag** (H1-H6 or div, or "from the layout", the default, which is what content did before). It decides the HTML tag
+  of the header, so the hierarchy can be fixed without touching the look: the layout (**Type**) only sets the CSS class
+  `ce-headline-layout-N`.
+- **Subheader tag**, the same for the subheader. The subheader has no layout of its own, it looks like its header
+  ("Hidden" hides both). Without the field (see the site setting below) the subheader is rendered one level below the
+  header.
 
-- **Tag** (H1-H6 or div, or "from the layout" as the default, which is what content did before). It decides the HTML
-  tag of the header, so the heading hierarchy can be fixed without touching the look: the layout (**Type**) only sets
-  the CSS class `ce-headline-layout-N`.
-- **Subheader tag**, the same for the subheader, with the same choices. The subheader has no layout of its own, it looks
-  like its header (and "Hidden" hides both). Without the field (see the site setting below), the subheader is rendered
-  one level below the header.
+## Installation
+
+```bash
+composer require twtgroup/headliner
+```
+
+Or download the extension from the [TYPO3 Extension Repository](https://extensions.typo3.org/extension/headliner) and
+install it with the Extension Manager.
+
+## Setup
+
+Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
+header partial of `fluid_styled_content`.
+
+> [!NOTE]
+> Content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
+> H1-H6), so existing pages do not change until an editor chooses a tag.
+>
+> The subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header
+> (an `h2` under an H1, a `div` below H6). Check pages with subheaders after the installation, or choose H3 in
+> *Subheader tag*.
+
+### Site settings
+
+| Setting                       | Default | Description |
+|-------------------------------|---------|-------------|
+| `headliner.subheader.enabled` | on      | Show the field *Subheader tag*. If switched off for a site, it is hidden in the backend and the subheader follows the tag of the header. |
+| `headliner.editRteHeadings`   | off     | Allow the tag of a heading in the rich text of a content element to be changed in the box (only to the headings the RTE offers). The text of the element is changed, so it is off by default. |
+| `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
+
+## Extending with your own rules
+
+The box checks four things: a missing H1, more than one H1, a skipped level and an empty heading. A project changes that
+with the PSR-14 event `Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent`. It is dispatched after the built-in rules,
+once for each language the box shows.
+
+| Method                                         | Does |
+|------------------------------------------------|------|
+| `getHeadings()`                                | The headings of the page, each with `level`, `text` and `outside`. |
+| `getIssues()`                                  | The issues found so far. |
+| `addIssue($type, $index, $label)`              | Add an issue (`$index` = `null` for a problem of the page). `$label` is plain text or an `LLL:` reference. |
+| `removeIssues($type)`                          | Remove the issues of a rule (`missingH1`, `multipleH1`, `skippedLevel`, `emptyHeading`). |
+| `setIssues($issues)`                           | Replace all issues. |
+
+```php
+use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
+use TYPO3\CMS\Core\Attribute\AsEventListener;
+
+#[AsEventListener]
+final class HeadingTooLong
+{
+    public function __invoke(ModifyHeadingIssuesEvent $event): void
+    {
+        foreach ($event->getHeadings() as $index => $heading) {
+            if (!$heading->outside && mb_strlen($heading->text) > 70) {
+                $event->addIssue('myext.tooLong', $index, 'LLL:EXT:myext/Resources/Private/Language/locallang.xlf:headingTooLong');
+            }
+        }
+    }
+}
+```
+
+What a listener gives back is checked, and a listener that throws an exception does not take the box down (the built-in
+issues are shown, the exception is logged). A slow listener is logged as a warning. The listener runs every time the page
+module is opened, so keep it quick. More in the documentation (Developer).
 
 ## Compatibility
 
 ### Content Blocks
 
-It works with Content Blocks, too. The Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header
-and subheader with their tags. The headings of a block are grouped, and the headings of its collection records (cards)
-get a select for their tag and for headings in their rich text, if you wrap a record in `headliner:headline.children`
-(see the documentation).
+The Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header and subheader with their tags. The
+headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for
+the headings in their rich text, if you wrap a record in `headliner:headline.children`:
+
+```html
+<f:for each="{data.cards}" as="card">
+    <headliner:headline.children record="{card}">
+        <headliner:headline tag="{card.tag}">{card -> f:render.text(field: 'title')}</headliner:headline>
+        {card -> f:render.text(field: 'text')}
+    </headliner:headline.children>
+</f:for>
+```
+
+The same works for child records made with the means of the core. See the documentation (Integration).
 
 ### Visual Editor
 
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
-together. headliner needs no ViewHelper in your own templates.
+together. For the content elements of the core headliner needs no ViewHelper in your templates; the ViewHelpers
+`headliner:headline` and `headliner:headline.children` are for your own templates.
 
 ### Themes with their own header
 
@@ -92,45 +169,16 @@ render paragraphs instead of headings, so they do not appear in the box.
 The documentation (Integration) says how to hide the fields for such element types with page TSconfig
 (`TCEFORM.tt_content.header_tag.types.<type>.disabled = 1`).
 
-## Installation
-
-### Composer
-
-```
-composer require twtgroup/headliner
-```
-
-### TER
-
-Alternatively, download the extension from the
-[TYPO3 Extension Repository](https://extensions.typo3.org/extension/headliner) and install it
-via the Extension Manager.
-
-## Setup
-
-Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
-header partial of `fluid_styled_content`.
-
-Content without a Tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
-H1-H6), so existing pages do not change until an editor chooses a tag.
-
-The subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header (an
-`h2` under an H1, a `div` below H6), so check pages with subheaders after the installation or choose H3 in
-*Subheader tag*.
-
-### Site settings
-
-| Setting                      | Default | Description |
-|------------------------------|---------|-------------|
-| `headliner.subheader.enabled` | on      | Show the field *Subheader tag*. If switched off for a site, it is hidden in the backend and the subheader follows the tag of the header. |
-| `headliner.editRteHeadings`   | off     | Allow the tag of a heading in the rich text of a content element to be changed in the box (only to the headings the RTE offers). The text of the element is changed, so it is off by default. |
-| `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
-
 ## Migration
 
 Coming from the Semantilizer (`z7_semantilizer`)? The upgrade wizard `headlinerMigrateSemantilizerFields` takes its field
-`header_type` into the tags of headliner (`vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields`). See the
-documentation for what is left to do by hand.
+`header_type` into the tags of headliner:
+
+```bash
+vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields
+```
+
+See the documentation for what is left to do by hand.
 
 ## Requirements
 
@@ -148,7 +196,8 @@ ddev test all && ddev lint
 
 Backend login: `https://headliner.ddev.site/typo3/`, user `admin`, password `Password.1` (local demo only).
 
-How to work on the extension, what a change needs and how to write a commit message: see [CONTRIBUTING.md](CONTRIBUTING.md).
+How to work on the extension, what a change needs and how to write a commit message: see
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
