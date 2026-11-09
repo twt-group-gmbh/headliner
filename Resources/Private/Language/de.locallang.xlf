@@ -59,10 +59,6 @@
 				<source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source>
 				<target>Die Seite kann nie angezeigt werden: Die Frontend-Benutzergruppen der Seite und ihrer übergeordneten Seiten schließen sich aus.</target>
 			</trans-unit>
-			<trans-unit id="workspace">
-				<source>You work in the workspace "%s". The structure shows the versions of this workspace.</source>
-				<target>Sie arbeiten im Workspace „%s“. Die Struktur zeigt die Versionen dieses Workspace.</target>
-			</trans-unit>
 			<trans-unit id="outside">
 				<source>Outside the content</source>
 				<target>Außerhalb des Inhalts</target>

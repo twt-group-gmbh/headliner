@@ -66,8 +66,8 @@ First release.
   `headliner.contentSelector` matches (empty by default: the whole page, set it to `main` or `#content` if the content has its own element); the headings around it are shown very pale, in the colour of their level, with the
   tooltip "Outside the content". If the page has no such element, the whole page is checked as before. The selector is translated by
   `symfony/css-selector`, which is a requirement now.
-- Page module, workspaces: in a workspace the box shows the versions of that workspace, like the page module itself, and
-  says which workspace it is. The versions of the page, its translation and its parents count for the hidden state, the
+- Page module, workspaces: in a workspace the box shows the versions of that workspace, like the page module itself.
+  The versions of the page, its translation and its parents count for the hidden state, the
   times and the groups. A tag changed in the box changes the version, not the live record.
 - Page module, `l10n_mode = exclude`: if a project sets that for `header_tag` (or `subheader_tag`), a translation has no
   tag of its own (the DataHandler copies it from the original and drops what is saved on the translation). In the box

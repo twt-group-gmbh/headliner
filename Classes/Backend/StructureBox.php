@@ -130,7 +130,6 @@ final readonly class StructureBox
             // only with several languages the sections are labelled with their language
             'multiple' => count($sections) > 1,
             'columns' => count($sections),
-            'workspace' => $workspaceId > 0 ? $this->getWorkspaceTitle($backendUser, $workspaceId) : '',
             'collapsed' => $this->isCollapsed(),
             'rteUrl' => (string) $this->uriBuilder->buildUriFromRoute(self::RTE_ROUTE),
             'issueCount' => array_sum(array_column($sections, 'issueCount')),
@@ -407,13 +406,6 @@ final readonly class StructureBox
             $record,
             $pointer
         );
-    }
-
-    private function getWorkspaceTitle(?BackendUserAuthentication $backendUser, int $workspaceId): string
-    {
-        $title = $backendUser !== null ? (string) ($backendUser->workspaceRec['title'] ?? '') : '';
-
-        return $title !== '' ? $title : '#' . $workspaceId;
     }
 
     /**

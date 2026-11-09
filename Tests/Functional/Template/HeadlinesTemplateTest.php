@@ -49,7 +49,6 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
         $view->assignMultiple([
             'collapsed' => false,
             'rteUrl' => '/typo3/ajax/headliner/rte-tag',
-            'workspace' => $page['workspace'] ?? '',
             'multiple' => true,
             'columns' => 1,
             'issueCount' => $issueCount,
@@ -204,7 +203,7 @@ final class HeadlinesTemplateTest extends FunctionalTestCase
             0,
             'default',
             [],
-            ['workspace' => self::EVIL],
+            [],
             [
                 'title' => self::EVIL,
             ]

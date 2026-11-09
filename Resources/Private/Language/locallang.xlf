@@ -45,9 +45,6 @@
 			<trans-unit id="accessNever">
 				<source>The page can never be shown: the frontend user groups of the page and of its parents exclude each other.</source>
 			</trans-unit>
-			<trans-unit id="workspace">
-				<source>You work in the workspace "%s". The structure shows the versions of this workspace.</source>
-			</trans-unit>
 			<trans-unit id="outside">
 				<source>Outside the content</source>
 			</trans-unit>

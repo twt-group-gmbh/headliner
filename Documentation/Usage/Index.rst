@@ -116,7 +116,7 @@ What is checked, and what is not
     its parents that extend to their subpages. A page that is only for visitors who are not logged in ("hide at login")
     is rendered as a visitor. If the groups of the page and of its parents exclude each other, the box says that the
     page can never be shown. Content elements with their own groups are judged for the same user.
-*   In a **workspace** the box shows the versions of the workspace the backend user works in, like the page module does,
-    and says which workspace it is. The versions of the page, of its translation and of its parents count for the times
+*   In a **workspace** the box shows the versions of the workspace the backend user works in, like the page module does.
+    The versions of the page, of its translation and of its parents count for the times
     and groups, too. Changing a tag there changes the version, not the live record.
 *   Only standard pages are checked.
