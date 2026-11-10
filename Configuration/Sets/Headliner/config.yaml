@@ -1,2 +1,6 @@
 name: twtgroup/headliner
 label: Headliner
+# fluid_styled_content is optional: if it is there its sets are loaded first, so the partial path below is added to its
+# paths; if it is not, nothing is reported and the set does the rest.
+optionalDependencies:
+  - typo3/fluid-styled-content

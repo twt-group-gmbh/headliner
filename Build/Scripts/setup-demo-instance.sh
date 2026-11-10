@@ -78,10 +78,10 @@ if [ -d .Build/vendor/twtgroup/headliner-demo ]; then
     DEMO_DEPENDENCY='\n  - twtgroup/headliner-demo'
 fi
 if grep -q '^dependencies: {  }$' "${SITE_CONFIG}"; then
-    sed -i "s#^dependencies: {  }\$#dependencies:\n  - typo3/fluid-styled-content\n  - twtgroup/headliner-fluid-styled-content${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
+    sed -i "s#^dependencies: {  }\$#dependencies:\n  - typo3/fluid-styled-content\n  - twtgroup/headliner${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
 else
     # `typo3 setup` already lists the fluid_styled_content sets; add ours to that list
-    sed -i "s#^dependencies:\$#dependencies:\n  - twtgroup/headliner-fluid-styled-content${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
+    sed -i "s#^dependencies:\$#dependencies:\n  - twtgroup/headliner${DEMO_DEPENDENCY}#" "${SITE_CONFIG}"
 fi
 mysql -h "${DB_HOST}" -P "${DB_PORT}" -u "${DB_USER}" -p"${DB_PASS}" "${DB_NAME}" -e "
     INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, subheader, subheader_tag, bodytext, crdate, tstamp) VALUES

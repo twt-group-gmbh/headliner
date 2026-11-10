@@ -9,15 +9,14 @@ use Twtgroup\Headliner\Middleware\InspectRequest;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Configuration\SiteWriter;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Core\Site\Set\SetError;
 use TYPO3\CMS\Core\Site\Set\SetRegistry;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\TestingFramework\Core\Functional\Framework\Frontend\InternalRequest;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
- * Without fluid_styled_content: no core extension is loaded here. The set for it cannot be used, the base set can, and
- * the ViewHelper renders in a template of its own.
+ * Without fluid_styled_content: no core extension is loaded here. The set is valid and reports nothing, and the
+ * ViewHelper renders in a template of its own.
  */
 final class SiteSetsWithoutFluidStyledContentTest extends FunctionalTestCase
 {
@@ -32,15 +31,13 @@ final class SiteSetsWithoutFluidStyledContentTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function theBaseSetIsValidAndTheSetForFluidStyledContentIsNot(): void
+    public function theSetIsValidWithoutFluidStyledContentAndNothingIsReported(): void
     {
         $registry = $this->get(SetRegistry::class);
 
         self::assertNotNull($registry->getSet('twtgroup/headliner'));
-        self::assertNull($registry->getSet('twtgroup/headliner-fluid-styled-content'));
-        $invalid = $registry->getInvalidSets();
-        self::assertArrayNotHasKey('twtgroup/headliner', $invalid);
-        self::assertSame(SetError::missingDependency, $invalid['twtgroup/headliner-fluid-styled-content']['error'] ?? null);
+        // no invalid set means no error in the log: the optional dependency is skipped without one
+        self::assertSame([], $registry->getInvalidSets());
     }
 
     #[Test]

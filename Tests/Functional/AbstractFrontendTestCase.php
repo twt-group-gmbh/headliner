@@ -76,7 +76,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
      * @param string|null $pageTypoScript The TypoScript of the page; by default the content elements and nothing around them
      * @param list<string> $sets The site sets of the site
      */
-    protected function writeSite(array $settings = [], ?string $pageTypoScript = null, array $sets = ['twtgroup/headliner-fluid-styled-content']): void
+    protected function writeSite(array $settings = [], ?string $pageTypoScript = null, array $sets = ['typo3/fluid-styled-content', 'twtgroup/headliner']): void
     {
         $siteWriter = GeneralUtility::makeInstance(SiteWriter::class);
         // The instance is shared by the tests: nothing of an earlier test may stay behind

@@ -9,8 +9,8 @@ use TYPO3\CMS\Core\Site\Set\SetRegistry;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
- * Two site sets: the one for every site, which needs nothing, and the one for fluid_styled_content, which adds the
- * header partial. fluid_styled_content is optional because only the second set depends on it.
+ * One site set. fluid_styled_content is an optional dependency: it is loaded before the set if it is there, and nothing
+ * is reported if it is not.
  */
 final class SiteSetsTest extends FunctionalTestCase
 {
@@ -19,31 +19,25 @@ final class SiteSetsTest extends FunctionalTestCase
     protected array $testExtensionsToLoad = ['twtgroup/headliner'];
 
     #[Test]
-    public function theBaseSetDependsOnNothing(): void
+    public function theSetNeedsNothingAndLoadsFluidStyledContentFirstIfItIsThere(): void
     {
-        $set = $this->get(SetRegistry::class)->getSet('twtgroup/headliner');
+        $registry = $this->get(SetRegistry::class);
+        $set = $registry->getSet('twtgroup/headliner');
 
         self::assertNotNull($set);
         self::assertSame([], $set->dependencies);
-        // the settings and the page TSconfig are in it, the TypoScript with the partial of fluid_styled_content is not
-        self::assertNotEmpty($set->settingsDefinitions);
-        self::assertNotEmpty($set->pagets);
-        self::assertFileDoesNotExist(__DIR__ . '/../../../Configuration/Sets/Headliner/setup.typoscript');
+        self::assertSame(['typo3/fluid-styled-content'], $set->optionalDependencies);
+        self::assertSame([], $registry->getInvalidSets());
+        // the partial path is in its TypoScript, and fluid_styled_content comes before it
+        self::assertFileExists(__DIR__ . '/../../../Configuration/Sets/Headliner/setup.typoscript');
+        // the site lists Headliner first, and fluid_styled_content is still applied before it
+        $order = array_values(array_map(static fn($definition): string => $definition->name, $registry->getSets('twtgroup/headliner', 'typo3/fluid-styled-content')));
+        self::assertLessThan(array_search('twtgroup/headliner', $order, true), array_search('typo3/fluid-styled-content', $order, true));
     }
 
     #[Test]
-    public function theSetForFluidStyledContentAddsThePartialOnTopOfTheBaseSet(): void
+    public function thereIsNoSecondSet(): void
     {
-        $set = $this->get(SetRegistry::class)->getSet('twtgroup/headliner-fluid-styled-content');
-
-        self::assertNotNull($set);
-        self::assertSame(['typo3/fluid-styled-content', 'twtgroup/headliner'], $set->dependencies);
-        self::assertStringContainsString('partialRootPaths', (string) file_get_contents(__DIR__ . '/../../../Configuration/Sets/FluidStyledContent/setup.typoscript'));
-    }
-
-    #[Test]
-    public function neitherSetIsInvalid(): void
-    {
-        self::assertSame([], $this->get(SetRegistry::class)->getInvalidSets());
+        self::assertNull($this->get(SetRegistry::class)->getSet('twtgroup/headliner-fluid-styled-content'));
     }
 }
