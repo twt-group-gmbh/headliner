@@ -1,0 +1,22 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<f:comment>
+    The same as the block "cards", but the ViewHelper gets the record and reads the tag, the layout and the mark for
+    the page module from it: no tag="...", layout="..." or edit="..." anywhere.
+</f:comment>
+<section class="cards">
+    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
+    <f:if condition="{header}">
+        <headliner:headline record="{data}" default="2">{header}</headliner:headline>
+    </f:if>
+    <f:for each="{data.recordcards}" as="card">
+        <headliner:headline.children record="{card}">
+            <article class="card">
+                <headliner:headline record="{card}" tagField="tag">{card -> f:render.text(field: 'title')}</headliner:headline>
+                {card -> f:render.text(field: 'text')}
+            </article>
+        </headliner:headline.children>
+    </f:for>
+</section>
+</html>

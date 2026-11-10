@@ -55,10 +55,10 @@ Child records (IRRE) have demos in `Build/Demo/`, two small TYPO3 extensions tha
 - `headliner_demo` (`twtgroup/headliner-demo`, in `require-dev`, needs nothing but the core): the content element
   "Teaser list" with a child table made with plain TCA, its own site set and a Fluid template with
   `headliner:headline.children`. The page `/teaser` is seeded by `setup-demo-instance.sh`.
-- `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "cards" and "slider" with the Basic
-  `Twtgroup/Headline`. NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
+- `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "cards", "recordcards" and "slider" with the Basic
+  `Twtgroup/Headline` ("recordcards" is "cards" once more, with `record="{card}" tagField="tag"` in the template instead of the values). NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
   runs `composer require --dev` for them (this changes `composer.json` and `composer.lock` locally: do not commit it,
-  `git checkout composer.json` takes it out). The script seeds `/cards` and `/slider` when the tables exist.
+  `git checkout composer.json` takes it out). The script seeds `/cards`, `/cards-record` and `/slider` when the tables exist.
 The seed blocks for the demos only run if their tables exist, and unlike the older seeds they show SQL errors.
 
 Backend login: `https://headliner.ddev.site/typo3/`, user `admin`, password `Password.1` (local demo only; the

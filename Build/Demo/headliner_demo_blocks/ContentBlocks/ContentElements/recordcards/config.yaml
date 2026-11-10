@@ -1,0 +1,29 @@
+name: twtgroup/recordcards
+group: common
+prefixFields: false
+fields:
+  - identifier: Twtgroup/Headline
+    type: Basic
+  - identifier: recordcards
+    type: Collection
+    minitems: 1
+    labelField: title
+    fields:
+      - identifier: title
+        type: Text
+      - identifier: tag
+        type: Select
+        renderType: selectSingle
+        default: h3
+        items:
+          - label: H2
+            value: h2
+          - label: H3
+            value: h3
+          - label: H4
+            value: h4
+          - label: div
+            value: div
+      - identifier: text
+        type: Textarea
+        enableRichtext: true

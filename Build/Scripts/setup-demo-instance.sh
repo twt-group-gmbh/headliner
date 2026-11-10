@@ -245,6 +245,24 @@ if demo_has_table cards && demo_has_table slides; then
     "
 fi
 
+# The same cards once more, but the template gives the record to the ViewHelper (`record="{card}" tagField="tag"`) instead of
+# the values (block recordcards, same package).
+if demo_has_table recordcards; then
+    echo "› creating the demo of the Content Block with the record (cards, record variant)"
+    demo_sql -e "
+        INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
+            (1, 'Cards with record (Content Block)', '/cards-record', 1, 1792, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @page = LAST_INSERT_ID();
+        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, recordcards, crdate, tstamp)
+            VALUES (@page, 'twtgroup_recordcards', 0, 256, 0, 'Our cards', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        SET @element = LAST_INSERT_ID();
+        INSERT INTO recordcards (pid, sorting, title, tag, text, foreign_table_parent_uid, crdate, tstamp) VALUES
+            (@page, 256, 'First card', 'h3', '<p>The first card has an H3.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 512, 'Second card', 'h3', '<p>The second card has an H3 as well.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 768, 'Third card', 'h4', '<h3>A heading in the text of a card</h3><p>An H4 right after an H2: a level is skipped.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    "
+fi
+
 echo "› finalising extensions and caches"
 "${TYPO3_BIN}" extension:setup
 "${TYPO3_BIN}" asset:publish || true

@@ -20,7 +20,9 @@ Content elements with child records (IRRE) are shown by two small demo extension
 the demo instance, never in the package:
 
 - **Teaser list** (`/teaser`), made with the means of the core only. It is part of `ddev start` and `ddev demo`.
-- **Cards** and **Slider** (`/cards`, `/slider`), Content Blocks, plus the Visual Editor. They need packages that CI does not
+- **Cards**, **Cards with record** and **Slider** (`/cards`, `/cards-record`, `/slider`), Content Blocks, plus the Visual Editor.
+  The two cards are the same block: one gives the values to `headliner:headline` (`tag="{card.tag}"`), the other the
+  record (`record="{card}" tagField="tag"`). They need packages that CI does not
   install, so `ddev demo --extras` installs them first. That changes `composer.json` and `composer.lock` on your machine:
   do not commit them (`git checkout composer.json` takes the extras out again).
 
