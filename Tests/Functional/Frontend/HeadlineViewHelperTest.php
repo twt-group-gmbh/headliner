@@ -12,6 +12,7 @@ use TYPO3\CMS\Core\Domain\Record\ComputedProperties;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
+use TYPO3Fluid\Fluid\Core\ViewHelper\InvalidArgumentValueException;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 
 /**
@@ -178,13 +179,6 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function aRowAsAnArrayIsNoRecordForTheRecordArgument(): void
-    {
-        // an array goes in `row`, with its table: `record` takes record objects only
-        self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), ['uid' => 7, 'title' => 'A']));
-    }
-
-    #[Test]
     public function withoutARecordThereIsNoMark(): void
     {
         self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), null));
@@ -293,7 +287,7 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
             templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
             request: $request,
         ));
-        $view->assignMultiple(['record' => $record, 'card' => $card, 'notARecord' => ['uid' => 5, 'header_tag' => 'h5']]);
+        $view->assignMultiple(['record' => $record, 'card' => $card]);
 
         return trim($view->render('Record'));
     }
@@ -386,12 +380,12 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function somethingThatIsNoRecordIsIgnored(): void
+    public function anArrayIsNoRecordAndIsRefused(): void
     {
-        $html = $this->renderWithRecords(true, self::element(), self::row('cards', 7, []));
+        $this->expectException(InvalidArgumentValueException::class);
 
-        // an array does not give a tag or a mark: the default
-        self::assertStringContainsString('<h2>Array</h2>', $html);
+        // `record` takes record objects: an array is a row, or the values, and goes elsewhere
+        $this->renderCard(true, self::content(), ['uid' => 7]);
     }
 
     /**
@@ -407,7 +401,7 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
             templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
             request: $request,
         ));
-        $view->assignMultiple(['parent' => $parent, 'card' => self::row('cards', 7, $card), 'notAParent' => 'h2']);
+        $view->assignMultiple(['parent' => $parent, 'card' => self::row('cards', 7, $card), 'element' => self::element()]);
 
         return trim($view->render('Parent'));
     }
@@ -478,10 +472,11 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function aParentThatIsNoRecordIsIgnored(): void
+    public function aParentThatIsNeitherARecordNorAnArrayIsRefused(): void
     {
-        // a string is neither a record nor an array: the default
-        self::assertStringContainsString('<h2>Ignored</h2>', $this->renderBelow(self::element(), ['tag' => '']));
+        $this->expectException(InvalidArgumentValueException::class);
+
+        $this->renderBelow('h2', ['tag' => '']);
     }
 
     #[Test]

@@ -48,16 +48,16 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6 (defaultHeaderType), else h2');
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header', false, false);
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
-        $this->registerArgument('record', 'mixed', 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it (anything that is no record object is ignored)');
+        $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader"');
-        $this->registerArgument('parent', 'mixed', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header. Not used for a subheader');
+        $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header. Not used for a subheader');
         $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" a heading without a tag of its own is (negative: above)', false, 1);
         $this->registerArgument('subheaderTag', 'string', 'The tag chosen for the subheader; without it the subheader is one level below the header');
     }
 
     public function render(): string
     {
-        $record = $this->arguments['record'] instanceof RecordInterface ? $this->arguments['record'] : null;
+        $record = $this->arguments['record'];
         $tagField = (string) ($this->arguments['tagField'] ?? '') !== ''
             ? (string) $this->arguments['tagField']
             : ($this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);

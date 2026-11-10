@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Twtgroup\Headliner\Frontend\EditMark;
 use Twtgroup\Headliner\Frontend\RowTable;
 use Twtgroup\Headliner\Middleware\InspectRequest;
+use TYPO3\CMS\Core\Domain\RecordInterface;
 use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
 
 /**
@@ -42,7 +43,7 @@ final class ChildrenViewHelper extends AbstractTagBasedViewHelper
 
     public function initializeArguments(): void
     {
-        $this->registerArgument('record', 'mixed', 'The record the content is rendered for, as a Content Block gives it (a record object)');
+        $this->registerArgument('record', RecordInterface::class, 'The record the content is rendered for, as a Content Block gives it (a record object)');
         $this->registerArgument('row', 'array', 'Instead of `record`: the row as an array, as a data processor gives it');
         $this->registerArgument('table', 'string', 'The table of `row`, if the content element does not link it with an inline field', false, '');
     }

@@ -138,7 +138,8 @@ The arguments
     The record object the heading belongs to. The ViewHelper reads the tag from its field `header_tag` (with `subheader`
     from `subheader_tag`) and the layout from `header_layout`, and names the record for the page module: the table, the
     uid (in a translation the uid of the translation) and the field. A record without that field gives no mark, never
-    the mark of the content element. Anything that is no record object, an array for example, is ignored.
+    the mark of the content element. It takes a record object only (type `RecordInterface`): an array, such as `{data}` in a
+    template of `fluid_styled_content`, is refused with an error. Use `{record}` there; the values go in `tag` and `layout`.
 
 `tagField`
     The field of `record` that holds the tag, if it is not `header_tag` (or `subheader_tag`): `tagField="tag"` for a card.
@@ -148,7 +149,7 @@ The arguments
 
 `parent`, `offset`
     For a heading in a record that is not the content element, a card for example. `parent` is the record of the content
-    element (`{data}`: a record object, or the array of a content element). A heading that has no tag of its own (the
+    element (`{data}`: a record object, or the array of a content element; any other type is refused). A heading that has no tag of its own (the
     field is empty or missing) is then `offset` levels below the header of the parent, one by default, and not the
     default tag: `h3` under an `h2`, `h5` under an `h4`, a `div` below `h6`; a `div` stays a `div`. A negative `offset`
     goes up (never above `h1`). The tag an editor chose always wins, and a subheader ignores `parent`.

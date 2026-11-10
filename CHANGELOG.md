@@ -99,7 +99,7 @@ First release.
   `fluid_styled_content`, `{data}` or a card in a Content Block) the ViewHelper reads the tag (`header_tag`, with
   `subheader` `subheader_tag`, or the field `tagField` of any table) and the layout itself and names the record for the
   page module (table, uid, in a translation the uid of the translation, and the field), so a template needs no `tag`,
-  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record.
+  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record. `record` takes a record object (`RecordInterface`) and `parent` a record object or an array; Fluid refuses any other type.
   The header partial of the extension hands the record on instead of an `edit` of its own, so the headings of the core's
   content elements get the element too. `edit` still works and wins.
   With the record no wrapper is needed (see the next entry); `headliner:headline.children` is the wrapper for the values.
