@@ -23,8 +23,6 @@ use PhpParser\PhpVersion;
 use Symfony\Component\Finder\Finder;
 use TYPO3\CMS\Core\Core\ApplicationContext;
 use TYPO3\CMS\Core\Core\Environment;
-use TYPO3\CMS\Install\ExtensionScanner\Php\CodeStatistics;
-use TYPO3\CMS\Install\ExtensionScanner\Php\GeneratorClassesResolver;
 use TYPO3\CMS\Install\ExtensionScanner\Php\MatcherFactory;
 
 $options = getopt('', ['vendor::', 'path::', 'strict']);
@@ -90,6 +88,13 @@ $parseErrors = 0;
 $effectiveLines = 0;
 $report = [];
 
+// Two visitors moved from `...\Php` to `...\Php\Visitor` within TYPO3 14.3: use the ones the installed version has
+$visitorClass = static fn(string $name): string => class_exists('TYPO3\\CMS\\Install\\ExtensionScanner\\Php\\Visitor\\' . $name)
+    ? 'TYPO3\\CMS\\Install\\ExtensionScanner\\Php\\Visitor\\' . $name
+    : 'TYPO3\\CMS\\Install\\ExtensionScanner\\Php\\' . $name;
+$generatorClassesResolver = $visitorClass('GeneratorClassesResolver');
+$codeStatistics = $visitorClass('CodeStatistics');
+
 foreach ($files as $path) {
     $relative = ltrim(substr($path, strlen($extensionRoot)), '/');
     $parser = (new ParserFactory())->createForVersion(PhpVersion::fromComponents(8, 2));
@@ -107,8 +112,8 @@ foreach ($files as $path) {
     $statements = $traverser->traverse((array) $statements);
 
     $traverser = new NodeTraverser();
-    $traverser->addVisitor(new GeneratorClassesResolver());
-    $statistics = new CodeStatistics();
+    $traverser->addVisitor(new $generatorClassesResolver());
+    $statistics = new $codeStatistics();
     $traverser->addVisitor($statistics);
     $matchers = (new MatcherFactory())->createAll($matcherConfigurations);
     foreach ($matchers as $matcher) {
