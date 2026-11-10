@@ -57,40 +57,6 @@ final class HeaderTagTest extends TestCase
     }
 
     /**
-     * @return iterable<string, array{string, string|null}>
-     */
-    public static function subheaderProvider(): iterable
-    {
-        yield 'h1' => ['h1', 'h2'];
-        yield 'h5' => ['h5', 'h6'];
-        yield 'h6 has no level below' => ['h6', 'div'];
-        yield 'div stays div' => ['div', 'div'];
-    }
-
-    #[Test]
-    #[DataProvider('subheaderProvider')]
-    public function derivesTheSubheaderTagFromTheHeaderTag(string $tag, string $expected): void
-    {
-        self::assertSame($expected, HeaderTag::forSubheader($tag));
-        self::assertSame($expected, HeaderTag::forSubheader($tag, ''));
-        self::assertSame($expected, HeaderTag::forSubheader($tag, null));
-    }
-
-    #[Test]
-    public function usesTheChosenSubheaderTagInsteadOfTheDerivedOne(): void
-    {
-        self::assertSame('h5', HeaderTag::forSubheader('h1', 'h5'));
-        self::assertSame('div', HeaderTag::forSubheader('h2', 'div'));
-        self::assertSame('h2', HeaderTag::forSubheader('h2', 'h2'));
-    }
-
-    #[Test]
-    public function ignoresASubheaderTagThatIsNotAllowed(): void
-    {
-        self::assertSame('h3', HeaderTag::forSubheader('h2', 'span'));
-    }
-
-    /**
      * @return iterable<string, array{string, int, string}>
      */
     public static function shiftedProvider(): iterable

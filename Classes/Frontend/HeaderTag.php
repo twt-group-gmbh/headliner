@@ -44,15 +44,6 @@ final class HeaderTag
     }
 
     /**
-     * The tag of the subheader: the one the editor chose, otherwise one level below its header
-     * (below h6, or in a div, it is a div as well).
-     */
-    public static function forSubheader(string $headerTag, mixed $subheaderTag = null): string
-    {
-        return self::resolve($subheaderTag) ?? self::shifted($headerTag, 1);
-    }
-
-    /**
      * The tag the given number of levels below another (above, if negative): h2 and 2 is h4. Above h1 it stays h1, below
      * h6 it is a div, and a div stays a div.
      */

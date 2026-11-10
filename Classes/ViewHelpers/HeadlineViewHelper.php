@@ -43,16 +43,15 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
     public function initializeArguments(): void
     {
         parent::initializeArguments();
-        $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div');
+        $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. With "subheader" it is the tag of the subheader');
         $this->registerArgument('layout', 'string', 'The layout of the header (header_layout, 1-6): adds the CSS class ce-headline-layout-N and, for content without a tag, decides the tag');
         $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6 (defaultHeaderType), else h2');
-        $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header', false, false);
+        $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else the field subheader_tag of the record, else "offset" levels below the header of the parent or of the record', false, false);
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
         $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader"');
-        $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header. Not used for a subheader');
+        $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header; for a subheader without a parent it is its own record');
         $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" a heading without a tag of its own is (negative: above)', false, 1);
-        $this->registerArgument('subheaderTag', 'string', 'The tag chosen for the subheader; without it the subheader is one level below the header');
     }
 
     public function render(): string
@@ -61,18 +60,21 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $tagField = (string) ($this->arguments['tagField'] ?? '') !== ''
             ? (string) $this->arguments['tagField']
             : ($this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);
-        $layout = $this->arguments['layout'] ?? self::valueOf($record, 'header_layout');
         $own = $this->arguments['tag'] ?? self::valueOf($record, $tagField);
         $parent = $this->arguments['parent'];
 
+        // The header the level is counted from: the parent, or for a subheader its own record. The subheader has the
+        // layout of its header.
+        $reference = $this->arguments['subheader'] && !$parent instanceof RecordInterface && !is_array($parent) ? $record : $parent;
+        $layout = $this->arguments['layout'] ?? self::valueOf($this->arguments['subheader'] ? $reference : $record, 'header_layout');
         if ($this->arguments['subheader']) {
-            // one level below the header of the same record, unless the subheader has a tag of its own
-            $headerTag = HeaderTag::forContent($this->arguments['tag'] ?? self::valueOf($record, HeaderTag::FIELD), $layout, $this->arguments['default']);
-            $tag = HeaderTag::forSubheader($headerTag, $this->arguments['subheaderTag'] ?? self::valueOf($record, $tagField));
+            // the tag of the subheader, else `offset` levels below the header it belongs to
+            $headerTag = HeaderTag::forContent(self::valueOf($reference, HeaderTag::FIELD), $layout, $this->arguments['default']);
+            $tag = HeaderTag::resolve($own) ?? HeaderTag::shifted($headerTag, (int) $this->arguments['offset']);
         } elseif (HeaderTag::resolve($own) === null && ($parent instanceof RecordInterface || is_array($parent))) {
             // no tag of its own: below the header of the parent, not the default and not a layout of its own
-            $reference = HeaderTag::forContent(self::valueOf($parent, HeaderTag::FIELD), self::valueOf($parent, 'header_layout'), $this->arguments['default']);
-            $tag = HeaderTag::shifted($reference, (int) $this->arguments['offset']);
+            $headerTag = HeaderTag::forContent(self::valueOf($parent, HeaderTag::FIELD), self::valueOf($parent, 'header_layout'), $this->arguments['default']);
+            $tag = HeaderTag::shifted($headerTag, (int) $this->arguments['offset']);
         } else {
             $tag = HeaderTag::forContent($own, $layout, $this->arguments['default']);
         }

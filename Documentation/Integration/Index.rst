@@ -75,7 +75,7 @@ If you have only the values (the content element as an array, or a partial that 
         {record -> f:render.text(field: 'header')}
     </headliner:headline>
 
-    <headliner:headline subheader="1" tag="{data.header_tag}" subheaderTag="{data.subheader_tag}"
+    <headliner:headline subheader="1" tag="{data.subheader_tag}" parent="{data}"
                         layout="{data.header_layout}" default="{settings.defaultHeaderType}">
         {record -> f:render.text(field: 'subheader')}
     </headliner:headline>
@@ -152,7 +152,8 @@ The arguments
     element (`{data}`: a record object, or the array of a content element; any other type is refused). A heading that has no tag of its own (the
     field is empty or missing) is then `offset` levels below the header of the parent, one by default, and not the
     default tag: `h3` under an `h2`, `h5` under an `h4`, a `div` below `h6`; a `div` stays a `div`. A negative `offset`
-    goes up (never above `h1`). The tag an editor chose always wins, and a subheader ignores `parent`.
+    goes up (never above `h1`). The tag an editor chose always wins. With `subheader`, `parent` is the header the
+    subheader is counted from.
 
     ..  code-block:: html
 
@@ -163,9 +164,8 @@ The arguments
     This also keeps a forgotten or misspelled `tagField` from ending in an `h2` under an `h2`.
 
 `tag`
-    The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`. With
-    `subheader` it is the tag of the **header**, not of the subheader: the subheader is one level below it unless it has
-    a `subheaderTag` of its own.
+    The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`. It is the
+    tag of the heading itself, also with `subheader`: then the tag of the subheader.
 
 `layout`
     The layout of the header (`header_layout`, 1 to 6): how it should look, not what it is. It does two things. It adds
@@ -187,10 +187,12 @@ The arguments
     the record from `record`, or from the variable `data` of the content element if there is no `record`. It is rendered only for the request of the page module,
     never for visitors.
 
-`subheader`, `subheaderTag`
-    Render a subheader instead of the header. Without `subheaderTag` it is one level below the header, so pass the tag of
-    the header as `tag` (and its `layout`) as well. With a `subheaderTag` the subheader has exactly that tag, and `tag`
-    is not needed. With `record` you pass neither: the ViewHelper reads `header_tag` and `subheader_tag` itself.
+`subheader`
+    Render a subheader instead of the header. Its tag is `tag`, else the field `subheader_tag` of the `record`, else
+    `offset` levels (one by default) below the header it belongs to: the header of `parent`, or of the `record` if there
+    is no `parent`. With a record you pass nothing else (`record="{record}" subheader="1"`); with an array pass the
+    array as `parent` (`tag="{data.subheader_tag}" parent="{data}"`), so the header is known. A subheader has the
+    layout of its header.
 
 ..  _integration-children-arguments:
 

@@ -23,8 +23,8 @@
                 <f:then>
                     <f:render partial="Headliner/SubHeader" arguments="{
                         subheader: subheader,
-                        tag: data.header_tag,
-                        subheaderTag: data.subheader_tag,
+                        tag: data.subheader_tag,
+                        parent: data,
                         record: record,
                         layout: data.header_layout,
                         default: settings.defaultHeaderType,
@@ -33,7 +33,7 @@
                 <f:else>
                     <f:render partial="Headliner/SubHeader" arguments="{
                         subheader: subheader,
-                        tag: data.header_tag,
+                        parent: data,
                         layout: data.header_layout,
                         default: settings.defaultHeaderType,
                         positionClass: '{f:if(condition: data.header_position, then: \'ce-headline-{data.header_position}\')}'}" />

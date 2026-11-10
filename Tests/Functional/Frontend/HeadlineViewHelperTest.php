@@ -479,6 +479,46 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         $this->renderBelow('h2', ['tag' => '']);
     }
 
+    /**
+     * The template "Subheader": a subheader below `parent`, one with a tag of its own, one with an offset below its record.
+     *
+     * @param array<string, mixed> $parent
+     */
+    private function renderSubheader(array $parent, Record $element): string
+    {
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: new ServerRequest('https://website.local/', 'GET'),
+        ));
+        $view->assignMultiple(['parent' => $parent, 'element' => $element]);
+
+        return trim($view->render('Subheader'));
+    }
+
+    #[Test]
+    public function aSubheaderWithoutATagIsOneLevelBelowTheHeaderOfItsParent(): void
+    {
+        $html = $this->renderSubheader(['header_tag' => 'h4'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
+
+        self::assertStringContainsString('<h5>Below</h5>', $html);
+    }
+
+    #[Test]
+    public function theTagOfASubheaderIsItsOwnTagAndNotThatOfTheHeader(): void
+    {
+        $html = $this->renderSubheader(['header_tag' => 'h2'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
+
+        self::assertStringContainsString('<h6>Own</h6>', $html);
+    }
+
+    #[Test]
+    public function aSubheaderIsOffsetLevelsBelowItsHeader(): void
+    {
+        $html = $this->renderSubheader(['header_tag' => 'h2'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
+
+        self::assertStringContainsString('<h4>Offset</h4>', $html);
+    }
+
     #[Test]
     public function aSubheaderIgnoresTheParent(): void
     {
