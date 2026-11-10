@@ -99,18 +99,32 @@ What you need when
 
 ..  list-table::
     :header-rows: 1
-    :widths: 40 60
+    :widths: 36 34 30
 
     *   -   You have
-        -   Pass
-    *   -   The record of the content element (`{record}`, or `{data}` in a Content Block)
-        -   `record`
-    *   -   A record in a collection (a card) with its own tag field
-        -   `record` and `tagField`; in a Content Block also `parent="{data}"`, see below
-    *   -   Only values: an array, or a partial without a record
+        -   On `headliner:headline`
+        -   Around it
+    *   -   The content element as a record object (`{record}` of `fluid_styled_content`, `{data}` in a Content Block)
+        -   `record` (and `subheader="1"` for the subheader)
+        -   nothing
+    *   -   A record of a collection (a card) as a record object, with its own tag field
+        -   `record`, `tagField`, and `parent="{data}"` so a card without a tag is one level below the header
+        -   nothing
+    *   -   The same card, written with its values (`tag="{card.tag}"`)
+        -   `tag`
+        -   `headliner:headline.children record="{card}"`
+    *   -   A row as an array (`database-query`), turned into records with `record-transformation`
+        -   as for a record object
+        -   nothing
+    *   -   A row as an array that you keep
+        -   `tag`
+        -   `headliner:headline.children row="{item}"` (and `table` if the table cannot be found)
+    *   -   The content element as an array, or a partial that gets no record
         -   `tag`, `layout`, `default`, and `edit` (and `data`) for the page module
+        -   nothing
     *   -   No record at all (a step of a form, say)
         -   `tag`; there is no mark, so the page module cannot change it
+        -   nothing
 
 An argument that is given always wins over what the record says, so `tag`, `layout` and `edit` still work next to
 `record`. Without `record` and without `data` the ViewHelper renders the heading and names no record.
