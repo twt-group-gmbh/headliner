@@ -146,7 +146,18 @@ module is opened, so keep it quick. More in the documentation (Developer).
 
 The Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header and subheader with their tags. The
 headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for
-the headings in their rich text, if you wrap a record in `headliner:headline.children`:
+the headings in their rich text. Give the ViewHelper the record: it reads the tag and names the record for the page
+module itself, and `parent="{data}"` puts a card without a tag one level below the header of the element. Nothing
+else is needed, the headings in the rich text of the card are found by themselves:
+
+```html
+<f:for each="{data.cards}" as="card">
+    <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+    {card -> f:render.text(field: 'text')}
+</f:for>
+```
+
+Or pass the values and wrap the record in `headliner:headline.children`, which names the record for the page module:
 
 ```html
 <f:for each="{data.cards}" as="card">
@@ -157,14 +168,9 @@ the headings in their rich text, if you wrap a record in `headliner:headline.chi
 </f:for>
 ```
 
-Or give the ViewHelper the record instead of the values: it reads the tag and names the record for the page module
-itself, and `parent="{data}"` puts a card without a tag one level below the header of the element:
-
-```html
-<headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
-```
-
-The wrapper stays for the headings in rich text. See the documentation (Integration) for both ways.
+Both need a record object (a Content Block gives one). For rows as arrays (a data processor), turn them into records with
+the core's `record-transformation`, or keep them and pass each row as `row` (not `record`): the wrapper finds the table of a row from the inline field of the content element (`table="..."` if it cannot).
+See the documentation (Integration) for the differences.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 
@@ -176,7 +182,7 @@ The header partial keeps the `f:render.text` calls of the partial of `fluid_styl
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. For the content elements of the core headliner needs no ViewHelper in your templates; the ViewHelpers
 `headliner:headline` (with `record="{record}"`, or with the values `tag` and `layout`) and `headliner:headline.children`
-are for your own templates.
+(only for the values) are for your own templates.
 
 ### Themes with their own header
 

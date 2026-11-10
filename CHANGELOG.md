@@ -99,8 +99,16 @@ First release.
   `fluid_styled_content`, `{data}` or a card in a Content Block) the ViewHelper reads the tag (`header_tag`, with
   `subheader` `subheader_tag`, or the field `tagField` of any table) and the layout itself and names the record for the
   page module (table, uid, in a translation the uid of the translation, and the field), so a template needs no `tag`,
-  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record, and
-  `headliner:headline.children` is still the wrapper for the rich text of a record.
+  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record.
+  The header partial of the extension hands the record on instead of an `edit` of its own, so the headings of the core's
+  content elements get the element too. `edit` still works and wins.
+  With the record no wrapper is needed (see the next entry); `headliner:headline.children` is the wrapper for the values.
+- Headings in the rich text of a record object: for the request of the page module only, the record names itself in
+  every heading of its rich text fields (`data-headliner-record`, `data-headliner-field`, put into the field value when the
+  record is created, so it does not matter how the template renders the text), and the page module takes the content
+  element of the record from the inline field that links it. So `headliner:headline.children` is not needed with
+  `record="{card}"`; it stays for the values (`tag="{card.tag}"`). Rows as arrays (a data processor): turn them into
+  records with the core's `record-transformation`, or keep them and pass each row as `row` instead of `record`: the wrapper finds the table of a row from the inline field of the content element that links it (`table="tx_myext_item"` if that is not clear). `record` takes record objects only.
 - ViewHelper `headliner:headline`, the arguments `parent` and `offset`: for a heading in a record that is not the content
   element (a card), `parent="{data}"` makes a heading without a tag of its own `offset` levels (default one) below the
   header of the content element instead of the default tag (`h3` under an `h2`; a `div` below `h6`, a `div` stays a

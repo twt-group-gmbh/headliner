@@ -56,7 +56,7 @@ Child records (IRRE) have demos in `Build/Demo/`, two small TYPO3 extensions tha
   "Teaser list" with a child table made with plain TCA, its own site set and a Fluid template with
   `headliner:headline.children`. The page `/teaser` is seeded by `setup-demo-instance.sh`.
 - `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "cards", "recordcards" and "slider" with the Basic
-  `Twtgroup/Headline` ("recordcards" is "cards" once more, with `record="{card}" tagField="tag"` in the template instead of the values). NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
+  `Twtgroup/Headline` ("recordcards" is "cards" once more, with `record="{card}" tagField="tag"` and no wrapper in the template instead of the values). NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
   runs `composer require --dev` for them (this changes `composer.json` and `composer.lock` locally: do not commit it,
   `git checkout composer.json` takes it out). The script seeds `/cards`, `/cards-record` and `/slider` when the tables exist.
 The seed blocks for the demos only run if their tables exist, and unlike the older seeds they show SQL errors.
@@ -121,7 +121,11 @@ Tests split into two suites by what they need to boot:
   the box only believes it for a field that `TagField` says is a select of tags (h1-h6, div) - never for another field
   or table - and checks the rights for that table (`EditAccess::canEditFieldOf`). The record of a collection is not the
   element: it is saved in its own table, the edit link and the group are those of its content element.
-  `headliner:headline.children record="{card}"` marks the record around its content (`data-headliner-record`, plus the
+  `MarkRichTextHeadings` (listener on the core's `RecordCreationEvent`, only for `headliner.inspect`) writes
+  `data-headliner-record`/`-field` into the headings of the rich text fields of every record object, so a template with
+  `record="{card}"` needs no wrapper; `HeadingExtractor` reads the mark on the heading itself, and
+  `StructureBox::elementOfRecord()` finds the content element from the `foreign_field` of the inline field of `tt_content`.
+  `headliner:headline.children record="{card}"` (a row as an array goes in `row`, not `record`: `RowTable` finds the table from the inline field of the element, else `table="..."`; for the values, `tag="{card.tag}"`) marks the record around its content (`data-headliner-record`, plus the
   element from `data`); a headline inside it gets no automatic `edit` for the element's header. `StructureBox::resolveInRecord()`
   then finds the field of each heading in the record: the first not yet used heading of a rich text field with the same
   level and text, else the one tag field whose value is the rendered tag (ambiguous: a label). A rich text is only ever

@@ -4,7 +4,9 @@
 <f:comment>
     The same as the block "cards", but the ViewHelper gets the record and reads the tag, the layout and the mark for
     the page module from it: no tag="...", layout="..." or edit="..." anywhere. A card without a tag of its own is
-    one level below the header of the element (parent="{data}"), not an h2 under whatever the header is.
+    one level below the header of the element (parent="{data}"), not an h2 under whatever the header is. There is no
+    headliner:headline.children around a card either: the records tell the page module themselves which record a
+    heading in a rich text is in.
 </f:comment>
 <section class="cards">
     <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
@@ -12,12 +14,10 @@
         <headliner:headline record="{data}" default="2">{header}</headliner:headline>
     </f:if>
     <f:for each="{data.recordcards}" as="card">
-        <headliner:headline.children record="{card}">
-            <article class="card">
-                <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
-                {card -> f:render.text(field: 'text')}
-            </article>
-        </headliner:headline.children>
+        <article class="card">
+            <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+            {card -> f:render.text(field: 'text')}
+        </article>
     </f:for>
 </section>
 </html>

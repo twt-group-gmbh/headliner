@@ -192,8 +192,9 @@ TCA when it compiles a block, not the ones an extension adds in its TCA override
 Blocks is not a requirement of headliner: without it nothing reads the files.
 
 A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
-records of tables of their own. Wrap what is rendered for each record in `headliner:headline.children`. The headings
-can be written in the same two ways as above.
+records of tables of their own. The headings can be written in the same two ways as above, and the two differ in what
+the template does for the records of a collection: with the values, wrap what is rendered for each record in
+`headliner:headline.children`; with the record, nothing more is needed.
 
 With the values (`tag="{card.tag}"`):
 
@@ -224,23 +225,96 @@ tag (`parent="{data}"`):
     </f:if>
 
     <f:for each="{data.cards}" as="card">
-        <headliner:headline.children record="{card}">
-            <article class="card">
-                <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
-                {card -> f:render.text(field: 'text')}
-            </article>
-        </headliner:headline.children>
+        <article class="card">
+            <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+            {card -> f:render.text(field: 'text')}
+        </article>
     </f:for>
 
 Both are in the demo (`ddev demo --extras`): the block *Cards* at `/cards` with the values, *Cards with record* at
 `/cards-record` with the record. They give the same page and the same box.
 
-The wrapper is all it takes for the rich text: no `edit`. It stays with `record`, too: a heading in the rich text of a
-card never goes through `headliner:headline`, so only the wrapper tells the page module which record it is in.
+With the record there is no wrapper: the records tell the page module themselves. A heading in the rich text of a card
+is marked with its record and field when the record is created for the page module (a heading in a text never goes
+through `headliner:headline`, so the record is where the mark can come from), and the title has the record in
+`record="{card}"`. The same box comes out of both templates.
 
-Without the wrapper (and with `record`) the title of a card still gets its mark, its select and its place in the group of
-the content element. A heading in the rich text of a card is then only a plain row: no badge, no select, and not in the
-group. So you can leave the wrapper out if the rich text of your cards has no headings.
+With the values the wrapper stays: `tag="{card.tag}"` is only a value, so the wrapper is what names the record behind
+the title and the heading in the text.
+
+The two differ like this:
+
+..  list-table::
+    :header-rows: 1
+    :widths: 30 35 35
+
+    *   -
+        -   With the record
+        -   With the values
+    *   -   Wrapper `headliner:headline.children`
+        -   not needed
+        -   needed
+    *   -   Title of a card
+        -   `record="{card}" tagField="tag"`
+        -   `tag="{card.tag}"`
+    *   -   Heading in the rich text of a card
+        -   found by the mark of the record
+        -   found through the wrapper, by level and text
+    *   -   Data that is an array (`DatabaseQueryProcessor`, a partial with `data`)
+        -   turn it into records first (`record-transformation`), see below
+        -   the wrapper finds the table (or `table="..."`), see below
+
+The record is a *record object* in both ways: a Content Block gives one, `{record}` of `fluid_styled_content` is one, and
+so is `{record.field}` of such a record. The mark in the rich text is only made for a record object, and only for the
+request of the page module: a visitor gets the text as it is.
+
+..  _integration-arrays:
+
+Rows as arrays (data processors)
+--------------------------------
+
+A data processor such as `database-query` gives rows as arrays, and an array knows nothing of its table. Two ways:
+
+**Turn the rows into records** with the core's `record-transformation` processor, below `database-query`. Then everything
+above works as for a Content Block: `record="{item}"`, no wrapper.
+
+..  code-block:: typoscript
+
+    dataProcessing {
+        10 = database-query
+        10 {
+            as = items
+            table = tx_myext_item
+            pidInList.field = pid
+            dataProcessing {
+                10 = record-transformation
+                10 {
+                    table = tx_myext_item
+                    as = items
+                }
+            }
+        }
+    }
+
+**Or keep the arrays.** A row knows nothing of its table, but the wrapper finds it: the content element has an inline
+field for the table (its `foreign_table`), and the row points to the element with the `foreign_field` of that field. That
+is the case for the child records of a content element, so `table` is not needed there. It is when the answer is not
+clear (a row of another table, or two tables that the element links by the same column): then no mark is made, and you
+tell the wrapper with `table`. A row as an array goes in `row`, not in `record`: `record` takes record objects only, as in
+`headliner:headline`. The page module finds the heading of the rich text through the wrapper (by level and text), as
+with the values:
+
+..  code-block:: html
+
+    <f:for each="{items}" as="item">
+        <headliner:headline.children row="{item}">
+            <headliner:headline tag="{item.tag}">{item.title}</headliner:headline>
+            <f:format.html>{item.text}</f:format.html>
+        </headliner:headline.children>
+    </f:for>
+
+The uid of a translation (`_LOCALIZED_UID`) is used if the row has one. Without a table that can be found, or without a uid,
+there is no mark.
 
 ..  figure:: /Images/content-blocks-cards.png
     :alt: The box with the headings of a Content Block and of its cards
@@ -248,7 +322,7 @@ group. So you can leave the wrapper out if the rich text of your cards has no he
 
     The headings of a block and of its cards: the cards have the title of their table as badge, the heading in a text has the badge RTE.
 
-- For a visitor the wrapper changes nothing. For the page module it marks the record (`data-headliner-record`) and the
+- The rest of this list is about the wrapper. For a visitor it changes nothing. For the page module it marks the record (`data-headliner-record`) and the
   content element it belongs to (`data-headliner-element`, taken from `{data}`), so a Content Block, which has no frame
   `id="c12"` around its element, still gets the group and the badges.
 - The page module then finds the field of every heading in the record by itself: the **rich text** it is written in (a
@@ -269,7 +343,7 @@ group. So you can leave the wrapper out if the rich text of your cards has no he
 Child records without Content Blocks
 ====================================
 
-The wrapper and everything the page module does with it do not depend on Content Blocks. A content element with child
+The wrapper, the marks of the records and everything the page module does with them do not depend on Content Blocks. A content element with child
 records (inline, IRRE) made with the means of the core works the same way. This is the minimum:
 
 ..  code-block:: php
@@ -335,6 +409,8 @@ records (inline, IRRE) made with the means of the core works the same way. This 
 - The rules are the same as for Content Blocks (see above): the wrapper names the record and its content element, the page
   module finds the field of every heading (its rich text, or the field with its tag, which must be a select of tags and
   nothing else), and the badge is the title of the table (`ctrl.title`, here :guilabel:`Teaser`).
+- With `record="{item}" tagField="tag"` on the title instead of `tag="{item.tag}"` the wrapper is not needed here either,
+  as for Content Blocks (see above).
 - The tag of a record is saved in its own table with the rights of the backend user for it, so the editor needs to be
   allowed to modify `tx_myext_item`.
 
