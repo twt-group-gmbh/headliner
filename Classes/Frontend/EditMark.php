@@ -43,6 +43,20 @@ final class EditMark
     }
 
     /**
+     * A row as an array (from a data processor), which does not know its table: "table:uid", the translation by its own uid.
+     * NULL without a uid or with a table that is no TCA name.
+     *
+     * @param array<mixed> $row
+     */
+    public static function rowSource(array $row, string $table): ?string
+    {
+        // the frontend gives the original of a translation, with the uid of the translation beside it
+        $uid = (int) ($row['_LOCALIZED_UID'] ?? $row['uid'] ?? 0);
+
+        return $uid > 0 && preg_match('/^[a-z][a-z0-9_]*$/', $table) === 1 ? $table . ':' . $uid : null;
+    }
+
+    /**
      * The field of a record that holds a tag, "table:uid:field", for any record object (a content element, a card of a
      * Content Block). NULL if the record has no such field: a mark for a field that is not there would only send the
      * page module to look for it.

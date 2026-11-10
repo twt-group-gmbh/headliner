@@ -94,8 +94,27 @@ final class EditMarkTest extends TestCase
     public function aRecordIsOnlyNamedForARecordObject(): void
     {
         self::assertNull(EditMark::recordSource(null));
+        // a row as an array is no record: it is named with rowSource() and its table
         self::assertNull(EditMark::recordSource(['uid' => 7, 'CType' => 'text']));
         self::assertNull(EditMark::recordSource('cards'));
+    }
+
+    #[Test]
+    public function anArrayIsNamedWithTheTableThatIsGiven(): void
+    {
+        self::assertSame('cards:7', EditMark::rowSource(['uid' => 7, 'title' => 'A'], 'cards'));
+        // the frontend gives the original of a translation, with the uid of the translation beside it
+        self::assertSame('cards:70', EditMark::rowSource(['uid' => 7, '_LOCALIZED_UID' => 70], 'cards'));
+    }
+
+    #[Test]
+    public function anArrayIsNotNamedWithoutATableOrAUid(): void
+    {
+        self::assertNull(EditMark::rowSource(['uid' => 7], ''));
+        self::assertNull(EditMark::rowSource(['title' => 'A'], 'cards'));
+        self::assertNull(EditMark::rowSource(['uid' => 0], 'cards'));
+        // a table is a TCA name, nothing that could break out of the attribute
+        self::assertNull(EditMark::rowSource(['uid' => 7], 'Cards"><x'));
     }
 
     #[Test]

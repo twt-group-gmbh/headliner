@@ -19,7 +19,10 @@ use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
  */
 final class HeadlineViewHelperTest extends FunctionalTestCase
 {
-    protected array $testExtensionsToLoad = ['twtgroup/headliner'];
+    protected array $testExtensionsToLoad = [
+        'twtgroup/headliner',
+        __DIR__ . '/../Fixtures/Extensions/headliner_test_cards',
+    ];
 
     /**
      * @param array<string, mixed>|Record $data
@@ -175,10 +178,72 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
+    public function aRowAsAnArrayIsNoRecordForTheRecordArgument(): void
+    {
+        // an array goes in `row`, with its table: `record` takes record objects only
+        self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), ['uid' => 7, 'title' => 'A']));
+    }
+
+    #[Test]
     public function withoutARecordThereIsNoMark(): void
     {
         self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), null));
         self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $this->renderCard(true, self::content(), null));
+    }
+
+    /**
+     * @param array<string, mixed> $card
+     * @param array<string, mixed> $data
+     */
+    private function renderArrayCard(bool $forThePageModule, string $table, array $card, array $data = []): string
+    {
+        $request = new ServerRequest('https://website.local/', 'GET');
+        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: $request,
+        ));
+        $view->assignMultiple(['card' => $card, 'table' => $table, 'data' => $data]);
+
+        return trim($view->render('ArrayCard'));
+    }
+
+    #[Test]
+    public function aRowAsAnArrayIsMarkedWithTheTableThatIsGiven(): void
+    {
+        $html = $this->renderArrayCard(true, 'cards', ['uid' => 7, 'title' => 'A card']);
+
+        self::assertStringContainsString('data-headliner-record="cards:7"', $html);
+        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $html);
+    }
+
+    #[Test]
+    public function theTableOfARowIsFoundFromTheFieldOfTheElementThatLinksIt(): void
+    {
+        // no `table`: the element has an inline field for that table, and the row points to the element with its foreign_field
+        $html = $this->renderArrayCard(true, '', ['uid' => 7, 'parent' => 21], ['uid' => 21, 'CType' => 'text']);
+
+        self::assertStringContainsString('data-headliner-record="tx_headlinertestcards_card:7"', $html);
+    }
+
+    #[Test]
+    public function theTableOfARowThatPointsToAnotherElementIsNotGuessed(): void
+    {
+        $html = $this->renderArrayCard(true, '', ['uid' => 7, 'parent' => 99], ['uid' => 21, 'CType' => 'text']);
+
+        self::assertStringNotContainsString('data-headliner-record', $html);
+    }
+
+    #[Test]
+    public function aRowAsAnArrayWithoutATableHasNoMark(): void
+    {
+        self::assertStringNotContainsString('data-headliner-record', $this->renderArrayCard(true, '', ['uid' => 7]));
+    }
+
+    #[Test]
+    public function aVisitorGetsTheRowAsAnArrayWithoutMarks(): void
+    {
+        self::assertStringNotContainsString('data-headliner', $this->renderArrayCard(false, 'cards', ['uid' => 7]));
     }
 
     /**
