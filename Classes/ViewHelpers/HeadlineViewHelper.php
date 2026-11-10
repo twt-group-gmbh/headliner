@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Domain\RecordInterface;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
-use Twtgroup\Headliner\Backend\TagField;
+use Twtgroup\Headliner\Schema\TagField;
 use Twtgroup\Headliner\Frontend\EditMark;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Middleware\InspectRequest;

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Twtgroup\Headliner\Tests\Functional\Backend;
+namespace Twtgroup\Headliner\Tests\Functional\Schema;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
-use Twtgroup\Headliner\Backend\TagField;
+use Twtgroup\Headliner\Schema\TagField;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\TestingFramework\Core\Functional\FunctionalTestCase;
 

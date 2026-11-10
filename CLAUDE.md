@@ -118,7 +118,7 @@ Tests split into two suites by what they need to boot:
 - A heading names its content element itself (`data-headliner-element`, written by the ViewHelper from `data`, an array or a
   record object), so Content Blocks, which have no frame `id="cNN"`, get groups and badges. `edit` can name a record of
   another table (a card of a collection). The mark is part of the rendered page and an editor can write to it (RTE), so
-  the box only believes it for a field that `TagField` says is a select of tags (h1-h6, div) - never for another field
+  the box only believes it for a field that `Schema\TagField` says is a select of tags (h1-h6, div) - never for another field
   or table - and checks the rights for that table (`EditAccess::canEditFieldOf`). The record of a collection is not the
   element: it is saved in its own table, the edit link and the group are those of its content element.
   `MarkRichTextHeadings` (listener on the core's `RecordCreationEvent`, only for `headliner.inspect`) writes

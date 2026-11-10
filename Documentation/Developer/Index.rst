@@ -46,7 +46,7 @@ How the structure is checked
     `StructureBox` then finds the field of each heading in the record (`resolveInRecord()`: the rich text, or the one
     field with its tag) and, for a record without a wrapper that names its element, the content element it is linked to
     from the inline field of `tt_content` (`elementOfRecord()`). The box only believes a mark for a field that
-    `TagField` says is a select of tags, on its own page, and for a table the user may edit.
+    `Schema\TagField` says is a select of tags, on its own page, and for a table the user may edit.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.
 

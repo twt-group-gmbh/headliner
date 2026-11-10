@@ -27,7 +27,7 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use Twtgroup\Headliner\Backend\RteHeadingEditor;
 use Twtgroup\Headliner\Backend\StructureBox;
-use Twtgroup\Headliner\Backend\TagField;
+use Twtgroup\Headliner\Schema\TagField;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;
 use Twtgroup\Headliner\Structure\PageHtmlFetcher;

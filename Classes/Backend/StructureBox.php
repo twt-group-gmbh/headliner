@@ -22,6 +22,7 @@ use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 use Twtgroup\Headliner\Event\ModifyHeadingIssuesEvent;
 use Twtgroup\Headliner\Frontend\HeaderTag;
+use Twtgroup\Headliner\Schema\TagField;
 use Twtgroup\Headliner\Structure\Heading;
 use Twtgroup\Headliner\Structure\HeadingExtractor;
 use Twtgroup\Headliner\Structure\HeadingValidator;

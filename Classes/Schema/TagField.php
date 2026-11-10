@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Twtgroup\Headliner\Backend;
+namespace Twtgroup\Headliner\Schema;
 
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 
@@ -11,7 +11,7 @@ use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
  * the empty choice that leaves the tag to the layout.
  * The mark `data-headliner-edit="table:uid:field"` is part of the rendered page, and an editor can write to that (in a
  * rich text, for example), so the box only believes it where the field is such a select, and never offers a change to
- * another field.
+ * another field. The ViewHelper uses it too, to find the one tag field of a record.
  */
 final readonly class TagField
 {
