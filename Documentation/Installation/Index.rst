@@ -18,20 +18,36 @@ The extension can also be installed from the
 
 ..  _installation-site-set:
 
-Add the site set
-================
+Add a site set
+==============
 
-The tags and CSS classes in the frontend come from a site set that overrides the header partial of
-`fluid_styled_content`. Add it to your site, after `fluid_styled_content`:
+Headliner has two site sets. Add the one that fits your site, in :guilabel:`Sites > Setup` or in the configuration of the
+site:
 
-..  code-block:: yaml
-    :caption: config/sites/<identifier>/config.yaml
+:file:`twtgroup/headliner-fluid-styled-content`
+    For a site that uses `fluid_styled_content`. It overrides the header partial, so the tags and CSS classes of the
+    content elements of the core come from the fields of Headliner, and it includes the set below. It depends on
+    `fluid_styled_content`, which is added with it.
 
-    dependencies:
-      - typo3/fluid-styled-content
-      - twtgroup/headliner
+    ..  code-block:: yaml
+        :caption: config/sites/<identifier>/config.yaml
 
-You can also select the set in :guilabel:`Sites > Setup`.
+        dependencies:
+          - twtgroup/headliner-fluid-styled-content
+
+:file:`twtgroup/headliner`
+    For a site **without** `fluid_styled_content` (only Content Blocks, say, or templates of your own). It has the site
+    settings and the page TSconfig and needs nothing else. It changes no template: the tags in the frontend come from
+    the ViewHelper `headliner:headline` in your own templates (see :ref:`integration-own-templates`). The box in the page
+    module works the same.
+
+    ..  code-block:: yaml
+        :caption: config/sites/<identifier>/config.yaml
+
+        dependencies:
+          - twtgroup/headliner
+
+`fluid_styled_content` is therefore optional: only the first set needs it. Add one of the two, not both.
 
 ..  note::
 

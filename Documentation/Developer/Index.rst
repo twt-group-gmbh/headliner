@@ -167,7 +167,7 @@ Tests
 
 The JavaScript tests (`ddev test js`, Vitest with jsdom) cover :file:`headlines.js`: loading the box, the reload after
 changes, collapsing, and changing a tag. The unit tests need no TYPO3 bootstrap. The functional tests render the frontend through the real application, with the
-site sets of `fluid_styled_content` and of the extension, and use the testing framework: the tag and layout of the
+site set of the extension for `fluid_styled_content`, and use the testing framework: the tag and layout of the
 headers, the subheader and its site setting, the marks for the page module (which a visitor and a request with a header
 from outside must never get), the page cache, the fields and the sub-request of the page module.
 

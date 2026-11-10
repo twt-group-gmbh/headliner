@@ -42,7 +42,7 @@ choose the HTML tag of the headers of content elements separately from their loo
 
     ..  card:: Installation
 
-        Install the extension and add the site set.
+        Install the extension and add a site set, with or without fluid_styled_content.
 
         ..  card-footer:: :ref:`Read more <installation>`
             :button-style: btn btn-secondary stretched-link

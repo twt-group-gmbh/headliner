@@ -67,8 +67,8 @@ still in the database and there is something to change.
 
 What is left to do by hand:
 
-#.  Remove the Semantilizer (`composer remove zeroseven/z7-semantilizer`) and add the site set of headliner after
-    `fluid_styled_content` (see :ref:`installation`).
+#.  Remove the Semantilizer (`composer remove zeroseven/z7-semantilizer`) and add the site set
+    `twtgroup/headliner-fluid-styled-content` of headliner (see :ref:`installation`).
 #.  Change the templates that use `<semantilizer:headline>` to `<headliner:headline>` (see :ref:`integration-own-templates`).
     The simplest is `record="{record}"` (`record="{record}" subheader="1"` for the subheader): the tag, the layout and the
     mark for the page module come from the record. With the values it is `tag="{data.header_tag}"` instead of

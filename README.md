@@ -85,8 +85,14 @@ install it with the Extension Manager.
 
 ## Setup
 
-Add the site set **Headliner** (`twtgroup/headliner`) to your site, after `fluid_styled_content`: it overrides the
-header partial of `fluid_styled_content`.
+Add a site set to your site. Headliner has two, and `fluid_styled_content` is optional:
+
+| Site set                                        | For | What it does |
+|-------------------------------------------------|-----|--------------|
+| `twtgroup/headliner-fluid-styled-content`       | a site that uses `fluid_styled_content` | Overrides the header partial of `fluid_styled_content`, so its content elements use the fields *Tag* and *Subheader tag*. Includes the set below and depends on `fluid_styled_content`. |
+| `twtgroup/headliner`                            | a site without `fluid_styled_content` | The site settings and the page TSconfig only. The tags in the frontend come from the ViewHelper in your own templates. |
+
+Add one of them, not both. The box in the page module works the same with either.
 
 > [!NOTE]
 > Content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
@@ -225,6 +231,7 @@ See the documentation for what is left to do by hand.
 
 - PHP **8.3+**
 - TYPO3 **14.3 LTS**
+- Optional: `fluid_styled_content`, for the site set `twtgroup/headliner-fluid-styled-content`
 
 ## Contributing
 
