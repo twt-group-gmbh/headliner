@@ -157,6 +157,10 @@ the headings in their rich text, if you wrap a record in `headliner:headline.chi
 </f:for>
 ```
 
+Instead of the values, the ViewHelper can take the record and read the tag and the record for the page module itself
+(`record="{card}" tagField="tag"`; `parent="{data}"` puts a card without a tag one level below the header of the
+element). The wrapper stays for the headings in rich text. See the documentation (Integration) for both ways.
+
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 
 The same works for child records made with the means of the core. See the documentation (Integration).

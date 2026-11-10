@@ -35,47 +35,23 @@ The tag comes from :guilabel:`Tag`, the class from :guilabel:`Type`. Style the c
 Your own templates
 ==================
 
-If your templates render the header themselves, use the ViewHelper:
+If your templates render the header themselves, use the ViewHelper. There are two ways to write it, and both give the
+same page: with the **record**, or with the **values** of its fields.
+
+..  _integration-with-record:
+
+With the record
+---------------
+
+The record object is `{record}` in a template of `fluid_styled_content` and `{data}` in a Content Block. The ViewHelper
+reads the tag and the layout from it and names the record for the page module, so there is no `tag`, no `layout` and no
+`edit`:
 
 ..  code-block:: html
 
     <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
           xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
           data-namespace-typo3-fluid="true">
-
-    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}"
-                        default="{settings.defaultHeaderType}">
-        {record -> f:render.text(field: 'header')}
-    </headliner:headline>
-
-A subheader is rendered the same way, with `subheader`:
-
-..  code-block:: html
-
-    <headliner:headline subheader="1" tag="{data.header_tag}" subheaderTag="{data.subheader_tag}"
-                        layout="{data.header_layout}" default="{settings.defaultHeaderType}">
-        {record -> f:render.text(field: 'subheader')}
-    </headliner:headline>
-
-..  important::
-
-    Keep `{record -> f:render.text(field: ...)}` for the text, as in the examples. That is how
-    `visual_editor <https://github.com/FriendsOfTYPO3/visual_editor>`__ finds the text to edit; with a plain
-    `{data.header}` the heading is still rendered, but `visual_editor` cannot edit it.
-
-..  note::
-
-    The page module finds the record behind a header by the mark `data-headliner-edit`. The ViewHelper adds it itself,
-    for the page module only, from the variable `data` of the content element (an array, or a record object as a Content Block
-    has it): its uid (in a translation the uid of
-    the translation, `data._LOCALIZED_UID`) and the field, `header_tag` or, with `subheader`, `subheader_tag`. You do not
-    have to pass `edit`. Pass it only if the ViewHelper is used where there is no `data` (a partial gets only the
-    arguments it is given, so pass `data` to it).
-
-With the record object, which a template of `fluid_styled_content` has as `{record}` and a Content Block as `{data}`, the
-ViewHelper reads the tag and the layout itself and needs no `tag`, `layout` or `edit`:
-
-..  code-block:: html
 
     <headliner:headline record="{record}" default="{settings.defaultHeaderType}">
         {record -> f:render.text(field: 'header')}
@@ -85,11 +61,64 @@ ViewHelper reads the tag and the layout itself and needs no `tag`, `layout` or `
         {record -> f:render.text(field: 'subheader')}
     </headliner:headline>
 
+..  _integration-with-values:
+
+With the values
+---------------
+
+If you have only the values (the content element as an array, or a partial that gets no record), pass them yourself:
+
+..  code-block:: html
+
+    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}"
+                        default="{settings.defaultHeaderType}">
+        {record -> f:render.text(field: 'header')}
+    </headliner:headline>
+
+    <headliner:headline subheader="1" tag="{data.header_tag}" subheaderTag="{data.subheader_tag}"
+                        layout="{data.header_layout}" default="{settings.defaultHeaderType}">
+        {record -> f:render.text(field: 'subheader')}
+    </headliner:headline>
+
+The page module finds the record behind a header by the mark `data-headliner-edit`. Here the ViewHelper adds it itself,
+for the page module only, from the variable `data` of the content element (an array, or a record object as a Content
+Block has it): its uid (in a translation the uid of the translation, `data._LOCALIZED_UID`) and the field,
+`header_tag` or, with `subheader`, `subheader_tag`. You do not have to pass `edit`. Pass it only if the ViewHelper is
+used where there is no `data` (a partial gets only the arguments it is given, so pass `data` to it).
+
 ..  important::
 
-    When to use what: pass `record` whenever you have the record object. Pass `edit` only where there is none (the values
-    are an array, or a heading belongs to a record that you cannot pass). An argument that is given always wins over what
-    the record says, so `tag`, `layout` and `edit` still work next to `record`.
+    Keep `{record -> f:render.text(field: ...)}` for the text, in both ways. That is how
+    `visual_editor <https://github.com/FriendsOfTYPO3/visual_editor>`__ finds the text to edit; with a plain
+    `{data.header}` the heading is still rendered, but `visual_editor` cannot edit it.
+
+..  _integration-which-arguments:
+
+What you need when
+------------------
+
+..  list-table::
+    :header-rows: 1
+    :widths: 40 60
+
+    *   -   You have
+        -   Pass
+    *   -   The record of the content element (`{record}`, or `{data}` in a Content Block)
+        -   `record`
+    *   -   A record in a collection (a card) with its own tag field
+        -   `record` and `tagField`; in a Content Block also `parent="{data}"`, see below
+    *   -   Only values: an array, or a partial without a record
+        -   `tag`, `layout`, `default`, and `edit` (and `data`) for the page module
+    *   -   No record at all (a step of a form, say)
+        -   `tag`; there is no mark, so the page module cannot change it
+
+An argument that is given always wins over what the record says, so `tag`, `layout` and `edit` still work next to
+`record`. Without `record` and without `data` the ViewHelper renders the heading and names no record.
+
+..  _integration-arguments:
+
+The arguments
+-------------
 
 `record`
     The record object the heading belongs to. The ViewHelper reads the tag from its field `header_tag` (with `subheader`
@@ -99,6 +128,9 @@ ViewHelper reads the tag and the layout itself and needs no `tag`, `layout` or `
 
 `tagField`
     The field of `record` that holds the tag, if it is not `header_tag` (or `subheader_tag`): `tagField="tag"` for a card.
+    If the record has no such field (a card with `tag`, but no `tagField`), the ViewHelper does not say so: the heading
+    gets the default tag and no mark, so the page module cannot change it. With `parent` it is one level below the
+    header instead of the default.
 
 `parent`, `offset`
     For a heading in a record that is not the content element, a card for example. `parent` is the record of the content
@@ -156,7 +188,10 @@ TCA when it compiles a block, not the ones an extension adds in its TCA override
 Blocks is not a requirement of headliner: without it nothing reads the files.
 
 A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
-records of tables of their own. Wrap what is rendered for each record in `headliner:headline.children`:
+records of tables of their own. Wrap what is rendered for each record in `headliner:headline.children`. The headings
+can be written in the same two ways as above.
+
+With the values (`tag="{card.tag}"`):
 
 ..  code-block:: html
 
@@ -174,7 +209,34 @@ records of tables of their own. Wrap what is rendered for each record in `headli
         </headliner:headline.children>
     </f:for>
 
-The wrapper is all it takes: no `edit`, and nothing for the rich text.
+With the record (`record="{card}" tagField="tag"`), and one level below the header of the element for a card without a
+tag (`parent="{data}"`):
+
+..  code-block:: html
+
+    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
+    <f:if condition="{header}">
+        <headliner:headline record="{data}" default="2">{header}</headliner:headline>
+    </f:if>
+
+    <f:for each="{data.cards}" as="card">
+        <headliner:headline.children record="{card}">
+            <article class="card">
+                <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+                {card -> f:render.text(field: 'text')}
+            </article>
+        </headliner:headline.children>
+    </f:for>
+
+Both are in the demo (`ddev demo --extras`): the block *Cards* at `/cards` with the values, *Cards with record* at
+`/cards-record` with the record. They give the same page and the same box.
+
+The wrapper is all it takes for the rich text: no `edit`. It stays with `record`, too: a heading in the rich text of a
+card never goes through `headliner:headline`, so only the wrapper tells the page module which record it is in.
+
+Without the wrapper (and with `record`) the title of a card still gets its mark, its select and its place in the group of
+the content element. A heading in the rich text of a card is then only a plain row: no badge, no select, and not in the
+group. So you can leave the wrapper out if the rich text of your cards has no headings.
 
 ..  figure:: /Images/content-blocks-cards.png
     :alt: The box with the headings of a Content Block and of its cards
