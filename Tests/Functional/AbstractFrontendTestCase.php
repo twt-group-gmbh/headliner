@@ -82,7 +82,7 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
         if (is_dir(Environment::getConfigPath() . '/sites/test')) {
             $siteWriter->delete('test');
         }
-        $siteWriter->createNewBasicSite('test', 1, 'https://website.local/', ['typo3/fluid-styled-content', 'twtgroup/headliner']);
+        $siteWriter->createNewBasicSite('test', 1, 'https://website.local/', ['twtgroup/headliner-fluid-styled-content']);
         if ($settings !== []) {
             $siteWriter->writeSettings('test', $settings);
         }

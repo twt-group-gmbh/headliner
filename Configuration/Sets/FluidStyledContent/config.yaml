@@ -1,0 +1,5 @@
+name: twtgroup/headliner-fluid-styled-content
+label: Headliner for fluid_styled_content
+dependencies:
+  - typo3/fluid-styled-content
+  - twtgroup/headliner

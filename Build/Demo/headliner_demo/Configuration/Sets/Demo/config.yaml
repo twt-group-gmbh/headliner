@@ -1,5 +1,4 @@
 name: twtgroup/headliner-demo
 label: Headliner demo content
 dependencies:
-  - typo3/fluid-styled-content
-  - twtgroup/headliner
+  - twtgroup/headliner-fluid-styled-content

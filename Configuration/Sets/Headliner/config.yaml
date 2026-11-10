@@ -1,4 +1,2 @@
 name: twtgroup/headliner
 label: Headliner
-dependencies:
-  - typo3/fluid-styled-content
