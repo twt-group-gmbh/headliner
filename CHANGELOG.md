@@ -95,6 +95,12 @@ First release.
   of `header_layout`), and the layout "Hidden" hides the header and the subheader.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the
   backend of that site and the subheader follows the tag of the header (one level below).
+- ViewHelper `headliner:headline`, the arguments `record` and `tagField`: with the record object (`{record}` in a template of
+  `fluid_styled_content`, `{data}` or a card in a Content Block) the ViewHelper reads the tag (`header_tag`, with
+  `subheader` `subheader_tag`, or the field `tagField` of any table) and the layout itself and names the record for the
+  page module (table, uid, in a translation the uid of the translation, and the field), so a template needs no `tag`,
+  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record, and
+  `headliner:headline.children` is still the wrapper for the rich text of a record.
 - ViewHelper `headliner:headline`: the argument `edit` is optional now. Without it the ViewHelper names the record behind
   the header itself, for the page module only, from the variable `data` of the content element, an array or a record object as a Content Block has it (in a translation the uid of
   the translation). Own templates need nothing but `tag` and `layout`.

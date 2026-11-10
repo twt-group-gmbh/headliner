@@ -97,4 +97,23 @@ final class EditMarkTest extends TestCase
         self::assertNull(EditMark::recordSource(['uid' => 7, 'CType' => 'text']));
         self::assertNull(EditMark::recordSource('cards'));
     }
+
+    #[Test]
+    public function namesTheTagFieldOfARecordOfAnyTable(): void
+    {
+        $card = new Record(new RawRecord(7, 1, ['tag' => 'h3'], new ComputedProperties(localizedUid: 70), 'cards'), ['tag' => 'h3']);
+
+        self::assertSame('cards:70:tag', EditMark::forRecord($card, 'tag'));
+        self::assertSame('tt_content:12:header_tag', EditMark::forRecord(new Record(new RawRecord(12, 1, ['header_tag' => 'h2'], new ComputedProperties(), 'tt_content.text'), ['header_tag' => 'h2']), 'header_tag'));
+    }
+
+    #[Test]
+    public function namesNothingForAFieldTheRecordDoesNotHave(): void
+    {
+        $card = new Record(new RawRecord(7, 1, ['title' => 'A'], new ComputedProperties(), 'cards'), ['title' => 'A']);
+
+        self::assertNull(EditMark::forRecord($card, 'tag'));
+        self::assertNull(EditMark::forRecord(['uid' => 7, 'tag' => 'h3'], 'tag'));
+        self::assertNull(EditMark::forRecord(null, 'tag'));
+    }
 }

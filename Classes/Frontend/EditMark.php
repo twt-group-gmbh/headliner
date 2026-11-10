@@ -43,6 +43,18 @@ final class EditMark
     }
 
     /**
+     * The field of a record that holds a tag, "table:uid:field", for any record object (a content element, a card of a
+     * Content Block). NULL if the record has no such field: a mark for a field that is not there would only send the
+     * page module to look for it.
+     */
+    public static function forRecord(mixed $record, string $field): ?string
+    {
+        $source = self::recordSource($record);
+
+        return $source !== null && $record instanceof RecordInterface && $record->has($field) ? $source . ':' . $field : null;
+    }
+
+    /**
      * The uid of the content element the data is of (the translation in a translation), NULL if it is none.
      *
      * @param mixed $data See forContent()

@@ -72,6 +72,34 @@ A subheader is rendered the same way, with `subheader`:
     have to pass `edit`. Pass it only if the ViewHelper is used where there is no `data` (a partial gets only the
     arguments it is given, so pass `data` to it).
 
+With the record object, which a template of `fluid_styled_content` has as `{record}` and a Content Block as `{data}`, the
+ViewHelper reads the tag and the layout itself and needs no `tag`, `layout` or `edit`:
+
+..  code-block:: html
+
+    <headliner:headline record="{record}" default="{settings.defaultHeaderType}">
+        {record -> f:render.text(field: 'header')}
+    </headliner:headline>
+
+    <headliner:headline record="{record}" subheader="1" default="{settings.defaultHeaderType}">
+        {record -> f:render.text(field: 'subheader')}
+    </headliner:headline>
+
+..  important::
+
+    When to use what: pass `record` whenever you have the record object. Pass `edit` only where there is none (the values
+    are an array, or a heading belongs to a record that you cannot pass). An argument that is given always wins over what
+    the record says, so `tag`, `layout` and `edit` still work next to `record`.
+
+`record`
+    The record object the heading belongs to. The ViewHelper reads the tag from its field `header_tag` (with `subheader`
+    from `subheader_tag`) and the layout from `header_layout`, and names the record for the page module: the table, the
+    uid (in a translation the uid of the translation) and the field. A record without that field gives no mark, never
+    the mark of the content element. Anything that is no record object, an array for example, is ignored.
+
+`tagField`
+    The field of `record` that holds the tag, if it is not `header_tag` (or `subheader_tag`): `tagField="tag"` for a card.
+
 `tag`
     The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`.
 
@@ -83,7 +111,7 @@ A subheader is rendered the same way, with `subheader`:
 
 `edit`
     Optional. `table:uid:field`. Lets the page module find the record behind a heading. Without it the ViewHelper takes
-    the record from the variable `data` of the content element. It is rendered only for the request of the page module,
+    the record from `record`, or from the variable `data` of the content element if there is no `record`. It is rendered only for the request of the page module,
     never for visitors.
 
 `subheader`, `subheaderTag`
@@ -152,7 +180,7 @@ The wrapper is all it takes: no `edit`, and nothing for the rich text.
   changed in a rich text field. The page module ignores anything else: the marks are part of the rendered page, which an
   editor can write to.
 - If a record has two tag fields with the same value, the page module cannot tell which one a heading was rendered with,
-  and shows it as a label. Then name the field with `edit` (`{card.mainType}:{card.uid}:tag`).
+  and shows it as a label. Then name the field: pass the card as `record` and the field as `tagField` (`record="{card}" tagField="tag"`), or with `edit` (`{card.mainType}:{card.uid}:tag`).
 - The wrapper can be nested (a collection in a collection): a heading belongs to the nearest wrapper around it.
 
 ..  _integration-core-records:

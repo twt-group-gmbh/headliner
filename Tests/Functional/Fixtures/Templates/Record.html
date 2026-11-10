@@ -1,0 +1,10 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<headliner:headline record="{record}">Header</headliner:headline>
+<headliner:headline record="{record}" subheader="1">Subheader</headliner:headline>
+<headliner:headline record="{card}" tagField="tag">Card</headliner:headline>
+<headliner:headline record="{record}" tag="h5" subheader="1" subheaderTag="h6">Explicit</headliner:headline>
+<headliner:headline record="{record}" edit="tt_content:99:header_tag">Edit</headliner:headline>
+<headliner:headline record="{notARecord}">Array</headliner:headline>
+</html>
