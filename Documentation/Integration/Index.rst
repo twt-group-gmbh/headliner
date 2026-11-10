@@ -148,7 +148,9 @@ The arguments
     This also keeps a forgotten or misspelled `tagField` from ending in an `h2` under an `h2`.
 
 `tag`
-    The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`.
+    The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`. With
+    `subheader` it is the tag of the **header**, not of the subheader: the subheader is one level below it unless it has
+    a `subheaderTag` of its own.
 
 `layout`
     The layout of the header. Only used for the CSS class `ce-headline-layout-N`.
@@ -162,7 +164,9 @@ The arguments
     never for visitors.
 
 `subheader`, `subheaderTag`
-    Render a subheader instead of the header. Without `subheaderTag` it is one level below the header.
+    Render a subheader instead of the header. Without `subheaderTag` it is one level below the header, so pass the tag of
+    the header as `tag` (and its `layout`) as well. With a `subheaderTag` the subheader has exactly that tag, and `tag`
+    is not needed. With `record` you pass neither: the ViewHelper reads `header_tag` and `subheader_tag` itself.
 
 ..  _integration-content-blocks:
 

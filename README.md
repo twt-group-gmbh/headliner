@@ -157,9 +157,14 @@ the headings in their rich text, if you wrap a record in `headliner:headline.chi
 </f:for>
 ```
 
-Instead of the values, the ViewHelper can take the record and read the tag and the record for the page module itself
-(`record="{card}" tagField="tag"`; `parent="{data}"` puts a card without a tag one level below the header of the
-element). The wrapper stays for the headings in rich text. See the documentation (Integration) for both ways.
+Or give the ViewHelper the record instead of the values: it reads the tag and names the record for the page module
+itself, and `parent="{data}"` puts a card without a tag one level below the header of the element:
+
+```html
+<headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+```
+
+The wrapper stays for the headings in rich text. See the documentation (Integration) for both ways.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 
@@ -170,7 +175,8 @@ The same works for child records made with the means of the core. See the docume
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. For the content elements of the core headliner needs no ViewHelper in your templates; the ViewHelpers
-`headliner:headline` and `headliner:headline.children` are for your own templates.
+`headliner:headline` (with `record="{record}"`, or with the values `tag` and `layout`) and `headliner:headline.children`
+are for your own templates.
 
 ### Themes with their own header
 
