@@ -192,7 +192,7 @@ Or pass the values and wrap each record in `headliner:headline.children`, which 
 
 With the record there is no wrapper; with the values there is. Both need a record object, which a Content Block gives.
 Rows as arrays (from `database-query`, say) are no records: turn them into records with the core's `record-transformation`
-data processor, or pass each row as `row` to the wrapper (`<headliner:headline.children row="{item}">`). The
+data processor, or pass each row as `row` to the wrapper (`<headliner:headline.children row="{item.data}">`). The
 documentation (Integration) shows the differences.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)

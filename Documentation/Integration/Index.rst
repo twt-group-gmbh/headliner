@@ -121,7 +121,7 @@ What you need when
         -   nothing
     *   -   A row as an array that you keep
         -   `tag`
-        -   `headliner:headline.children row="{item}"` (and `table` if the table cannot be found)
+        -   `headliner:headline.children row="{item.data}"` (and `table` if the table cannot be found)
     *   -   The content element as an array, or a partial that gets no record
         -   `tag`, `layout`, `default`, and `edit` (and `data`) for the page module
         -   nothing
@@ -317,10 +317,12 @@ request of the page module: a visitor gets the text as it is.
 Rows as arrays (data processors)
 --------------------------------
 
-A data processor such as `database-query` gives rows as arrays, and an array knows nothing of its table. Two ways:
+A data processor such as `database-query` gives rows as arrays, and an array knows nothing of its table. It wraps each
+row: an entry of `{items}` is an array with the row in `data`, so `{item.data.title}` is the title. Two ways:
 
-**Turn the rows into records** with the core's `record-transformation` processor, below `database-query`. Then everything
-above works as for a Content Block: `record="{item}"`, no wrapper.
+**Turn the rows into records** with the core's `record-transformation` processor, nested below `database-query`. It runs
+for every row and puts the record next to the row, by default as `record`. Then everything above works as for a Content
+Block: `record="{item.record}"`, no wrapper.
 
 ..  code-block:: typoscript
 
@@ -332,13 +334,17 @@ above works as for a Content Block: `record="{item}"`, no wrapper.
             pidInList.field = pid
             dataProcessing {
                 10 = record-transformation
-                10 {
-                    table = tx_myext_item
-                    as = items
-                }
+                10.table = tx_myext_item
             }
         }
     }
+
+..  code-block:: html
+
+    <f:for each="{items}" as="item">
+        <headliner:headline record="{item.record}">{item.record -> f:render.text(field: 'title')}</headliner:headline>
+        {item.record -> f:render.text(field: 'text')}
+    </f:for>
 
 **Or keep the arrays.** A row knows nothing of its table, but the wrapper finds it: the content element has an inline
 field for the table (its `foreign_table`), and the row points to the element with the `foreign_field` of that field. That
@@ -351,9 +357,9 @@ with the values:
 ..  code-block:: html
 
     <f:for each="{items}" as="item">
-        <headliner:headline.children row="{item}">
-            <headliner:headline tag="{item.tag}">{item.title}</headliner:headline>
-            <f:format.html>{item.text}</f:format.html>
+        <headliner:headline.children row="{item.data}">
+            <headliner:headline tag="{item.data.tag}">{item.data.title}</headliner:headline>
+            <f:format.html>{item.data.text}</f:format.html>
         </headliner:headline.children>
     </f:for>
 
