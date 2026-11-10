@@ -6,7 +6,6 @@
     site settings (headliner.subheader.enabled); then the subheader follows the header tag.
 </f:comment>
 <f:variable name="ownSubheader" value="{settings.headliner.subheaderFields}" />
-<f:variable name="editUid" value="{f:if(condition: data._LOCALIZED_UID, then: data._LOCALIZED_UID, else: data.uid)}" />
 <f:if condition="{data.header_layout} != 100">
     <f:variable name="header">{record -> f:render.text(field: 'header', optional: true)}</f:variable>
     <f:variable name="subheader">{record -> f:render.text(field: 'subheader', optional: true)}</f:variable>
@@ -18,7 +17,7 @@
                 layout: data.header_layout,
                 default: settings.defaultHeaderType,
                 positionClass: '{f:if(condition: data.header_position, then: \'ce-headline-{data.header_position}\')}',
-                edit: 'tt_content:{editUid}:header_tag',
+                record: record,
                 link: data.header_link}" />
             <f:if condition="{ownSubheader}">
                 <f:then>
@@ -26,7 +25,7 @@
                         subheader: subheader,
                         tag: data.header_tag,
                         subheaderTag: data.subheader_tag,
-                        edit: 'tt_content:{editUid}:subheader_tag',
+                        record: record,
                         layout: data.header_layout,
                         default: settings.defaultHeaderType,
                         positionClass: '{f:if(condition: data.header_position, then: \'ce-headline-{data.header_position}\')}'}" />

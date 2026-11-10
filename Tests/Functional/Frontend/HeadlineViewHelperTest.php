@@ -208,6 +208,34 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         return trim($view->render('ArrayCard'));
     }
 
+    private function renderHeaderPartial(mixed $record): string
+    {
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            partialRootPaths: [__DIR__ . '/../../../Resources/Private/Partials'],
+            request: (new ServerRequest('https://website.local/', 'GET'))->withAttribute(InspectRequest::ATTRIBUTE, true),
+        ));
+        $view->assign('record', $record);
+
+        return trim($view->render('HeaderPartial'));
+    }
+
+    #[Test]
+    public function theHeaderPartialTakesTheMarkFromTheRecordItIsGiven(): void
+    {
+        self::assertStringContainsString(
+            'data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Hi</h3>',
+            $this->renderHeaderPartial(self::element())
+        );
+    }
+
+    #[Test]
+    public function theHeaderPartialStillRendersTheHeadingWithoutARecord(): void
+    {
+        // no `{record}` in the template (a content element without lib.contentElement): the heading, but no mark
+        self::assertSame('<h3>Hi</h3>', $this->renderHeaderPartial(null));
+    }
+
     #[Test]
     public function aRowAsAnArrayIsMarkedWithTheTableThatIsGiven(): void
     {

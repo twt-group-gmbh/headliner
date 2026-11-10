@@ -43,10 +43,10 @@ final class InspectionTest extends AbstractFrontendTestCase
         $this->writeSite();
         $html = $this->render($this->inspect());
 
-        self::assertStringContainsString('<h4 class="ce-headline-layout-2" data-headliner-edit="tt_content:1:header_tag">Chosen tag</h4>', $html);
+        self::assertStringContainsString('<h4 class="ce-headline-layout-2" data-headliner-edit="tt_content:1:header_tag" data-headliner-element="1">Chosen tag</h4>', $html);
         // a div can be turned back into a heading, so it is marked too
-        self::assertStringContainsString('<div class="ce-headline-layout-3" data-headliner-edit="tt_content:2:header_tag">Only a div</div>', $html);
-        self::assertStringContainsString('data-headliner-edit="tt_content:4:subheader_tag">Own subheader</h5>', $html);
+        self::assertStringContainsString('<div class="ce-headline-layout-3" data-headliner-edit="tt_content:2:header_tag" data-headliner-element="2">Only a div</div>', $html);
+        self::assertStringContainsString('data-headliner-edit="tt_content:4:subheader_tag" data-headliner-element="4">Own subheader</h5>', $html);
     }
 
     #[Test]
@@ -86,7 +86,7 @@ final class InspectionTest extends AbstractFrontendTestCase
 
         $html = $this->render((new InternalRequest('https://website.local/not-published'))->withAttribute(InspectRequest::ATTRIBUTE, true));
 
-        self::assertStringContainsString('<h3 class="ce-headline-layout-2" data-headliner-edit="tt_content:7:header_tag">On a hidden page</h3>', $html);
+        self::assertStringContainsString('<h3 class="ce-headline-layout-2" data-headliner-edit="tt_content:7:header_tag" data-headliner-element="7">On a hidden page</h3>', $html);
     }
 
     #[Test]
@@ -234,7 +234,7 @@ final class InspectionTest extends AbstractFrontendTestCase
         $html = $this->render($request);
 
         // the mark names the live record: that is what the page module edits, the DataHandler works on the version
-        self::assertStringContainsString('<h5 class="ce-headline-layout-2" data-headliner-edit="tt_content:1:header_tag">Chosen tag (draft)</h5>', $html);
+        self::assertStringContainsString('<h5 class="ce-headline-layout-2" data-headliner-edit="tt_content:1:header_tag" data-headliner-element="1">Chosen tag (draft)</h5>', $html);
     }
 
     #[Test]
