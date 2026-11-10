@@ -40,6 +40,5 @@ Requirements
 
 *   PHP 8.3 or newer
 *   TYPO3 14.3 LTS
-*   Optional: `fluid_styled_content`. The site set `twtgroup/headliner-fluid-styled-content` changes the headers of its
-    content elements. Without it use the site set `twtgroup/headliner` and the ViewHelper in your own templates (see
-    :ref:`installation-site-set` and :ref:`integration`).
+*   Optional: `fluid_styled_content`. With it the site set changes the headers of its content elements. Without it
+    use the ViewHelper in your own templates (see :ref:`installation-site-set` and :ref:`integration`).

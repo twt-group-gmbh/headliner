@@ -18,40 +18,30 @@ The extension can also be installed from the
 
 ..  _installation-site-set:
 
-Add a site set
-==============
+Add the site set
+================
 
-Headliner has two site sets. Add the one that fits your site, in :guilabel:`Sites > Setup` or in the configuration of the
+Add the site set :file:`twtgroup/headliner` to your site, in :guilabel:`Sites > Setup` or in the configuration of the
 site:
 
-:file:`twtgroup/headliner-fluid-styled-content`
-    For a site that uses `fluid_styled_content`. It overrides the header partial, so the tags and CSS classes of the
-    content elements of the core come from the fields of Headliner, and it includes the set below. It depends on
-    `fluid_styled_content`, which is added with it.
+..  code-block:: yaml
+    :caption: config/sites/<identifier>/config.yaml
 
-    ..  code-block:: yaml
-        :caption: config/sites/<identifier>/config.yaml
+    dependencies:
+      - twtgroup/headliner
 
-        dependencies:
-          - twtgroup/headliner-fluid-styled-content
+`fluid_styled_content` is optional:
 
-:file:`twtgroup/headliner`
-    For a site **without** `fluid_styled_content` (only Content Blocks, say, or templates of your own). It has the site
-    settings and the page TSconfig and needs nothing else. It changes no template: the tags in the frontend come from
-    the ViewHelper `headliner:headline` in your own templates (see :ref:`integration-own-templates`). The box in the page
-    module works the same.
+*   **With it** (add its set to the site as well, `typo3/fluid-styled-content`) the site set overrides the header partial,
+    so the tags and CSS classes of the content elements of the core come from the fields of Headliner. The set loads
+    `fluid_styled_content` before itself, whatever the order in the site.
+*   **Without it** (only Content Blocks, say, or templates of your own) the set has the site settings and the page
+    TSconfig and changes no template: the tags in the frontend come from the ViewHelper `headliner:headline` in your
+    own templates (see :ref:`integration-own-templates`). Nothing is reported or logged. The box in the page module
+    works the same.
 
-    ..  code-block:: yaml
-        :caption: config/sites/<identifier>/config.yaml
-
-        dependencies:
-          - twtgroup/headliner
-
-`fluid_styled_content` is therefore optional: only the first set needs it. Add one of the two, not both.
-
-Clear the caches after you add a set or change from one to the other: the site sets and the TypoScript are cached, and
-until then the box can show headers of `fluid_styled_content` as if they came from the text of the element (badge
-:guilabel:`RTE`).
+Clear the caches after you add the set: the site sets and the TypoScript are cached, and until then the box can show
+headers of `fluid_styled_content` as if they came from the text of the element (badge :guilabel:`RTE`).
 
 ..  note::
 

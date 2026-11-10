@@ -76,7 +76,7 @@ Tests split into two suites by what they need to boot:
 - **`Tests/Functional/`** — `typo3/testing-framework`, boots TYPO3 + DB. Used for anything touching
   FAL, middlewares, TCA, or ViewHelpers. They must restore request-related globals: the testing framework does not
   reset `$GLOBALS['TYPO3_REQUEST']` / `BE_USER`, so save them in `setUp()` and restore them in `tearDown()`.
-  The frontend tests extend `AbstractFrontendTestCase`: a site with the site set `twtgroup/headliner-fluid-styled-content` (written with the core's `SiteWriter`)
+  The frontend tests extend `AbstractFrontendTestCase`: a site with the sets `typo3/fluid-styled-content` and `twtgroup/headliner` (written with the core's `SiteWriter`)
   and a few headers, rendered through the real frontend application (`executeFrontendSubRequest()`); mark the request
   with `InspectRequest::ATTRIBUTE` to get the marks of the page module. The testing framework's own frontend middleware
   needs the request attribute `typo3.testing.context`, which only its own way of requesting sets, so

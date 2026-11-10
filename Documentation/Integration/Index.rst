@@ -9,8 +9,8 @@ Integration
 fluid_styled_content
 ====================
 
-This is for sites that use `fluid_styled_content` and the site set `twtgroup/headliner-fluid-styled-content`. Without
-`fluid_styled_content` skip this section and use the ViewHelper in your own templates (below).
+This is for sites that use `fluid_styled_content`: the site set `twtgroup/headliner` then overrides its header partial.
+Without `fluid_styled_content` skip this section and use the ViewHelper in your own templates (below).
 
 The site set adds a partial path (`lib.contentElement.partialRootPaths.200`) with an override of the partial
 :file:`Header/All.fluid.html`. It is a copy of the partial of `fluid_styled_content`: the texts are still output with

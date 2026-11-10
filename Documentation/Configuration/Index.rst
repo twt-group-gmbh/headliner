@@ -9,8 +9,7 @@ Configuration
 Site settings
 =============
 
-The site set :guilabel:`Headliner` (`twtgroup/headliner`, also part of the set for `fluid_styled_content`) has three
-site settings. Change them in :guilabel:`Sites > Setup`, or in
+The site set :guilabel:`Headliner` (`twtgroup/headliner`) has three site settings. Change them in :guilabel:`Sites > Setup`, or in
 :file:`config/sites/<identifier>/settings.yaml`.
 
 ..  confval:: headliner.subheader.enabled

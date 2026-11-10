@@ -83,13 +83,13 @@ First release.
 - Page module, language: the summary uses the correct singular and plural ("1 issue", "2 issues") and the dates in the
   notes about start and end time are shown in the format of the language of the backend user, not as ISO dates.
 - Validation of the structure: missing H1, more than one H1, skipped heading levels and empty headings are marked.
-- Two site sets, so `fluid_styled_content` is optional: `twtgroup/headliner-fluid-styled-content` (the partial override, depends on
-  `fluid_styled_content` and includes the other) and `twtgroup/headliner` (the site settings and the page TSconfig, no
-  dependency). The box in the page module works with either.
+- `fluid_styled_content` is optional: the site set `twtgroup/headliner` has it as an optional dependency (loaded before the
+  set if it is there, nothing reported if it is not), so the partial override works with it and the set is valid without
+  it. The box in the page module works either way.
 - Content elements: the field "Tag" (`header_tag`, H1-H6 or div, default "from the layout") decides the HTML tag of the header. The
   layout ("Type", `header_layout`) only decides how it looks, through the CSS class `ce-headline-layout-N`. The
   subheader is rendered one level below the header. Provided as a partial override for `fluid_styled_content`
-  through the site set `twtgroup/headliner-fluid-styled-content`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6). The field is empty by default, in the TCA and as the
+  through the site set `twtgroup/headliner`; content without a tag keeps the old behaviour (layout 1-6 = H1-H6). The field is empty by default, in the TCA and as the
   default of the database column, so installing the extension changes nothing in existing content. The exception is the
   subheader: `fluid_styled_content` renders it as `h3` always, headliner one level below the header (documented in the
   installation notes).

@@ -85,18 +85,17 @@ install it with the Extension Manager.
 
 ## Setup
 
-Add a site set to your site. Headliner has two, and `fluid_styled_content` is optional:
+Add the site set **Headliner** (`twtgroup/headliner`) to your site and clear the caches (the site sets and the TypoScript
+are cached). `fluid_styled_content` is optional:
 
-| Site set                                        | For | What it does |
-|-------------------------------------------------|-----|--------------|
-| `twtgroup/headliner-fluid-styled-content`       | a site that uses `fluid_styled_content` | Overrides the header partial of `fluid_styled_content`, so its content elements use the fields *Tag* and *Subheader tag*. Includes the set below and depends on `fluid_styled_content`. |
-| `twtgroup/headliner`                            | a site without `fluid_styled_content` | The site settings and the page TSconfig only. The tags in the frontend come from the ViewHelper in your own templates. |
-
-Add one of them, not both, and clear the caches afterwards (the site sets and the TypoScript are cached). The box in the
-page module works the same with either.
+- **With it** (its set `typo3/fluid-styled-content` on the site as well) the set overrides the header partial of
+  `fluid_styled_content`, so its content elements use the fields *Tag* and *Subheader tag*. The set loads
+  `fluid_styled_content` before itself.
+- **Without it** the set has the site settings and the page TSconfig only, and nothing is reported or logged. The tags
+  in the frontend come from the ViewHelper in your own templates. The box in the page module works the same.
 
 > [!NOTE]
-> With the set for `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
+> With `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
 > H1-H6), so existing pages do not change until an editor chooses a tag.
 >
 > The subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header
@@ -232,7 +231,7 @@ See the documentation for what is left to do by hand.
 
 - PHP **8.3+**
 - TYPO3 **14.3 LTS**
-- Optional: `fluid_styled_content`, for the site set `twtgroup/headliner-fluid-styled-content`
+- Optional: `fluid_styled_content`, for the header partial of its content elements
 
 ## Contributing
 
