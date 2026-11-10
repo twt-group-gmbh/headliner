@@ -519,6 +519,87 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         self::assertStringContainsString('<h4>Offset</h4>', $html);
     }
 
+    /**
+     * The template "Auto": a record with one tag field, a record with two, and the content element, with no `tagField`,
+     * `parent` or `default` anywhere.
+     *
+     * @param array<string, mixed> $single
+     * @param array<string, mixed> $element
+     * @param array<string, mixed>|null $data
+     * @param array<string, mixed> $settings
+     */
+    private function renderAuto(array $single, array $element = ['CType' => 'text', 'header_tag' => ''], ?array $data = null, array $settings = [], bool $forThePageModule = true): string
+    {
+        $request = new ServerRequest('https://website.local/', 'GET');
+        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: $request,
+        ));
+        $view->assignMultiple(array_filter([
+            'single' => self::row('tx_headlinertestcards_single', 5, $single),
+            'card' => self::row('tx_headlinertestcards_card', 6, ['tag' => 'h3', 'subtag' => 'h4']),
+            'element' => self::row('tt_content.text', 12, $element),
+            'data' => $data,
+            'settings' => $settings,
+        ], static fn(mixed $value): bool => $value !== null));
+
+        return trim($view->render('Auto'));
+    }
+
+    #[Test]
+    public function theOnlyTagFieldOfARecordIsFoundWithoutTagField(): void
+    {
+        $html = $this->renderAuto(['level' => 'h4']);
+
+        self::assertStringContainsString('<h4 data-headliner-edit="tx_headlinertestcards_single:5:level">Single</h4>', $html);
+    }
+
+    #[Test]
+    public function aRecordWithTwoTagFieldsNeedsTagFieldAndGetsNoMarkWithout(): void
+    {
+        $html = $this->renderAuto(['level' => 'h4']);
+
+        // which of the two is meant is not known: the default tag, no mark
+        self::assertStringContainsString('<h2>Two</h2>', $html);
+        self::assertStringNotContainsString('tx_headlinertestcards_card:6', $html);
+    }
+
+    #[Test]
+    public function aRecordOfAnotherTableIsBelowTheHeaderOfTheElementInDataWithoutParent(): void
+    {
+        $html = $this->renderAuto(['level' => ''], data: ['uid' => 12, 'CType' => 'text', 'header_tag' => 'h4']);
+
+        self::assertStringContainsString('>Single</h5>', $html);
+    }
+
+    #[Test]
+    public function withoutDataARecordWithoutATagGetsTheDefaultTag(): void
+    {
+        self::assertStringContainsString('>Single</h2>', $this->renderAuto(['level' => '']));
+    }
+
+    #[Test]
+    public function theDefaultTagIsTheSettingOfTheContentElementWithoutDefault(): void
+    {
+        $html = $this->renderAuto(['level' => ''], settings: ['defaultHeaderType' => 4]);
+
+        self::assertStringContainsString('>Single</h4>', $html);
+        // the content element has no tag and no layout either
+        self::assertStringContainsString('>Header</h4>', $html);
+        // a default that is given wins over the setting
+        self::assertStringContainsString('>Own default</h5>', $html);
+    }
+
+    #[Test]
+    public function aVisitorGetsTheTagsOfTheAutomaticFieldWithoutMarks(): void
+    {
+        $html = $this->renderAuto(['level' => 'h3'], forThePageModule: false);
+
+        self::assertStringContainsString('<h3>Single</h3>', $html);
+        self::assertStringNotContainsString('data-headliner', $html);
+    }
+
     #[Test]
     public function aSubheaderIgnoresTheParent(): void
     {

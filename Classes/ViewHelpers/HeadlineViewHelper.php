@@ -6,6 +6,9 @@ namespace Twtgroup\Headliner\ViewHelpers;
 
 use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Domain\RecordInterface;
+use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use Twtgroup\Headliner\Backend\TagField;
 use Twtgroup\Headliner\Frontend\EditMark;
 use Twtgroup\Headliner\Frontend\HeaderTag;
 use Twtgroup\Headliner\Middleware\InspectRequest;
@@ -45,23 +48,28 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         parent::initializeArguments();
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. With "subheader" it is the tag of the subheader');
         $this->registerArgument('layout', 'string', 'The layout of the header (header_layout, 1-6): adds the CSS class ce-headline-layout-N and, for content without a tag, decides the tag');
-        $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6 (defaultHeaderType), else h2');
+        $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6. Without it the setting defaultHeaderType of the content element, else h2');
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else the field subheader_tag of the record, else "offset" levels below the header of the parent or of the record', false, false);
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
         $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it');
-        $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader"');
-        $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header; for a subheader without a parent it is its own record');
+        $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader". Without it the field header_tag if the record has it, else the one field of its table that is a select of tags');
+        $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array); without it the variable "data" for a record of another table than tt_content: a heading without a tag of its own is rendered "offset" levels below that header; for a subheader without a parent it is its own record');
         $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" a heading without a tag of its own is (negative: above)', false, 1);
     }
 
     public function render(): string
     {
         $record = $this->arguments['record'];
-        $tagField = (string) ($this->arguments['tagField'] ?? '') !== ''
-            ? (string) $this->arguments['tagField']
-            : ($this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);
+        $variables = $this->renderingContext?->getVariableProvider();
+        // the content element, as the templates of fluid_styled_content and a Content Block have it
+        $data = $variables?->get('data');
+        $subheader = (bool) $this->arguments['subheader'];
+        $tagField = (string) ($this->arguments['tagField'] ?? '') !== '' ? (string) $this->arguments['tagField'] : self::tagFieldOf($record, $subheader);
         $own = $this->arguments['tag'] ?? self::valueOf($record, $tagField);
-        $parent = $this->arguments['parent'];
+        // a record of another table (a card) is counted from the header of the content element, if the template has it
+        $parent = $this->arguments['parent'] ?? (!$subheader && $record instanceof RecordInterface && $record->getMainType() !== 'tt_content'
+            && ($data instanceof RecordInterface || is_array($data)) ? $data : null);
+        $default = $this->arguments['default'] ?? $variables?->getByPath('settings.defaultHeaderType');
 
         // The header the level is counted from: the parent, or for a subheader its own record. The subheader has the
         // layout of its header.
@@ -69,14 +77,14 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $layout = $this->arguments['layout'] ?? self::valueOf($this->arguments['subheader'] ? $reference : $record, 'header_layout');
         if ($this->arguments['subheader']) {
             // the tag of the subheader, else `offset` levels below the header it belongs to
-            $headerTag = HeaderTag::forContent(self::valueOf($reference, HeaderTag::FIELD), $layout, $this->arguments['default']);
+            $headerTag = HeaderTag::forContent(self::valueOf($reference, HeaderTag::FIELD), $layout, $default);
             $tag = HeaderTag::resolve($own) ?? HeaderTag::shifted($headerTag, (int) $this->arguments['offset']);
         } elseif (HeaderTag::resolve($own) === null && ($parent instanceof RecordInterface || is_array($parent))) {
             // no tag of its own: below the header of the parent, not the default and not a layout of its own
-            $headerTag = HeaderTag::forContent(self::valueOf($parent, HeaderTag::FIELD), self::valueOf($parent, 'header_layout'), $this->arguments['default']);
+            $headerTag = HeaderTag::forContent(self::valueOf($parent, HeaderTag::FIELD), self::valueOf($parent, 'header_layout'), $default);
             $tag = HeaderTag::shifted($headerTag, (int) $this->arguments['offset']);
         } else {
-            $tag = HeaderTag::forContent($own, $layout, $this->arguments['default']);
+            $tag = HeaderTag::forContent($own, $layout, $default);
         }
         $this->tag->setTagName($tag);
 
@@ -86,9 +94,6 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         ]);
         $this->tag->addAttribute('class', implode(' ', $classes));
         if ($this->isInspectRequest()) {
-            // the content element this is rendered for, as the templates of fluid_styled_content have it ("data"; a
-            // Content Block has it as a record object)
-            $data = $this->renderingContext?->getVariableProvider()->get('data');
             if ($record !== null) {
                 // the record names its own field (none if it has no such field): never the header of the element
                 $defaultEdit = EditMark::forRecord($record, $tagField);
@@ -124,6 +129,33 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
             is_array($source) => $source[$field] ?? null,
             default => null,
         };
+    }
+
+    /**
+     * The field of the record that holds the tag of the heading: `header_tag` (`subheader_tag`) if the record has it, else
+     * the one field of its table that is a select of tags. If there are several the template has to say which with
+     * `tagField`; the default name is then taken, which gives no mark if the record has no such field.
+     */
+    private static function tagFieldOf(mixed $record, bool $subheader): string
+    {
+        $standard = $subheader ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD;
+        if (!$record instanceof RecordInterface || $subheader || $record->has($standard)) {
+            return $standard;
+        }
+        $table = $record->getMainType();
+        $schemaFactory = GeneralUtility::makeInstance(TcaSchemaFactory::class);
+        if (!$schemaFactory->has($table)) {
+            return $standard;
+        }
+        $tagFields = new TagField($schemaFactory);
+        $candidates = [];
+        foreach ($schemaFactory->get($table)->getFields() as $field) {
+            if ($tagFields->is($table, $field->getName())) {
+                $candidates[] = $field->getName();
+            }
+        }
+
+        return count($candidates) === 1 ? $candidates[0] : $standard;
     }
 
     private function isInspectRequest(): bool
