@@ -74,15 +74,16 @@ abstract class AbstractFrontendTestCase extends FunctionalTestCase
     /**
      * @param array<string, mixed> $settings Site settings
      * @param string|null $pageTypoScript The TypoScript of the page; by default the content elements and nothing around them
+     * @param list<string> $sets The site sets of the site
      */
-    protected function writeSite(array $settings = [], ?string $pageTypoScript = null): void
+    protected function writeSite(array $settings = [], ?string $pageTypoScript = null, array $sets = ['twtgroup/headliner-fluid-styled-content']): void
     {
         $siteWriter = GeneralUtility::makeInstance(SiteWriter::class);
         // The instance is shared by the tests: nothing of an earlier test may stay behind
         if (is_dir(Environment::getConfigPath() . '/sites/test')) {
             $siteWriter->delete('test');
         }
-        $siteWriter->createNewBasicSite('test', 1, 'https://website.local/', ['twtgroup/headliner-fluid-styled-content']);
+        $siteWriter->createNewBasicSite('test', 1, 'https://website.local/', $sets);
         if ($settings !== []) {
             $siteWriter->writeSettings('test', $settings);
         }
