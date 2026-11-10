@@ -53,11 +53,11 @@ reads the tag and the layout from it and names the record for the page module, s
           xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
           data-namespace-typo3-fluid="true">
 
-    <headliner:headline record="{record}" default="{settings.defaultHeaderType}">
+    <headliner:headline record="{record}">
         {record -> f:render.text(field: 'header')}
     </headliner:headline>
 
-    <headliner:headline record="{record}" subheader="1" default="{settings.defaultHeaderType}">
+    <headliner:headline record="{record}" subheader="1">
         {record -> f:render.text(field: 'subheader')}
     </headliner:headline>
 
@@ -70,13 +70,12 @@ If you have only the values (the content element as an array, or a partial that 
 
 ..  code-block:: html
 
-    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}"
-                        default="{settings.defaultHeaderType}">
+    <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}">
         {record -> f:render.text(field: 'header')}
     </headliner:headline>
 
     <headliner:headline subheader="1" tag="{data.subheader_tag}" parent="{data}"
-                        layout="{data.header_layout}" default="{settings.defaultHeaderType}">
+                        layout="{data.header_layout}">
         {record -> f:render.text(field: 'subheader')}
     </headliner:headline>
 
@@ -108,7 +107,7 @@ What you need when
         -   `record` (and `subheader="1"` for the subheader)
         -   nothing
     *   -   A record of a collection (a card) as a record object, with its own tag field
-        -   `record`, `tagField`, and `parent="{data}"` so a card without a tag is one level below the header
+        -   `record`; the tag field and the parent are found by themselves (`tagField` and `parent` if not)
         -   nothing
     *   -   The same card, written with its values (`tag="{card.tag}"`)
         -   `tag`
@@ -142,26 +141,20 @@ The arguments
     template of `fluid_styled_content`, is refused with an error. Use `{record}` there; the values go in `tag` and `layout`.
 
 `tagField`
-    The field of `record` that holds the tag, if it is not `header_tag` (or `subheader_tag`): `tagField="tag"` for a card.
-    If the record has no such field (a card with `tag`, but no `tagField`), the ViewHelper does not say so: the heading
-    gets the default tag and no mark, so the page module cannot change it. With `parent` it is one level below the
-    header instead of the default.
+    The field of `record` that holds the tag. Optional: it is `header_tag` (`subheader_tag` with `subheader`) if the record
+    has that field, otherwise the one field of its table that is a select with tags and nothing else (`h1` to `h6`,
+    `div`): `tag` of a card. Pass it if the table has several such fields, or if you want another one. If the record has
+    none, or several and no `tagField`, the heading gets the default tag and no mark, so the page module cannot change it.
 
 `parent`, `offset`
     For a heading in a record that is not the content element, a card for example. `parent` is the record of the content
-    element (`{data}`: a record object, or the array of a content element; any other type is refused). A heading that has no tag of its own (the
-    field is empty or missing) is then `offset` levels below the header of the parent, one by default, and not the
-    default tag: `h3` under an `h2`, `h5` under an `h4`, a `div` below `h6`; a `div` stays a `div`. A negative `offset`
-    goes up (never above `h1`). The tag an editor chose always wins. With `subheader`, `parent` is the header the
-    subheader is counted from.
-
-    ..  code-block:: html
-
-        <headliner:headline record="{card}" tagField="tag" parent="{data}">
-            {card -> f:render.text(field: 'title')}
-        </headliner:headline>
-
-    This also keeps a forgotten or misspelled `tagField` from ending in an `h2` under an `h2`.
+    element (a record object, or the array of a content element; any other type is refused). Optional: for a record of
+    another table than `tt_content` it is the variable `data` of the template (the content element in a Content Block
+    and in `fluid_styled_content`), if there is one. A heading that has no tag of its own (the field is empty or missing)
+    is then `offset` levels below the header of the parent, one by default, and not the default tag: `h3` under an
+    `h2`, `h5` under an `h4`, a `div` below `h6`; a `div` stays a `div`. A negative `offset` goes up (never above `h1`).
+    The tag an editor chose always wins. With `subheader`, `parent` is the header the subheader is counted from, and
+    it is not taken from `data` (pass it, or the subheader is counted from its own `record`).
 
 `tag`
     The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`. It is the
@@ -179,8 +172,9 @@ The arguments
     and `layout="3"` give `class="ce-headline-left ce-headline-layout-3"`.
 
 `default`
-    Used if the content has no tag and no layout from 1 to 6: a number from 1 to 6 (the setting `defaultHeaderType` of
-    `fluid_styled_content`), otherwise `h2`.
+    Used if the content has no tag and no layout from 1 to 6: a number from 1 to 6. Optional: without it the setting
+    `defaultHeaderType` of the content element (`{settings.defaultHeaderType}` in `fluid_styled_content`) is used, and
+    `h2` if there is none.
 
 `edit`
     Optional. `table:uid:field`. Lets the page module find the record behind a heading. Without it the ViewHelper takes
@@ -249,7 +243,7 @@ With the values (`tag="{card.tag}"`):
 
     <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
     <f:if condition="{header}">
-        <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{header}</headliner:headline>
+        <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}">{header}</headliner:headline>
     </f:if>
 
     <f:for each="{data.cards}" as="card">
@@ -261,19 +255,18 @@ With the values (`tag="{card.tag}"`):
         </headliner:headline.children>
     </f:for>
 
-With the record (`record="{card}" tagField="tag"`), and one level below the header of the element for a card without a
-tag (`parent="{data}"`):
+With the record (`record="{card}"`; the one tag field of the card and the header of the element are found by themselves):
 
 ..  code-block:: html
 
     <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
     <f:if condition="{header}">
-        <headliner:headline record="{data}" default="2">{header}</headliner:headline>
+        <headliner:headline record="{data}">{header}</headliner:headline>
     </f:if>
 
     <f:for each="{data.cards}" as="card">
         <article class="card">
-            <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+            <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
             {card -> f:render.text(field: 'text')}
         </article>
     </f:for>
@@ -302,7 +295,7 @@ The two differ like this:
         -   not needed
         -   needed
     *   -   Title of a card
-        -   `record="{card}" tagField="tag"`
+        -   `record="{card}"`
         -   `tag="{card.tag}"`
     *   -   Heading in the rich text of a card
         -   found by the mark of the record
@@ -456,7 +449,7 @@ records (inline, IRRE) made with the means of the core works the same way. This 
 - The rules are the same as for Content Blocks (see above): the wrapper names the record and its content element, the page
   module finds the field of every heading (its rich text, or the field with its tag, which must be a select of tags and
   nothing else), and the badge is the title of the table (`ctrl.title`, here :guilabel:`Teaser`).
-- With `record="{item}" tagField="tag"` on the title instead of `tag="{item.tag}"` the wrapper is not needed here either,
+- With `record="{item}"` on the title instead of `tag="{item.tag}"` the wrapper is not needed here either,
   as for Content Blocks (see above).
 - The tag of a record is saved in its own table with the rights of the backend user for it, so the editor needs to be
   allowed to modify `tx_myext_item`.

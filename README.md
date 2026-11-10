@@ -147,12 +147,12 @@ module is opened, so keep it quick. More in the documentation (Developer).
 The Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header and subheader with their tags. The
 headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for
 the headings in their rich text. Give the ViewHelper the record: it reads the tag and names the record for the page
-module itself, and `parent="{data}"` puts a card without a tag one level below the header of the element. Nothing
-else is needed, the headings in the rich text of the card are found by themselves:
+module itself. It finds the one tag field of the card, and a card without a tag is one level below the header of the
+element. Nothing else is needed, the headings in the rich text of the card are found by themselves:
 
 ```html
 <f:for each="{data.cards}" as="card">
-    <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
+    <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
     {card -> f:render.text(field: 'text')}
 </f:for>
 ```

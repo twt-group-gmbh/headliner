@@ -100,6 +100,9 @@ First release.
   `subheader` `subheader_tag`, or the field `tagField` of any table) and the layout itself and names the record for the
   page module (table, uid, in a translation the uid of the translation, and the field), so a template needs no `tag`,
   `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record. `record` takes a record object (`RecordInterface`) and `parent` a record object or an array; Fluid refuses any other type.
+  `tagField` is optional (the one field of the record's table that is a select of tags), so is `parent` for a record of
+  another table than `tt_content` (the variable `data`), and so is `default` (the setting `defaultHeaderType` of the content
+  element): `record="{card}"` is all a card needs.
   With `subheader` the argument `tag` is the tag of the subheader (there is no `subheaderTag`); without one it is
   `offset` levels below the header of `parent`, or of the `record`.
   The header partial of the extension hands the record on instead of an `edit` of its own, so the headings of the core's
