@@ -153,10 +153,19 @@ The arguments
     a `subheaderTag` of its own.
 
 `layout`
-    The layout of the header. Only used for the CSS class `ce-headline-layout-N`.
+    The layout of the header (`header_layout`, 1 to 6): how it should look, not what it is. It does two things. It adds
+    the CSS class `ce-headline-layout-N` to the heading, and for content without a tag of its own (from before the
+    extension was installed) it decides the tag, as `fluid_styled_content` does: layout 3 gives an `h3`. A tag the editor
+    chose always wins, the layout then only gives the class.
+
+`class`
+    Classes of your own, as on any tag ViewHelper (the alignment `ce-headline-left`, say). They are written as they
+    are and are not looked at. If there is a `layout` too, its class `ce-headline-layout-N` is added: `class="ce-headline-left"`
+    and `layout="3"` give `class="ce-headline-left ce-headline-layout-3"`.
 
 `default`
-    The layout to take the tag from if no tag is set (content from before the extension was installed).
+    Used if the content has no tag and no layout from 1 to 6: a number from 1 to 6 (the setting `defaultHeaderType` of
+    `fluid_styled_content`), otherwise `h2`.
 
 `edit`
     Optional. `table:uid:field`. Lets the page module find the record behind a heading. Without it the ViewHelper takes
@@ -167,6 +176,27 @@ The arguments
     Render a subheader instead of the header. Without `subheaderTag` it is one level below the header, so pass the tag of
     the header as `tag` (and its `layout`) as well. With a `subheaderTag` the subheader has exactly that tag, and `tag`
     is not needed. With `record` you pass neither: the ViewHelper reads `header_tag` and `subheader_tag` itself.
+
+..  _integration-children-arguments:
+
+The wrapper
+-----------
+
+`headliner:headline.children` is for the values (`tag="{card.tag}"`) and for rows as arrays; with a record object you
+need no wrapper (see the comparison below). It wraps what is rendered for one record that is not the content element, a
+card say. A visitor gets the content as it is; the page module gets a marker around it.
+
+`record`
+    The record object. A row as an array is no record: it goes in `row`.
+
+`row`
+    Instead of `record`: the row as an array, as a data processor gives it. Its uid (in a translation `_LOCALIZED_UID`)
+    and the table name the record.
+
+`table`
+    The table of `row`. Optional: the wrapper finds it from the inline field of the content element (the field with
+    this table as `foreign_table`, which the row points to with its `foreign_field`). Pass it if the element has no such
+    field, or if two fields of it would give different tables; without a table that is clear there is no mark.
 
 ..  _integration-content-blocks:
 

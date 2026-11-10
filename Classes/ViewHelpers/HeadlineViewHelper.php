@@ -44,8 +44,8 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
     {
         parent::initializeArguments();
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div');
-        $this->registerArgument('layout', 'string', 'The layout of the header (header_layout), only used for the CSS class');
-        $this->registerArgument('default', 'string', 'Layout to take the tag from if no tag is set (older content)');
+        $this->registerArgument('layout', 'string', 'The layout of the header (header_layout, 1-6): adds the CSS class ce-headline-layout-N and, for content without a tag, decides the tag');
+        $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6 (defaultHeaderType), else h2');
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header', false, false);
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
         $this->registerArgument('record', 'mixed', 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it (anything that is no record object is ignored)');
