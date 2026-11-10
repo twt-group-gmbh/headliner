@@ -38,7 +38,8 @@ The tag comes from :guilabel:`Tag`, the class from :guilabel:`Type`. Style the c
 Your own templates
 ==================
 
-If your templates render the header themselves, use the ViewHelper. There are two ways to write it, and both give the
+If your templates render the header themselves, use the ViewHelper. It works with either site set, also on a site
+without `fluid_styled_content`. There are two ways to write it, and both give the
 same page: with the **record**, or with the **values** of its fields.
 
 ..  _integration-with-record:

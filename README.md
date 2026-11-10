@@ -92,10 +92,11 @@ Add a site set to your site. Headliner has two, and `fluid_styled_content` is op
 | `twtgroup/headliner-fluid-styled-content`       | a site that uses `fluid_styled_content` | Overrides the header partial of `fluid_styled_content`, so its content elements use the fields *Tag* and *Subheader tag*. Includes the set below and depends on `fluid_styled_content`. |
 | `twtgroup/headliner`                            | a site without `fluid_styled_content` | The site settings and the page TSconfig only. The tags in the frontend come from the ViewHelper in your own templates. |
 
-Add one of them, not both. The box in the page module works the same with either.
+Add one of them, not both, and clear the caches afterwards (the site sets and the TypoScript are cached). The box in the
+page module works the same with either.
 
 > [!NOTE]
-> Content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
+> With the set for `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
 > H1-H6), so existing pages do not change until an editor chooses a tag.
 >
 > The subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header

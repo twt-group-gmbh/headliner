@@ -49,9 +49,13 @@ site:
 
 `fluid_styled_content` is therefore optional: only the first set needs it. Add one of the two, not both.
 
+Clear the caches after you add a set or change from one to the other: the site sets and the TypoScript are cached, and
+until then the box can show headers of `fluid_styled_content` as if they came from the text of the element (badge
+:guilabel:`RTE`).
+
 ..  note::
 
-    Content that was created before the extension is installed has no tag: the field :guilabel:`Tag` is empty, which is
+    This is about the set for `fluid_styled_content`. Content that was created before the extension is installed has no tag: the field :guilabel:`Tag` is empty, which is
     the choice :guilabel:`From the layout (as before)`. It keeps the behaviour of `fluid_styled_content` (layout 1 to 6
     means H1 to H6), so existing pages do not change until an editor chooses a tag. The database column has an empty
     default for this, so adding it changes nothing in the existing content.
