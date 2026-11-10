@@ -266,4 +266,20 @@ final class HeadingExtractorTest extends TestCase
             (new HeadingExtractor())->extract($html)
         );
     }
+
+    #[Test]
+    public function aHeadingInARichTextNamesItsRecordItself(): void
+    {
+        $html = '<body><h3 data-headliner-record="cards:3" data-headliner-field="text">In the text</h3></body>';
+
+        self::assertEquals([new Heading(3, 'In the text', null, null, false, 'cards:3')], (new HeadingExtractor())->extract($html));
+    }
+
+    #[Test]
+    public function theRecordOfTheHeadingItselfWinsOverTheOneAroundIt(): void
+    {
+        $html = '<body><div data-headliner-record="cards:3"><h3 data-headliner-record="cards:4" data-headliner-field="text">Inner</h3></div></body>';
+
+        self::assertSame('cards:4', (new HeadingExtractor())->extract($html)[0]->record);
+    }
 }

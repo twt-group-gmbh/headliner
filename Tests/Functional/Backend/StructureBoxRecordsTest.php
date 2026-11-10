@@ -230,4 +230,23 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
         self::assertStringContainsString('data-headliner-edit="tt_content:21:header_tag"', $here);
         self::assertStringContainsString('data-headliner-edit="' . self::TABLE . ':1:tag"', $here);
     }
+
+    /**
+     * A heading in a rich text that names its record itself (`MarkRichTextHeadings`) is in no wrapper that names the
+     * element: the element is the one the card is linked to.
+     */
+    #[Test]
+    public function aHeadingThatNamesItsRecordItselfIsInTheGroupOfTheElementOfThatRecord(): void
+    {
+        $this->setUpBackendUser(1);
+        $html = '<html><body><main>'
+            . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">Intro</h2>'
+            . '<h3 data-headliner-record="tx_headlinertestcards_card:1" data-headliner-field="text">Card text heading</h3>'
+            . '</main></body></html>';
+
+        $row = $this->row($this->structureBox($html)->render($this->backendRequest(), 8, [0], ''), 'Card text heading');
+
+        self::assertStringContainsString('data-headliner-group="21"', $row);
+        self::assertStringContainsString('data-headliner-rte="' . self::TABLE . ':1:text:0"', $row);
+    }
 }

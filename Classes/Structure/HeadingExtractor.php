@@ -74,13 +74,14 @@ final class HeadingExtractor
     }
 
     /**
-     * The record around a heading, from the mark a template put around it (`data-headliner-record`).
+     * The record of a heading, from the mark (`data-headliner-record`) on the heading itself (a heading in a rich text,
+     * see `MarkRichTextHeadings`) or else on the element a template put around it.
      */
     private function findRecord(\DOMElement $node): ?string
     {
-        for ($parent = $node->parentNode; $parent instanceof \DOMElement; $parent = $parent->parentNode) {
-            if ($parent->hasAttribute('data-headliner-record')) {
-                return $parent->getAttribute('data-headliner-record');
+        for ($current = $node; $current instanceof \DOMElement; $current = $current->parentNode) {
+            if ($current->hasAttribute('data-headliner-record')) {
+                return $current->getAttribute('data-headliner-record');
             }
         }
 

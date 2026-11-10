@@ -170,15 +170,17 @@ final readonly class StructureBox
             if ($target === null && $recordTarget !== null) {
                 ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord, $pageId);
             }
+            // A heading in a record that no wrapper names the element of (the rich text of a card marks itself): the element
+            // the record is linked to
+            // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
+            $headingElement = $heading->element ?? ($recordTarget !== null ? $this->elementOfRecord($recordTarget, $pageId) : null);
             $isElementTarget = $target !== null && $target['table'] === 'tt_content';
             $isSubheader = $isElementTarget && $target['field'] === HeaderTag::SUBHEADER_FIELD;
             // A heading without an editable tag that is rendered in a content element, for example from its RTE text
-            // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
-            $fromText = $target === null && ($heading->element !== null || $textTarget !== null);
+            $fromText = $target === null && ($headingElement !== null || $textTarget !== null);
             // The content element: the record of the mark, or the one the heading says it is rendered in (the record
             // of a collection, a card of a Content Block, is not the element)
-            // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
-            $elementUid = $isElementTarget ? $target['uid'] : $this->getTranslatedUid($heading->element, $languageId);
+            $elementUid = $isElementTarget ? $target['uid'] : $this->getTranslatedUid($headingElement, $languageId);
             // In a workspace the version: it has the text the frontend rendered
             $contentRecord = $elementUid !== null ? BackendUtility::getRecordWSOL('tt_content', $elementUid) : null;
             $canOpen = $contentRecord !== null && $editAccess->canOpen($contentRecord);
@@ -356,6 +358,38 @@ final readonly class StructureBox
         ));
 
         return count($matches) === 1 ? ['tag' => ['table' => $table, 'uid' => $uid, 'field' => $matches[0]], 'text' => null] : $none;
+    }
+
+    /**
+     * The content element a record of a collection belongs to: the one the card points to with the `foreign_field` of
+     * the inline field of `tt_content` that has the table of the record as its `foreign_table`. None for a record that
+     * is linked to nothing, or whose element is not on this page (the mark is part of the page, which an editor writes).
+     *
+     * @param array{table: string, uid: int} $recordTarget
+     */
+    private function elementOfRecord(array $recordTarget, int $pageId): ?int
+    {
+        ['table' => $table, 'uid' => $uid] = $recordTarget;
+        if ($table === 'tt_content' || !$this->tcaSchemaFactory->has($table) || !$this->tcaSchemaFactory->has('tt_content')) {
+            return null;
+        }
+        $record = BackendUtility::getRecordWSOL($table, $uid);
+        if ($record === null) {
+            return null;
+        }
+        foreach ($this->tcaSchemaFactory->get('tt_content')->getFields() as $field) {
+            $configuration = $field->getConfiguration();
+            if (($configuration['type'] ?? '') !== 'inline' || ($configuration['foreign_table'] ?? '') !== $table || !isset($configuration['foreign_field'])) {
+                continue;
+            }
+            $element = (int) ($record[$configuration['foreign_field']] ?? 0);
+            $elementRecord = $element > 0 ? BackendUtility::getRecordWSOL('tt_content', $element) : null;
+            if ($elementRecord !== null && $this->isOnPage($elementRecord, $pageId)) {
+                return $element;
+            }
+        }
+
+        return null;
     }
 
     /**
