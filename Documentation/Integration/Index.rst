@@ -44,8 +44,8 @@ With the record
 ---------------
 
 The record object is `{record}` in a template of `fluid_styled_content` and `{data}` in a Content Block. The ViewHelper
-reads the tag and the layout from it and names the record for the page module, so there is no `tag`, no `layout` and no
-`edit`:
+reads the tag and the layout from it and names the record for the page module, so there is no `tag`, no `layout`, no
+`default` and no `edit`:
 
 ..  code-block:: html
 

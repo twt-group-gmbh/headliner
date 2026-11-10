@@ -9,7 +9,7 @@ Configuration
 Site settings
 =============
 
-The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:`Sites > Setup`, or in
+The site set :guilabel:`Headliner` has three site settings. Change them in :guilabel:`Sites > Setup`, or in
 :file:`config/sites/<identifier>/settings.yaml`.
 
 ..  confval:: headliner.subheader.enabled
@@ -70,4 +70,4 @@ The site set :guilabel:`Headliner` has one site setting. Change it in :guilabel:
 Extension configuration
 =======================
 
-There is none. The setting above is the only one.
+There is none. The site settings above are all there is to configure.

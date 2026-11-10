@@ -26,7 +26,8 @@ How the structure is checked
     resolved, which is where a hidden page is turned down), and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
     attribute exists only inside the process, so a request from outside cannot set it.
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element
-    each is rendered in (the frame `id="c12"`). It marks the headings that are not in the elements of the site setting
+    each is rendered in: what the heading says itself (`data-headliner-element`), else the frame `id="c12"`. It reads the
+    record a heading is in from `data-headliner-record`, on the heading itself or on the element around it. It marks the headings that are not in the elements of the site setting
     `headliner.contentSelector` as outside; `symfony/css-selector` turns the CSS selector into the XPath the DOM needs.
 #.  `HeadingValidator` finds the problems. Then the event `ModifyHeadingIssuesEvent` is dispatched, so a project can add
     rules of its own or take built-in ones away (see :ref:`developer-rules`).
@@ -37,6 +38,15 @@ How the structure is checked
     the RTE configuration from `Richtext::getConfiguration()`, in the select and again on saving) and that the text at that place is the same, changes
     only the tag (`<hN>` and `</hN>`, the attributes stay) and saves the field through the DataHandler. If the text is not
     the same, nothing is changed.
+#.  The marks for a record that is not the content element come from two places. `MarkRichTextHeadings`, a listener on the
+    core's `RecordCreationEvent`, writes `data-headliner-record="table:uid"` and `data-headliner-field` into every heading
+    of the rich text fields of a record object, when the record is created for a request with `headliner.inspect`: it
+    does not matter how a template renders the text, and no wrapper is needed. `headliner:headline.children` puts the
+    mark around the content of a record instead (`record`, or `row` and `table` for a row as an array, see `RowTable`).
+    `StructureBox` then finds the field of each heading in the record (`resolveInRecord()`: the rich text, or the one
+    field with its tag) and, for a record without a wrapper that names its element, the content element it is linked to
+    from the inline field of `tt_content` (`elementOfRecord()`). The box only believes a mark for a field that
+    `TagField` says is a select of tags, on its own page, and for a table the user may edit.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template
     :file:`Resources/Private/Templates/PageModule/Headlines.html` draws the box.
 

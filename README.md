@@ -15,7 +15,7 @@ of a header can be changed right there, without touching the look of the page.
 The full documentation is in [`Documentation/`](Documentation/Index.rst).
 
 **Contents:** [Features](#features) · [Installation](#installation) · [Setup](#setup) ·
-[Extending](#extending-with-your-own-rules) · [Compatibility](#compatibility) · [Migration](#migration) ·
+[Your templates](#in-your-own-templates) · [Extending](#extending-with-your-own-rules) · [Compatibility](#compatibility) · [Migration](#migration) ·
 [Requirements](#requirements) · [Contributing](#contributing)
 
 ## Features
@@ -104,6 +104,21 @@ header partial of `fluid_styled_content`.
 | `headliner.editRteHeadings`   | off     | Allow the tag of a heading in the rich text of a content element to be changed in the box (only to the headings the RTE offers). The text of the element is changed, so it is off by default. |
 | `headliner.contentSelector`   | empty   | CSS selector of the content of the page. The headings in it are checked; the ones around it are shown very pale and only their H1 counts. If nothing matches, or if empty, the whole page is checked. |
 
+## In your own templates
+
+The content elements of the core need nothing: the site set changes their header partial. For a template of your own use
+the ViewHelper `headliner:headline`. Give it the record and it reads the tag and the layout, and names the record for the
+page module:
+
+```html
+<headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+<headliner:headline record="{record}" subheader="1">{record -> f:render.text(field: 'subheader')}</headliner:headline>
+```
+
+`{record}` is the record object of a template of `fluid_styled_content`, `{data}` in a Content Block. Without a record
+(an array, a fixed heading) pass the values: `tag`, `layout` and, for the page module, `edit`. The documentation
+(Integration) says which arguments you need when, and how child records (cards) work.
+
 ## Extending with your own rules
 
 The box checks four things: a missing H1, more than one H1, a skipped level and an empty heading. A project changes that
@@ -157,7 +172,7 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 </f:for>
 ```
 
-Or pass the values and wrap the record in `headliner:headline.children`, which names the record for the page module:
+Or pass the values and wrap each record in `headliner:headline.children`, which names the record for the page module:
 
 ```html
 <f:for each="{data.cards}" as="card">
@@ -168,9 +183,10 @@ Or pass the values and wrap the record in `headliner:headline.children`, which n
 </f:for>
 ```
 
-Both need a record object (a Content Block gives one). For rows as arrays (a data processor), turn them into records with
-the core's `record-transformation`, or keep them and pass each row as `row` (not `record`): the wrapper finds the table of a row from the inline field of the content element (`table="..."` if it cannot).
-See the documentation (Integration) for the differences.
+With the record there is no wrapper; with the values there is. Both need a record object, which a Content Block gives.
+Rows as arrays (from `database-query`, say) are no records: turn them into records with the core's `record-transformation`
+data processor, or pass each row as `row` to the wrapper (`<headliner:headline.children row="{item}">`). The
+documentation (Integration) shows the differences.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 

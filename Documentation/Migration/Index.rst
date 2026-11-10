@@ -70,6 +70,7 @@ What is left to do by hand:
 #.  Remove the Semantilizer (`composer remove zeroseven/z7-semantilizer`) and add the site set of headliner after
     `fluid_styled_content` (see :ref:`installation`).
 #.  Change the templates that use `<semantilizer:headline>` to `<headliner:headline>` (see :ref:`integration-own-templates`).
-    The arguments are `tag="{data.header_tag}"` instead of `type="{data.header_type}"`, and the mark `edit` is not needed
-    any more.
+    The simplest is `record="{record}"` (`record="{record}" subheader="1"` for the subheader): the tag, the layout and the
+    mark for the page module come from the record. With the values it is `tag="{data.header_tag}"` instead of
+    `type="{data.header_type}"`; the mark `edit` is not needed any more.
 #.  Check the CSS: headliner puts the class `ce-headline-layout-N` on a header, the Semantilizer `ce__header--N`.

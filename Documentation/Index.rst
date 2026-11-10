@@ -56,7 +56,7 @@ choose the HTML tag of the headers of content elements separately from their loo
 
     ..  card:: Integration
 
-        Templates, CSS classes and the compatibility with visual_editor.
+        The ViewHelper for your own templates, Content Blocks and other child records, CSS classes and the compatibility with visual_editor.
 
         ..  card-footer:: :ref:`Read more <integration>`
             :button-style: btn btn-secondary stretched-link
