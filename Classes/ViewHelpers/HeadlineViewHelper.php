@@ -26,6 +26,9 @@ use TYPO3Fluid\Fluid\Core\ViewHelper\AbstractTagBasedViewHelper;
  *   <headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
  *   <headliner:headline record="{card}" tagField="tag">{card -> f:render.text(field: 'title')}</headliner:headline>
  *
+ * With "parent" (the record of the content element) a heading that has no tag of its own is "offset" levels (one by
+ * default) below the header of the parent instead of the default.
+ *
  * The page module finds the record behind a header by the attribute data-headliner-edit, which is only rendered for it.
  * It is taken from "record" (the field "tagField", "header_tag" or with "subheader" "subheader_tag"). Without a record
  * it is taken from the variable "data" of the content element; "edit" names it explicitly. An argument that is given
@@ -47,6 +50,8 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module. Without it the record is taken from the variable "data" of the content element');
         $this->registerArgument('record', 'mixed', 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it (anything that is no record object is ignored)');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader"');
+        $this->registerArgument('parent', 'mixed', 'The record whose header is the reference, the record of the content element (a record object, or its array): a heading without a tag of its own is rendered "offset" levels below that header. Not used for a subheader');
+        $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" a heading without a tag of its own is (negative: above)', false, 1);
         $this->registerArgument('subheaderTag', 'string', 'The tag chosen for the subheader; without it the subheader is one level below the header');
     }
 
@@ -56,14 +61,20 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
         $tagField = (string) ($this->arguments['tagField'] ?? '') !== ''
             ? (string) $this->arguments['tagField']
             : ($this->arguments['subheader'] ? HeaderTag::SUBHEADER_FIELD : HeaderTag::FIELD);
-        $layout = $this->arguments['layout'] ?? self::fieldOf($record, 'header_layout');
+        $layout = $this->arguments['layout'] ?? self::valueOf($record, 'header_layout');
+        $own = $this->arguments['tag'] ?? self::valueOf($record, $tagField);
+        $parent = $this->arguments['parent'];
 
         if ($this->arguments['subheader']) {
             // one level below the header of the same record, unless the subheader has a tag of its own
-            $headerTag = HeaderTag::forContent($this->arguments['tag'] ?? self::fieldOf($record, HeaderTag::FIELD), $layout, $this->arguments['default']);
-            $tag = HeaderTag::forSubheader($headerTag, $this->arguments['subheaderTag'] ?? self::fieldOf($record, $tagField));
+            $headerTag = HeaderTag::forContent($this->arguments['tag'] ?? self::valueOf($record, HeaderTag::FIELD), $layout, $this->arguments['default']);
+            $tag = HeaderTag::forSubheader($headerTag, $this->arguments['subheaderTag'] ?? self::valueOf($record, $tagField));
+        } elseif (HeaderTag::resolve($own) === null && ($parent instanceof RecordInterface || is_array($parent))) {
+            // no tag of its own: below the header of the parent, not the default and not a layout of its own
+            $reference = HeaderTag::forContent(self::valueOf($parent, HeaderTag::FIELD), self::valueOf($parent, 'header_layout'), $this->arguments['default']);
+            $tag = HeaderTag::shifted($reference, (int) $this->arguments['offset']);
         } else {
-            $tag = HeaderTag::forContent($this->arguments['tag'] ?? self::fieldOf($record, $tagField), $layout, $this->arguments['default']);
+            $tag = HeaderTag::forContent($own, $layout, $this->arguments['default']);
         }
         $this->tag->setTagName($tag);
 
@@ -102,11 +113,15 @@ final class HeadlineViewHelper extends AbstractTagBasedViewHelper
     }
 
     /**
-     * The value of a field of the record, NULL if there is no record or the field is not in it.
+     * The value of a field of a record object or of the array of a record, NULL if there is none or the field is not in it.
      */
-    private static function fieldOf(?RecordInterface $record, string $field): mixed
+    private static function valueOf(mixed $source, string $field): mixed
     {
-        return $record !== null && $record->has($field) ? $record->get($field) : null;
+        return match (true) {
+            $source instanceof RecordInterface => $source->has($field) ? $source->get($field) : null,
+            is_array($source) => $source[$field] ?? null,
+            default => null,
+        };
     }
 
     private function isInspectRequest(): bool

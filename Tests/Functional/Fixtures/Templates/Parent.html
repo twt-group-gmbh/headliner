@@ -1,0 +1,10 @@
+<html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
+      xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+<headliner:headline record="{card}" tagField="tag" parent="{parent}">Default</headliner:headline>
+<headliner:headline record="{card}" tagField="tag" parent="{parent}" offset="2">Two</headliner:headline>
+<headliner:headline record="{card}" tagField="tag" parent="{parent}" offset="-5">Above</headliner:headline>
+<headliner:headline record="{card}" tagField="tag" parent="{parent}" tag="h5">Explicit</headliner:headline>
+<headliner:headline record="{card}" tagField="tag" parent="{notAParent}">Ignored</headliner:headline>
+<headliner:headline record="{parent}" subheader="1" parent="{parent}" offset="3">Subheader</headliner:headline>
+</html>

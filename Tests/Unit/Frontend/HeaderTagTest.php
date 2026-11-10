@@ -91,6 +91,30 @@ final class HeaderTagTest extends TestCase
     }
 
     /**
+     * @return iterable<string, array{string, int, string}>
+     */
+    public static function shiftedProvider(): iterable
+    {
+        yield 'one below h1' => ['h1', 1, 'h2'];
+        yield 'one below h5' => ['h5', 1, 'h6'];
+        yield 'below h6 is a div' => ['h6', 1, 'div'];
+        yield 'two below h5 is a div' => ['h5', 2, 'div'];
+        yield 'two below h2' => ['h2', 2, 'h4'];
+        yield 'the same level' => ['h3', 0, 'h3'];
+        yield 'one above h3' => ['h3', -1, 'h2'];
+        yield 'above h1 stays h1' => ['h2', -5, 'h1'];
+        yield 'a div stays a div' => ['div', 1, 'div'];
+        yield 'a div stays a div, above too' => ['div', -1, 'div'];
+    }
+
+    #[Test]
+    #[DataProvider('shiftedProvider')]
+    public function shiftsATagByLevels(string $tag, int $offset, string $expected): void
+    {
+        self::assertSame($expected, HeaderTag::shifted($tag, $offset));
+    }
+
+    /**
      * @return iterable<string, array{mixed, string|null}>
      */
     public static function layoutClassProvider(): iterable

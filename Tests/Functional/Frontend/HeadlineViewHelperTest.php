@@ -300,4 +300,109 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         // an array does not give a tag or a mark: the default
         self::assertStringContainsString('<h2>Array</h2>', $html);
     }
+
+    /**
+     * The template "Parent": a card with the given tag field, below the header of `parent`.
+     *
+     * @param array<string, mixed> $card
+     */
+    private function renderBelow(mixed $parent, array $card, bool $forThePageModule = false): string
+    {
+        $request = new ServerRequest('https://website.local/', 'GET');
+        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: $request,
+        ));
+        $view->assignMultiple(['parent' => $parent, 'card' => self::row('cards', 7, $card), 'notAParent' => 'h2']);
+
+        return trim($view->render('Parent'));
+    }
+
+    #[Test]
+    public function aCardWithoutATagIsOneLevelBelowTheHeaderOfTheParent(): void
+    {
+        $html = $this->renderBelow(self::element(), ['tag' => '']);
+
+        // the header of the element is an h2
+        self::assertStringContainsString('<h3>Default</h3>', $html);
+    }
+
+    #[Test]
+    public function aCardWithoutTheTagFieldIsOneLevelBelowToo(): void
+    {
+        // a forgotten or misspelled tagField no longer ends in an h2 below an h2
+        self::assertStringContainsString('<h3>Default</h3>', $this->renderBelow(self::element(), ['title' => 'No tag field']));
+    }
+
+    #[Test]
+    public function theOffsetSaysHowManyLevelsBelow(): void
+    {
+        $html = $this->renderBelow(self::element(), ['tag' => '']);
+
+        self::assertStringContainsString('<h4>Two</h4>', $html);
+        self::assertStringContainsString('<h1>Above</h1>', $html);
+    }
+
+    #[Test]
+    public function theTagTheEditorChoseWinsOverTheParent(): void
+    {
+        $html = $this->renderBelow(self::element(), ['tag' => 'h4']);
+
+        self::assertStringContainsString('<h4>Default</h4>', $html);
+        self::assertStringContainsString('<h4>Two</h4>', $html);
+        self::assertStringContainsString('<h5>Explicit</h5>', $html);
+    }
+
+    #[Test]
+    public function theParentCanBeTheArrayOfAContentElement(): void
+    {
+        self::assertStringContainsString('<h3>Default</h3>', $this->renderBelow(self::content(), ['tag' => '']));
+    }
+
+    #[Test]
+    public function theParentWithoutATagTakesItsLayout(): void
+    {
+        $parent = self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => '', 'header_layout' => 3]);
+
+        self::assertStringContainsString('<h4>Default</h4>', $this->renderBelow($parent, ['tag' => '']));
+    }
+
+    #[Test]
+    public function belowTheLastLevelItIsADiv(): void
+    {
+        $parent = self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h6']);
+
+        self::assertStringContainsString('<div>Default</div>', $this->renderBelow($parent, ['tag' => '']));
+    }
+
+    #[Test]
+    public function belowADivItIsADiv(): void
+    {
+        $parent = self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'div']);
+
+        self::assertStringContainsString('<div>Default</div>', $this->renderBelow($parent, ['tag' => '']));
+    }
+
+    #[Test]
+    public function aParentThatIsNoRecordIsIgnored(): void
+    {
+        // a string is neither a record nor an array: the default
+        self::assertStringContainsString('<h2>Ignored</h2>', $this->renderBelow(self::element(), ['tag' => '']));
+    }
+
+    #[Test]
+    public function aSubheaderIgnoresTheParent(): void
+    {
+        // the subheader is one level below its own header (h2): h3, not three below
+        self::assertStringContainsString('>Subheader</h3>', $this->renderBelow(self::element(), ['tag' => '']));
+    }
+
+    #[Test]
+    public function theMarkOfTheCardStaysTheCards(): void
+    {
+        $html = $this->renderBelow(self::element(), ['tag' => ''], true);
+
+        self::assertStringContainsString('<h3 data-headliner-edit="cards:7:tag">Default</h3>', $html);
+    }
 }

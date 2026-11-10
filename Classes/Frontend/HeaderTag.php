@@ -49,13 +49,22 @@ final class HeaderTag
      */
     public static function forSubheader(string $headerTag, mixed $subheaderTag = null): string
     {
-        $chosen = self::resolve($subheaderTag);
-        if ($chosen !== null) {
-            return $chosen;
-        }
-        $level = (int) substr($headerTag, 1);
+        return self::resolve($subheaderTag) ?? self::shifted($headerTag, 1);
+    }
 
-        return str_starts_with($headerTag, 'h') && $level >= 1 && $level < 6 ? 'h' . ($level + 1) : 'div';
+    /**
+     * The tag the given number of levels below another (above, if negative): h2 and 2 is h4. Above h1 it stays h1, below
+     * h6 it is a div, and a div stays a div.
+     */
+    public static function shifted(string $tag, int $levels): string
+    {
+        $level = (int) substr($tag, 1);
+        if (!str_starts_with($tag, 'h') || $level < 1 || $level > 6) {
+            return 'div';
+        }
+        $shifted = max(1, $level + $levels);
+
+        return $shifted > 6 ? 'div' : 'h' . $shifted;
     }
 
     /**

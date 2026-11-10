@@ -100,6 +100,21 @@ ViewHelper reads the tag and the layout itself and needs no `tag`, `layout` or `
 `tagField`
     The field of `record` that holds the tag, if it is not `header_tag` (or `subheader_tag`): `tagField="tag"` for a card.
 
+`parent`, `offset`
+    For a heading in a record that is not the content element, a card for example. `parent` is the record of the content
+    element (`{data}`: a record object, or the array of a content element). A heading that has no tag of its own (the
+    field is empty or missing) is then `offset` levels below the header of the parent, one by default, and not the
+    default tag: `h3` under an `h2`, `h5` under an `h4`, a `div` below `h6`; a `div` stays a `div`. A negative `offset`
+    goes up (never above `h1`). The tag an editor chose always wins, and a subheader ignores `parent`.
+
+    ..  code-block:: html
+
+        <headliner:headline record="{card}" tagField="tag" parent="{data}">
+            {card -> f:render.text(field: 'title')}
+        </headliner:headline>
+
+    This also keeps a forgotten or misspelled `tagField` from ending in an `h2` under an `h2`.
+
 `tag`
     The tag chosen by the editor. Only `h1` to `h6` and `div` can come out; anything else becomes a `div`.
 

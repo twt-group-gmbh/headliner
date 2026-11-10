@@ -3,7 +3,8 @@
       data-namespace-typo3-fluid="true">
 <f:comment>
     The same as the block "cards", but the ViewHelper gets the record and reads the tag, the layout and the mark for
-    the page module from it: no tag="...", layout="..." or edit="..." anywhere.
+    the page module from it: no tag="...", layout="..." or edit="..." anywhere. A card without a tag of its own is
+    one level below the header of the element (parent="{data}"), not an h2 under whatever the header is.
 </f:comment>
 <section class="cards">
     <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
@@ -13,7 +14,7 @@
     <f:for each="{data.recordcards}" as="card">
         <headliner:headline.children record="{card}">
             <article class="card">
-                <headliner:headline record="{card}" tagField="tag">{card -> f:render.text(field: 'title')}</headliner:headline>
+                <headliner:headline record="{card}" tagField="tag" parent="{data}">{card -> f:render.text(field: 'title')}</headliner:headline>
                 {card -> f:render.text(field: 'text')}
             </article>
         </headliner:headline.children>
