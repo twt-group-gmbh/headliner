@@ -268,11 +268,11 @@ are in the demo (`ddev demo --extras`). They give the same page and the same box
 - A heading names its content element (`data-headliner-element`, taken from `{data}`, or from the record), so a Content
   Block, which has no frame `id="c12"` around its element, still gets the group and the badges. For a heading in a rich
   text the page module finds the element from the record: the inline field of the content element that links it.
-- The page module finds the field of every heading in the record by itself: the **rich text** it is written in, or the
-  **field with its tag**. The heading of a rich text has the badge :guilabel:`RTE` and, with the site setting
-  :ref:`headliner.editRteHeadings <configuration-editrteheadings>`, a select of the headings the editor offers; the
-  heading of the tag field has the title of the table as its badge (for example :guilabel:`Cards`) and a select with
-  the values of the field.
+- The title of a card has the mark of its tag field, the title of the table as its badge (for example
+  :guilabel:`Cards`) and a select with the values of the field. A heading in a rich text names its record, and the page
+  module finds the **rich text** it is written in (a heading of that text with the same level and text): it has the badge
+  :guilabel:`RTE` and, with the site setting :ref:`headliner.editRteHeadings <configuration-editrteheadings>`, a select
+  of the headings the editor offers.
 - The tag field must be a **select whose values are tags and nothing else** (`h1` to `h6`, `div`), and a text is only
   changed in a rich text field. The page module ignores anything else: the marks are part of the rendered page, which an
   editor can write to.
@@ -345,9 +345,9 @@ with child records (inline, IRRE) made with the means of the core works the same
   resolved, `{record}`. `{record.myext_items}` are the child records as record objects, which is what
   `headliner:headline` wants. The layout renders the header of the element, so it needs no `headliner:headline` of its
   own for that.
-- The rules are the same as for Content Blocks (see above): the page module finds the field of every heading (its rich
-  text, or the field with its tag, which must be a select of tags and nothing else), and the badge is the title of the
-  table (`ctrl.title`, here :guilabel:`Teaser`).
+- The rules are the same as for Content Blocks (see above): the tag field must be a select of tags and nothing else, the
+  page module finds the rich text of a heading in the text of its record, and the badge is the title of the table
+  (`ctrl.title`, here :guilabel:`Teaser`).
 - The tag of a record is saved in its own table with the rights of the backend user for it, so the editor needs to be
   allowed to modify `tx_myext_item`.
 

@@ -129,9 +129,10 @@ Tests split into two suites by what they need to boot:
   row or from `RowTable` (the inline field of the element) and the one rich text field of the table. There are three
   ViewHelpers: `headliner:headline` (a record object: the tag, the layout and the mark come from it), `headliner:headline.values`
   (values: it marks nothing unless `edit` says where, never from `data`, so a card title cannot get the mark of the
-  element's header) and `headliner:text`. `StructureBox::resolveInRecord()`
-  finds the field of each heading in a record: the first not yet used heading of a rich text field with the same
-  level and text, else the one tag field whose value is the rendered tag (ambiguous: a label). A rich text is only ever
+  element's header) and `headliner:text`. `StructureBox::richTextOf()`
+  finds the rich text of a heading that names its record: the first not yet used heading of a rich text field with the same
+  level and text (nothing else says where a heading is written; a mark around a heading is never read, only the one
+  on the heading). A rich text is only ever
   changed if `RteHeadingEditor::isRichTextField()` says so for the type of that record (for a content element the
   rich text is on per type of element, in `columnsOverrides`), through the DataHandler.
 - Headings from the text of a content element (RTE) can have a tag select, but only with the site setting
