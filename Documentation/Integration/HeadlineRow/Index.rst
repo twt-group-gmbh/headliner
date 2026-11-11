@@ -1,8 +1,10 @@
 ..  _integration-headline-row:
 
-=============================================
-headliner:headline.row, for a row as an array
-=============================================
+======================
+headliner:headline.row
+======================
+
+For a **row as an array**, as a data processor gives it.
 
 A data processor such as `database-query` gives each row as an array, in `data` of each entry. Give the row, and a record is
 made of it: the heading is then the one of `headliner:headline`, with nothing written by hand.

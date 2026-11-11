@@ -1,8 +1,10 @@
 ..  _integration-headline-values:
 
-=====================================
-headliner:headline.values, for values
-=====================================
+=========================
+headliner:headline.values
+=========================
+
+For **values**: a partial without a record, a fixed heading.
 
 For a partial that gets no record or a fixed heading, where there is nothing to read from. It sets the tag and the class from
 what it is given:

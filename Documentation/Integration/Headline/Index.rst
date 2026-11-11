@@ -1,10 +1,12 @@
 ..  _integration-headline:
 
-================================
-headliner:headline, for a record
-================================
+==================
+headliner:headline
+==================
 
-Give it the record object and it does the rest. The text comes from the label field of the record's table, so the record is
+For a **record object**: `{record}` in `fluid_styled_content`, `{data}` in a Content Block, a card of a collection.
+
+Give it the record and it does the rest. The text comes from the label field of the record's table, so the record is
 written once:
 
 ..  code-block:: html

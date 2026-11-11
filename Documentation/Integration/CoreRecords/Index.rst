@@ -1,8 +1,8 @@
 ..  _integration-core-records:
 
-====================================
-Child records without Content Blocks
-====================================
+=========================
+Child records of the core
+=========================
 
 The marks of the records and everything the page module does with them do not depend on Content Blocks. A content element
 with child records (inline, IRRE) made with the means of the core works the same way. This is the minimum:

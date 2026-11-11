@@ -1,8 +1,10 @@
 ..  _integration-text:
 
-======================================================
-headliner:text, for the rich text of a row as an array
-======================================================
+==============
+headliner:text
+==============
+
+For the **rich text of a row as an array**.
 
 A data processor such as `database-query` gives each row as an array in `data`; an array knows nothing of its table or its
 field. `headliner:text` names them around the text, so the page module can find the headings in it:

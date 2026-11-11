@@ -1,8 +1,8 @@
 ..  _integration-content-blocks:
 
-===============================================
-Content Blocks and records in a content element
-===============================================
+==============
+Content Blocks
+==============
 
 A Content Block gets its content element as a record object (`{data}`), and its collections (for example cards) are
 records of tables of their own. Give each record to `headliner:headline`:
