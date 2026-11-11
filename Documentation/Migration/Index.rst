@@ -98,3 +98,10 @@ value, several variables) is listed as needing a decision: there is no record th
 The scanner skips comments, HTML files without Fluid, and the directories `vendor`, `node_modules`, `var`, `.Build`,
 `typo3temp`, `sysext` and `_assets`. The suggestion assumes the variable is a record object; in a template where it is an
 array, see :ref:`integration-headline-row` and :ref:`integration-headline-values`.
+
+..  note::
+
+    The scanner is a helper, not a guarantee. It reads the markup with patterns, so it can miss a heading (one that is built
+    by a partial, a ViewHelper or another extension) and it can suggest a call that does not fit (the variable is no
+    record, the heading has markup around the text). Check every suggestion, and the rendered page, before you change a
+    template.

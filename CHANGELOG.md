@@ -164,7 +164,7 @@ First release.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
 - Command `headliner:scan-templates`: lists the headings (h1-h6) in the Fluid templates of a project and the
   `headliner:headline` call that replaces each one whose text is a field of a record; headings with another dynamic text are
-  listed as needing a decision. It only reads. `--with-static` also lists fixed headings.
+  listed as needing a decision. It only reads. `--with-static` also lists fixed headings. A helper that works with patterns: it does not find every case.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer), with
   screenshots of the box (language comparison, the select of a heading, a Content Block with its cards).
 

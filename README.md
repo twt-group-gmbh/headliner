@@ -240,7 +240,7 @@ vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields
 See the documentation for what is left to do by hand.
 
 To find the headings in your own Fluid templates and which of them `headliner:headline` can replace, run the scanner (it
-only reads, nothing is changed):
+only reads, nothing is changed; it is a helper and does not find every case, so check each suggestion):
 
 ```bash
 vendor/bin/typo3 headliner:scan-templates
