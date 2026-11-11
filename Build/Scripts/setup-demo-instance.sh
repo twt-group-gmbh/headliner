@@ -216,22 +216,29 @@ if demo_has_table tx_headlinerdemo_item; then
     "
 fi
 
-# The same with Content Blocks (cards, a slider) and the Visual Editor, if `ddev demo --extras` installed them
-# (package twtgroup/headliner-demo-blocks, Build/Demo/headliner_demo_blocks).
-if demo_has_table cards && demo_has_table slides; then
-    echo "› creating the demo of the Content Blocks (cards, slider)"
+# The same child table once more, but its rows come as arrays from a data processor (`database-query`) and the template
+# gives the values to headliner:headline.values and the rich text to headliner:text (CType headlinerdemo_rows, same package).
+if demo_has_table tx_headlinerdemo_item; then
+    echo "› creating the demo of child records as rows (core, arrays)"
     demo_sql -e "
         INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
-            (1, 'Cards (Content Block)', '/cards', 1, 1280, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+            (1, 'Teaser as rows (core, arrays)', '/teaser-rows', 1, 1152, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
         SET @page = LAST_INSERT_ID();
-        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, cards, crdate, tstamp)
-            VALUES (@page, 'twtgroup_cards', 0, 256, 0, 'Our cards', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        INSERT INTO tt_content (pid, CType, colPos, sorting, sys_language_uid, header, header_layout, header_tag, headlinerdemo_items, crdate, tstamp)
+            VALUES (@page, 'headlinerdemo_rows', 0, 256, 0, 'Teaser rows', 0, 'h2', 3, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
         SET @element = LAST_INSERT_ID();
-        INSERT INTO cards (pid, sorting, title, tag, text, foreign_table_parent_uid, crdate, tstamp) VALUES
-            (@page, 256, 'First card', 'h3', '<p>The first card has an H3.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-            (@page, 512, 'Second card', 'h3', '<p>The second card has an H3 as well.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
-            (@page, 768, 'Third card', 'h4', '<h3>A heading in the text of a card</h3><p>An H4 right after an H2: a level is skipped.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+        INSERT INTO tx_headlinerdemo_item (pid, sorting, title, tag, text, parent, crdate, tstamp) VALUES
+            (@page, 256, 'First row', 'h3', '<p>A row as an array.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 512, 'Second row', 'h3', '<p>No heading in this text.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP()),
+            (@page, 768, 'Third row', 'h4', '<h3>A heading in the text of a row</h3><p>Text.</p>', @element, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
+    "
+fi
 
+# The same with Content Blocks (a slider; the cards follow) and the Visual Editor, if `ddev demo --extras` installed them
+# (package twtgroup/headliner-demo-blocks, Build/Demo/headliner_demo_blocks).
+if demo_has_table slides; then
+    echo "› creating the demo of the Content Block (slider)"
+    demo_sql -e "
         INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
             (1, 'Slider (Content Block)', '/slider', 1, 1536, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());
         SET @page = LAST_INSERT_ID();
@@ -245,10 +252,9 @@ if demo_has_table cards && demo_has_table slides; then
     "
 fi
 
-# The same cards once more, but the template gives the record to the ViewHelper (`record="{card}" tagField="tag"`) instead of
-# the values (block recordcards, same package).
+# Cards, with the record given to the ViewHelper (`record="{card}"`, block recordcards, same package).
 if demo_has_table recordcards; then
-    echo "› creating the demo of the Content Block with the record (cards, record variant)"
+    echo "› creating the demo of the Content Block (cards)"
     demo_sql -e "
         INSERT INTO pages (pid, title, slug, doktype, sorting, perms_userid, perms_groupid, perms_user, perms_group, perms_everybody, crdate, tstamp) VALUES
             (1, 'Cards with record (Content Block)', '/cards-record', 1, 1792, 1, 0, 31, 27, 0, UNIX_TIMESTAMP(), UNIX_TIMESTAMP());

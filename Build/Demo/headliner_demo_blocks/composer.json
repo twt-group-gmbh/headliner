@@ -1,6 +1,6 @@
 {
     "name": "twtgroup/headliner-demo-blocks",
-    "description": "Demo content blocks for the headliner extension: cards (with the values, and with the record) and a slider. Only for the local demo instance (ddev demo --extras).",
+    "description": "Demo content blocks for the headliner extension: cards (with the record) and a slider. Only for the local demo instance (ddev demo --extras).",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "require": {

@@ -1,6 +1,6 @@
 {
     "name": "twtgroup/headliner-demo",
-    "description": "Demo content for the headliner extension: a content element with child records made with the means of the core (no Content Blocks). Only for the local demo instance.",
+    "description": "Demo content for the headliner extension: two content elements with child records made with the means of the core (no Content Blocks): the records, and the rows as arrays of a data processor. Only for the local demo instance.",
     "type": "typo3-cms-extension",
     "license": "GPL-2.0-or-later",
     "require": {

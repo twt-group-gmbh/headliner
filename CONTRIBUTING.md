@@ -19,10 +19,11 @@ builds it again; that resets the database.
 Content elements with child records (IRRE) are shown by two small demo extensions in `Build/Demo/`, which are only installed in
 the demo instance, never in the package:
 
-- **Teaser list** (`/teaser`), made with the means of the core only. It is part of `ddev start` and `ddev demo`.
-- **Cards**, **Cards with record** and **Slider** (`/cards`, `/cards-record`, `/slider`), Content Blocks, plus the Visual Editor.
-  The two cards are the same block: one gives the values to `headliner:headline` (`tag="{card.tag}"`), the other the
-  record (`record="{card}" tagField="tag"`). They need packages that CI does not
+- **Teaser list** (`/teaser`) and **Teaser as rows** (`/teaser-rows`), made with the means of the core only. They are part
+  of `ddev start` and `ddev demo`. The list gives the record to `headliner:headline` (`record="{item}"`); the rows come as
+  arrays from `database-query`, so the template uses `headliner:headline.values` with `edit` and `headliner:text`.
+- **Cards with record** and **Slider** (`/cards-record`, `/slider`), Content Blocks, plus the Visual Editor. They give the
+  record to `headliner:headline` (`record="{card}"`). They need packages that CI does not
   install, so `ddev demo --extras` installs them first. That changes `composer.json` and `composer.lock` on your machine:
   do not commit them (`git checkout composer.json` takes the extras out again).
 

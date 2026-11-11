@@ -29,3 +29,13 @@ $GLOBALS['TCA']['tt_content']['types']['headlinerdemo_teaser'] = [
         . '--div--;core.form.tabs:language,--palette--;;language,'
         . '--div--;core.form.tabs:access,--palette--;;hidden,--palette--;;access',
 ];
+
+// The same field and child table once more, with a template that gets the rows as arrays (see the set of this package).
+ExtensionManagementUtility::addTcaSelectItem('tt_content', 'CType', [
+    'label' => 'Teaser rows as arrays (demo, no Content Block)',
+    'value' => 'headlinerdemo_rows',
+    'icon' => 'content-text',
+    'group' => 'default',
+]);
+
+$GLOBALS['TCA']['tt_content']['types']['headlinerdemo_rows'] = $GLOBALS['TCA']['tt_content']['types']['headlinerdemo_teaser'];

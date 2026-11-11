@@ -54,11 +54,13 @@ Child records (IRRE) have demos in `Build/Demo/`, two small TYPO3 extensions tha
 (path repositories in `composer.json`; `Build/` is `export-ignore`, so they are not in the package):
 - `headliner_demo` (`twtgroup/headliner-demo`, in `require-dev`, needs nothing but the core): the content element
   "Teaser list" with a child table made with plain TCA, its own site set and a Fluid template with
-  `headliner:headline record="{item}"`. The page `/teaser` is seeded by `setup-demo-instance.sh`.
-- `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "cards", "recordcards" and "slider" with the Basic
-  `Twtgroup/Headline` ("cards" writes the values with `headliner:headline.values` and `edit`, "recordcards" is "cards" once more with `record="{card}"` and nothing else). NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
+  `headliner:headline record="{item}"`, and "Teaser rows" (the same table and field; the rows come as arrays from
+  `database-query`, so the template uses `headliner:headline.values` with `edit` and `headliner:text`). The pages `/teaser`
+  and `/teaser-rows` are seeded by `setup-demo-instance.sh`.
+- `headliner_demo_blocks` (`twtgroup/headliner-demo-blocks`): Content Blocks "recordcards" (cards) and "slider" with the Basic
+  `Twtgroup/Headline`, both with `record="{card}"` and nothing else. NOT in `require-dev`, so CI does not install Content Blocks or the Visual Editor: `ddev demo --extras`
   runs `composer require --dev` for them (this changes `composer.json` and `composer.lock` locally: do not commit it,
-  `git checkout composer.json` takes it out). The script seeds `/cards`, `/cards-record` and `/slider` when the tables exist.
+  `git checkout composer.json` takes it out). The script seeds `/cards-record` and `/slider` when the tables exist.
 The seed blocks for the demos only run if their tables exist, and unlike the older seeds they show SQL errors.
 
 Backend login: `https://headliner.ddev.site/typo3/`, user `admin`, password `Password.1` (local demo only; the

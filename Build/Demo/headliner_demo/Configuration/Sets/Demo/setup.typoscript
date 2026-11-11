@@ -3,3 +3,22 @@ tt_content.headlinerdemo_teaser {
     templateName = Teaser
     templateRootPaths.250 = EXT:headliner_demo/Resources/Private/Templates
 }
+
+# The same child table, but its rows come as arrays from a data processor: the template uses the values
+# (headliner:headline.values) and headliner:text instead of a record. With `record-transformation` below database-query the
+# rows would be records, and headliner:headline would do.
+tt_content.headlinerdemo_rows =< lib.contentElement
+tt_content.headlinerdemo_rows {
+    templateName = Rows
+    templateRootPaths.250 = EXT:headliner_demo/Resources/Private/Templates
+    dataProcessing {
+        10 = database-query
+        10 {
+            table = tx_headlinerdemo_item
+            pidInList.field = pid
+            where.dataWrap = parent = {field:uid}
+            orderBy = sorting
+            as = items
+        }
+    }
+}

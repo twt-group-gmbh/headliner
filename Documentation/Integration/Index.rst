@@ -258,8 +258,8 @@ records of tables of their own. Give each record to `headliner:headline`:
         </article>
     </f:for>
 
-Both a block with the record (*Cards with record* at `/cards-record`) and one with values and `edit` (*Cards* at `/cards`)
-are in the demo (`ddev demo --extras`). They give the same page and the same box.
+The block *Cards with record* at `/cards-record` is in the demo (`ddev demo --extras`), and the page *Teaser as rows* at
+`/teaser-rows` shows rows as arrays with `headliner:headline.values` and `headliner:text` (`ddev demo`).
 
 ..  figure:: /Images/content-blocks-cards.png
     :alt: The box with the headings of a Content Block and of its cards
