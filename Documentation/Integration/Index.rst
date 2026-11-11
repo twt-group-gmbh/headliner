@@ -68,6 +68,11 @@ The text from a field is output with `f:render.text`, the one the namespace `f` 
 `{record -> f:render.text(...)}` in the template (checked with `visual_editor` in the edit mode: the same
 `ve-editable-text` with the table, the uid and the field). A field the record does not have gives no heading, not an
 empty one.
+
+A heading is for a plain text field (`input` or `text` without rich text). A rich text field works too, and
+`visual_editor` marks it as it does in the template (`ve-editable-rich-text`), but its paragraphs end up inside the
+heading, which HTML does not allow: the page module reads such a heading as empty. Use `field` for the title, and output a
+rich text next to the heading.
 With a header and a rich text field, a template of your own looks like this. The heading is the ViewHelper, the rich text is
 output as it is, with `f:render.text` (or `f:format.html`), and needs nothing else:
 
