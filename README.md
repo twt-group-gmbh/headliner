@@ -130,10 +130,11 @@ With the record the ViewHelper reads the tag and the layout, and names the recor
 ```html
 <headliner:headline record="{record}" />
 <headliner:headline record="{record}" subheader="1" />
-<headliner:headline record="{card}" field="title" />
+<headliner:headline record="{card}" />
 ```
 
-The text comes from the field (`header`, `subheader`, or the one you name with `field`), output with `f:render.text`, so
+The text comes from the label field of the table (the `header` of a content element, the title of a card; `subheader` with
+`subheader`), or from the field you name with `textField`, output with `f:render.text`, so
 `visual_editor` still marks it. Text between the tags wins, for a link around it, say. A rich text field next to it needs
 nothing: the headings the editor wrote in it are found by the page module on their own.
 
@@ -192,7 +193,7 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 
 ```html
 <f:for each="{data.cards}" as="card">
-    <headliner:headline record="{card}" field="title" />
+    <headliner:headline record="{card}" />
     {card -> f:render.text(field: 'text')}
 </f:for>
 ```

@@ -40,8 +40,8 @@ without `fluid_styled_content`. There are three, and which one you need depends 
 headliner:headline, for a record
 --------------------------------
 
-Give it the record object and it does the rest. The text comes from the field of the record, so the record is written
-once:
+Give it the record object and it does the rest. The text comes from the label field of the record's table, so the record is
+written once:
 
 ..  code-block:: html
 
@@ -53,10 +53,12 @@ once:
     <headliner:headline record="{record}" subheader="1" />
 
     <f:for each="{data.cards}" as="card">
-        <headliner:headline record="{card}" field="title" />
+        <headliner:headline record="{card}" />
     </f:for>
 
-Or put the text between the tags, which wins over the field. That is the way if you need something around the text (a
+The label field is the field the backend uses as the name of a record (`ctrl.label` in the TCA): the `header` of a content
+element, the title of a card. In a Content Block it is the `labelField` of the collection, or else the first text field.
+If another field is to be the text, name it with `textField`. Or put the text between the tags, which wins over the field. That is the way if you need something around the text (a
 link) or want to output it yourself:
 
 ..  code-block:: html
@@ -67,11 +69,11 @@ The text from a field is output with `f:render.text`, the one the namespace `f` 
 `visual_editor` that is its own ViewHelper, so what an editor can change in the frontend is marked as it is with
 `{record -> f:render.text(...)}` in the template (checked with `visual_editor` in the edit mode: the same
 `ve-editable-text` with the table, the uid and the field). A field the record does not have gives no heading, not an
-empty one.
+empty one, and neither does a label field that is no plain text (a select, a number).
 
 A heading is for a plain text field (`input` or `text` without rich text). A rich text field works too, and
 `visual_editor` marks it as it does in the template (`ve-editable-rich-text`), but its paragraphs end up inside the
-heading, which HTML does not allow: the page module reads such a heading as empty. Use `field` for the title, and output a
+heading, which HTML does not allow: the page module reads such a heading as empty. Use a plain text field for the title, and output a
 rich text next to the heading.
 With a header and a rich text field, a template of your own looks like this. The heading is the ViewHelper, the rich text is
 output as it is, with `f:render.text` (or `f:format.html`), and needs nothing else:
@@ -111,11 +113,12 @@ second column.
         -   Always. It takes record objects only (`RecordInterface`): an array, such as `{data}` in a template of
             `fluid_styled_content`, is refused with an error. Use `{record}` there, or `headliner:headline.values`.
         -   (required)
-    *   -   `field`
+    *   -   `textField`
         -   no
-        -   For the text of the heading from a field of the record, when there is no content between the tags: the field of a
-            card (`field="title"`). The text is output with `f:render.text`, so `visual_editor` still marks it.
-        -   `header` (`subheader` with `subheader`); content between the tags wins
+        -   Only if the text is **not** in the label field of the table, and there is no content between the tags:
+            `textField="description"`. The text is output with `f:render.text`, so `visual_editor` still marks it.
+        -   The label field of the table (the `header` of a content element, the title of a card), `subheader` with
+            `subheader`; content between the tags wins
     *   -   `subheader`
         -   no
         -   For the subheader of the element. Its tag is `tag`, else the field `subheader_tag` of the record, else
@@ -307,7 +310,7 @@ records of tables of their own. Give each record to `headliner:headline`:
 
     <f:for each="{data.cards}" as="card">
         <article class="card">
-            <headliner:headline record="{card}" field="title" />
+            <headliner:headline record="{card}" />
             {card -> f:render.text(field: 'text')}
         </article>
     </f:for>

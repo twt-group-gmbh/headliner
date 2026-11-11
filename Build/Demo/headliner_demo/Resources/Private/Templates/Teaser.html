@@ -7,7 +7,7 @@
     <div class="teasers">
         <f:for each="{record.headlinerdemo_items}" as="item">
             <article class="teaser">
-                <headliner:headline record="{item}">{item -> f:render.text(field: 'title')}</headliner:headline>
+                <headliner:headline record="{item}" />
                 {item -> f:render.text(field: 'text')}
             </article>
         </f:for>

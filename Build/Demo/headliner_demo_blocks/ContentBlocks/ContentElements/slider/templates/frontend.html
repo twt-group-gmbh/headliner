@@ -2,13 +2,10 @@
       xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
       data-namespace-typo3-fluid="true">
 <section class="slider">
-    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
-    <f:if condition="{header}">
-        <headliner:headline record="{data}">{header}</headliner:headline>
-    </f:if>
+    <headliner:headline record="{data}" />
     <f:for each="{data.slides}" as="slide">
         <div class="slide">
-            <headliner:headline record="{slide}">{slide -> f:render.text(field: 'title')}</headliner:headline>
+            <headliner:headline record="{slide}" />
             {slide -> f:render.text(field: 'text')}
         </div>
     </f:for>
