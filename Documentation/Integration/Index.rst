@@ -427,9 +427,15 @@ renders the subheader as a `p`. For these elements:
 *   the box shows their headings, but only as a label: it cannot change their tag, because nothing in the template names
     the field (the mark `data-headliner-edit` is written by the ViewHelpers `headliner:headline` and `headliner:headline.values`).
 
-This was seen with the content element :guilabel:`Regular Text Element` (`text`). The other element types that Camino
-does not override, for example :guilabel:`Header` (`header`) and :guilabel:`Bullet List` (`bullets`), use the partial of
-`fluid_styled_content`, so the fields work and the box can change their tags.
+This was seen with the content element :guilabel:`Regular Text Element` (`text`): it comes out as before with and without
+the site set, and the box lists its heading as a label.
+
+The element types :guilabel:`Header` (`header`) and :guilabel:`Bullet List` (`bullets`) are different. Camino renders their
+header with its own markup, `<p class="headline headline--small">`. With the site set the partial of Headliner takes its
+place, so these headers come out as `<h2 class="ce-headline-layout-2">` (with a subheader, `<h3 ...>`): the fields work and
+the box can change their tags, but the classes `headline` and `headline--small` of Camino are gone, and the look of these
+headers can change. Check the CSS, and style `ce-headline-layout-N` or hide the fields for these types (see below) if you
+want to keep the markup of Camino. This was seen with a page of the layout :guilabel:`Camino Contentpage`.
 
 Some of Camino's own element types do not render a heading unless the layout asks for one, so the box has nothing to list
 for them. The :guilabel:`Text Teaser` (`camino_textteaser`) and the three heroes (`camino_hero`, `camino_hero_small`,

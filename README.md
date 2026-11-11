@@ -95,6 +95,9 @@ are cached). `fluid_styled_content` is optional:
   in the frontend come from the ViewHelpers in your own templates. The box in the page module works the same.
 
 > [!NOTE]
+> Installing the package alone changes nothing in the frontend; the site set does. The fields *Tag* and *Subheader tag* and
+> the box are there once it is installed, but the fields have no effect in the frontend without the set.
+>
 > With `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
 > H1-H6), so existing pages do not change until an editor chooses a tag.
 >
@@ -211,6 +214,10 @@ A theme that does not use the header partial of `fluid_styled_content` ignores t
 the content elements it renders itself. This was seen with the Regular Text Element of `typo3/theme-camino`: the box
 shows their headings but cannot change their tag, and some of its own elements (Text Teaser, Text Media Teaser Grid)
 render paragraphs instead of headings, so they do not appear in the box.
+
+Where the theme uses the header partial of `fluid_styled_content` for an element (the `header` and `bullets` elements of
+Camino), the site set replaces the markup of the theme for its headers: Camino's `<p class="headline headline--small">`
+becomes `<h2 class="ce-headline-layout-2">`, so check the CSS of these elements.
 
 The documentation (Integration) says how to hide the fields for such element types with page TSconfig
 (`TCEFORM.tt_content.header_tag.types.<type>.disabled = 1`).

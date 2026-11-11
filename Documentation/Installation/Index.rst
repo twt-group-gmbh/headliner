@@ -40,6 +40,11 @@ site:
     own templates (see :ref:`integration-own-templates`). Nothing is reported or logged. The box in the page module
     works the same.
 
+Installing the package alone changes nothing in the frontend: the site set is what changes the header partial. The new
+fields :guilabel:`Tag` and :guilabel:`Subheader tag` are in the form of the content elements and the box is in the page
+module as soon as the package is installed, but without the site set the fields have no effect in the frontend, and the box
+shows the headings as labels, without a select.
+
 Clear the caches after you add the set: the site sets and the TypoScript are cached, and until then the box can show
 headers of `fluid_styled_content` as if they came from the text of the element (badge :guilabel:`RTE`).
 
