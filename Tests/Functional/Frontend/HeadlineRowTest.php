@@ -12,9 +12,9 @@ use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
 /**
- * headliner:headline.values with a row as an array: a record is made of it, and the heading is the one of a record.
+ * headliner:headline.row, a row as an array: a record is made of it, and the heading is the one of a record.
  */
-final class HeadlineValuesRowTest extends AbstractFrontendTestCase
+final class HeadlineRowTest extends AbstractFrontendTestCase
 {
     protected array $testExtensionsToLoad = [
         'twtgroup/headliner',
