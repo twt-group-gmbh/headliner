@@ -117,12 +117,12 @@ are cached). `fluid_styled_content` is optional:
 ## In your own templates
 
 The content elements of the core need nothing: the site set changes their header partial. For a template of your own
-there are three ViewHelpers, by what you have:
+there are four ViewHelpers, by what you have:
 
 | You have | Use |
 |----------|-----|
 | A record object (`{record}` in `fluid_styled_content`, `{data}` in a Content Block, a card) | `headliner:headline record="{record}"` |
-| A row as an array (from `database-query`) | `headliner:headline.values row="{item.data}"` |
+| A row as an array (from `database-query`) | `headliner:headline.row row="{item.data}"` |
 | Values: a partial without a record, a fixed heading | `headliner:headline.values tag="..." layout="..." edit="table:uid:field"` |
 | The rich text of a row as an array (from a data processor) | `headliner:text row="{item.data}"` |
 
@@ -200,7 +200,7 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 ```
 
 A record needs nothing else. A row as an array (from `database-query`, say) is no record: turn it into one with
-the core's `record-transformation` data processor, or use `headliner:headline.values` for the title and `headliner:text`
+the core's `record-transformation` data processor, or use `headliner:headline.row` for the title and `headliner:text`
 for the rich text. The documentation (Integration) shows both.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
@@ -212,7 +212,7 @@ The same works for child records made with the means of the core. See the docume
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. For the content elements of the core headliner needs no ViewHelper in your templates; the ViewHelpers
-`headliner:headline`, `headliner:headline.values` and `headliner:text` are for your own templates.
+`headliner:headline`, `headliner:headline.row`, `headliner:headline.values` and `headliner:text` are for your own templates.
 
 ### Themes with their own header
 

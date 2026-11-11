@@ -4,8 +4,8 @@
 <f:layout name="Default" />
 
 <f:comment>
-    The rows of `database-query` are arrays: each entry of {items} has its row in `data`. headliner:headline.values with the
-    row makes a record of it (the table is found from the inline field of the content element), so the title is the one of a
+    The rows of `database-query` are arrays: each entry of {items} has its row in `data`. headliner:headline.row makes a
+    record of the row (the table is found from the inline field of the content element), so the title is the one of a
     record: the text from the label field, the tag from the tag field, the mark for the page module from the table and the
     uid. headliner:text names the record and the field in the headings of the rich text. With `record-transformation` the
     rows would be records and headliner:headline would do.
@@ -14,7 +14,7 @@
     <div class="teasers">
         <f:for each="{items}" as="item">
             <article class="teaser">
-                <headliner:headline.values row="{item.data}" />
+                <headliner:headline.row row="{item.data}" />
                 <headliner:text row="{item.data}"><f:format.html>{item.data.text}</f:format.html></headliner:text>
             </article>
         </f:for>

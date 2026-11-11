@@ -112,12 +112,14 @@ First release.
   or the one named with `textField`: it is output with the `f:render.text` that the
   namespace `f` has in the template, so `visual_editor` still marks it (checked in its edit mode); a field the record does
   not have gives no heading.
-- ViewHelper `headliner:headline.values` for values (a partial without a record, a fixed heading) and for a row as an
-  array: `tag`, `layout`, `default`, `subheader`, `parent` and `offset`. With values it marks nothing for the page module
-  unless `edit` ("table:uid:field") says where the tag is edited, and never takes a mark from the variable `data`, so the
-  title of a card cannot get the mark of the element's header. With `row` (a row of `database-query`, with `table`,
-  `textField` and `tagField` if needed) a record is made of the row and the heading is the one of `headliner:headline`:
-  the text from the label field, the tag from the tag field, the mark from the table, the uid and the field.
+- ViewHelper `headliner:headline.values` for values (a partial without a record, a fixed heading): `tag`, `layout`,
+  `default`, `subheader`, `parent` and `offset`. It marks nothing for the page module unless `edit` ("table:uid:field")
+  says where the tag is edited, and never takes a mark from the variable `data`, so the title of a card cannot get the
+  mark of the element's header.
+- ViewHelper `headliner:headline.row` for a row as an array (a row of `database-query`): a record is made of the row and
+  the heading is the one of `headliner:headline`: the text from the label field of the table, the tag from the tag field,
+  the mark from the table, the uid and the field. The table is found from the inline field of the content element, or
+  named with `table`; `textField` and `tagField` name the fields if they are not found.
 - ViewHelper `headliner:text` for the rich text of a row as an array (from a data processor): for the request of the page
   module only, every heading in it names the record and the field. `table` is found from the inline field of the content
   element, and `field` is the one rich text field of the table, if they are not given.

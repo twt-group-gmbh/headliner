@@ -129,8 +129,9 @@ Tests split into two suites by what they need to boot:
   `record="{card}"` needs nothing else; `HeadingExtractor` reads the mark on the heading itself (or on an element around it),
   and `StructureBox::elementOfRecord()` finds the content element from the `foreign_field` of the inline field of `tt_content`.
   A row as an array has no record to create: `headliner:text` writes the same mark (`HeadingMark`), with the table from the
-  row or from `RowTable` (the inline field of the element) and the one rich text field of the table. There are three
-  ViewHelpers: `headliner:headline` (a record object: the tag, the layout and the mark come from it), `headliner:headline.values`
+  row or from `RowTable` (the inline field of the element) and the one rich text field of the table. There are four
+  ViewHelpers: `headliner:headline` (a record object: the tag, the layout and the mark come from it), `headliner:headline.row`
+  (a row as an array: a record is made of it and the heading is the one of `headline`), `headliner:headline.values`
   (values: it marks nothing unless `edit` says where, never from `data`, so a card title cannot get the mark of the
   element's header) and `headliner:text`. `StructureBox::richTextOf()`
   finds the rich text of a heading that names its record: the first not yet used heading of a rich text field with the same
