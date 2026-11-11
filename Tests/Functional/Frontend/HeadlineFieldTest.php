@@ -7,13 +7,16 @@ namespace Twtgroup\Headliner\Tests\Functional\Frontend;
 use PHPUnit\Framework\Attributes\Test;
 use Twtgroup\Headliner\Middleware\InspectRequest;
 use Twtgroup\Headliner\Tests\Functional\AbstractFrontendTestCase;
+use TYPO3\CMS\Core\Domain\RawRecord;
+use TYPO3\CMS\Core\Domain\Record;
+use TYPO3\CMS\Core\Domain\Record\ComputedProperties;
 use TYPO3\CMS\Core\Domain\RecordFactory;
 use TYPO3\CMS\Core\Http\ServerRequest;
 use TYPO3\CMS\Core\View\ViewFactoryData;
 use TYPO3\CMS\Core\View\ViewFactoryInterface;
 
 /**
- * The text of the heading from a field of the record, as `f:render.text` gives it: the record is written once.
+ * The text of the heading from a field of the record (the label field of the table, or the one named with textField), as `f:render.text` gives it: the record is written once.
  */
 final class HeadlineFieldTest extends AbstractFrontendTestCase
 {
@@ -47,6 +50,8 @@ final class HeadlineFieldTest extends AbstractFrontendTestCase
         $view->assignMultiple([
             'record' => $factory->createResolvedRecordFromDatabaseRow('tt_content', $element),
             'card' => $factory->createResolvedRecordFromDatabaseRow('tx_headlinertestcards_card', $card),
+            // a record whose label field is a select
+            'levelled' => new Record(new RawRecord(9, 1, ['level' => 'h3'], new ComputedProperties(), 'tx_headlinertestcards_levellabel'), ['level' => 'h3']),
         ]);
 
         return trim($view->render('Field'));
@@ -62,9 +67,16 @@ final class HeadlineFieldTest extends AbstractFrontendTestCase
     }
 
     #[Test]
-    public function aFieldNamesTheTextOfARecordOfAnotherTable(): void
+    public function aTextFieldNamesTheTextOfARecordOfAnotherTable(): void
     {
         self::assertStringContainsString('<h3>First card</h3>', $this->renderField());
+    }
+
+    #[Test]
+    public function withoutATextFieldTheLabelFieldOfTheTableIsTheText(): void
+    {
+        // the card has the label field "title": two headings with its text, one by name and one by the label
+        self::assertSame(2, substr_count($this->renderField(), '<h3>First card</h3>'));
     }
 
     #[Test]
@@ -74,13 +86,20 @@ final class HeadlineFieldTest extends AbstractFrontendTestCase
     }
 
     #[Test]
-    public function aFieldThatIsNotThereGivesNoHeading(): void
+    public function aTextFieldThatIsNotThereGivesNoHeading(): void
     {
         $html = $this->renderField();
 
-        // a field and a standard field that the card does not have: nothing is output for them, only the card with a title
-        self::assertSame(1, substr_count($html, '<h3'));
+        // the text field "missing": nothing is output for it, and no empty heading
         self::assertStringNotContainsString('<h3></h3>', $html);
+        self::assertSame(2, substr_count($html, '<h3'));
+    }
+
+    #[Test]
+    public function aLabelFieldThatIsNoTextGivesNoHeading(): void
+    {
+        // the label field of that table is a select: no text, so no heading (the level h3 must not become the text)
+        self::assertStringNotContainsString('>h3<', $this->renderField());
     }
 
     #[Test]

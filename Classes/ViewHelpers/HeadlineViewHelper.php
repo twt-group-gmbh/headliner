@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Twtgroup\Headliner\ViewHelpers;
 
 use TYPO3\CMS\Core\Domain\RecordInterface;
+use TYPO3\CMS\Core\Schema\Capability\TcaSchemaCapability;
+use TYPO3\CMS\Core\Schema\Field\InputFieldType;
+use TYPO3\CMS\Core\Schema\Field\TextFieldType;
 use TYPO3\CMS\Core\Schema\TcaSchemaFactory;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use Twtgroup\Headliner\Schema\TagField;
@@ -34,7 +37,7 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
         parent::initializeArguments();
         $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it', true);
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else the field subheader_tag, else "offset" levels below the header of the parent or of the record', false, false);
-        $this->registerArgument('field', 'string', 'The field of "record" with the text of the heading, output with f:render.text (so visual_editor can edit it); without content between the tags. "header", or "subheader" with "subheader", if you do not name one');
+        $this->registerArgument('textField', 'string', 'The field of "record" with the text of the heading, output with f:render.text (so visual_editor can edit it), when there is no content between the tags. Without it the label field of the table (the title of a card, the header of a content element), or "subheader" with "subheader"');
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. It wins over the record. With "subheader" it is the tag of the subheader');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader". Without it the field header_tag if the record has it, else the one field of its table that is a select of tags');
         $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array); without it the variable "data" for a record of another table than tt_content: a heading without a tag of its own is rendered "offset" levels below that header; for a subheader without a parent it is its own record');
@@ -68,7 +71,8 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
         // the text: what is between the tags, else the field of the record
         $content = (string) $this->renderChildren();
         if (trim($content) === '') {
-            $content = $this->textOf($record, (string) ($this->arguments['field'] ?? '') !== '' ? (string) $this->arguments['field'] : ($subheader ? 'subheader' : 'header'));
+            $textField = (string) ($this->arguments['textField'] ?? '');
+            $content = $this->textOf($record, $textField !== '' ? $textField : ($subheader ? 'subheader' : self::labelFieldOf($record)));
             if ($content === '') {
                 // nothing to say: no empty heading
                 return '';
@@ -76,6 +80,31 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
         }
 
         return $this->output($tag, $layout, EditMark::forRecord($record, $tagField), EditMark::elementUid($data) ?? EditMark::elementUid($record), $content);
+    }
+
+    /**
+     * The label field of the table of the record, if it is a plain text (an input, or a text that is no rich text): the
+     * title of a card, the header of a content element. Nothing for a table without one or with another kind of field (a
+     * select, a number), as that is no text for a heading.
+     */
+    private static function labelFieldOf(RecordInterface $record): string
+    {
+        $schemaFactory = GeneralUtility::makeInstance(TcaSchemaFactory::class);
+        $table = $record->getMainType();
+        if (!$schemaFactory->has($table)) {
+            return '';
+        }
+        $schema = $schemaFactory->get($table);
+        if (!$schema->hasCapability(TcaSchemaCapability::Label)) {
+            return '';
+        }
+        $name = (string) $schema->getCapability(TcaSchemaCapability::Label)->getPrimaryFieldName();
+        if ($name === '' || !$schema->hasField($name)) {
+            return '';
+        }
+        $field = $schema->getField($name);
+
+        return $field instanceof InputFieldType || ($field instanceof TextFieldType && !$field->isRichText()) ? $name : '';
     }
 
     /**
