@@ -91,6 +91,22 @@ Give it the record object and it does the rest:
         <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
     </f:for>
 
+With a header and a rich text field, a template of your own looks like this. The heading is the ViewHelper, the rich text is
+output as it is, with `f:render.text` (or `f:format.html`), and needs nothing else:
+
+..  code-block:: html
+
+    <article>
+        <headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+        {record -> f:render.text(field: 'bodytext')}
+    </article>
+
+The headings the editor wrote in `bodytext` (`<h3>` in the text) are found by the page module as well: they have the badge
+:guilabel:`RTE` and, with the site setting :ref:`headliner.editRteHeadings <configuration-editrteheadings>`, a select. Nothing
+in the template says so. The record names itself in every heading of its rich text fields when it is created for the page
+module (the listener `MarkRichTextHeadings`), so it does not matter how the text is output. The same works for a card in a
+collection: `{card -> f:render.text(field: 'text')}` next to `headliner:headline record="{card}"`.
+
 The tag comes from the field of the record (`header_tag`, `subheader_tag`, or for a card the one field of its table that
 is a select of tags), the layout class from `header_layout`, and the page module gets the record, its uid (in a
 translation the uid of the translation) and the field. A card without a tag of its own is one level below the header of

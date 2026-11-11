@@ -128,6 +128,13 @@ With the record the ViewHelper reads the tag and the layout, and names the recor
 <headliner:headline record="{record}" subheader="1">{record -> f:render.text(field: 'subheader')}</headliner:headline>
 ```
 
+A rich text field next to it needs nothing: the headings the editor wrote in it are found by the page module on their own.
+
+```html
+<headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+{record -> f:render.text(field: 'bodytext')}
+```
+
 The documentation (Integration) lists the arguments of each ViewHelper and how child records (cards) work.
 
 ## Extending with your own rules
