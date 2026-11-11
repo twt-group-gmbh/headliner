@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use TYPO3\CMS\Core\Attribute\AsEventListener;
 use TYPO3\CMS\Core\Domain\Event\RecordCreationEvent;
 use TYPO3\CMS\Core\Schema\Field\TextFieldType;
+use Twtgroup\Headliner\Frontend\HeadingMark;
 use Twtgroup\Headliner\Middleware\InspectRequest;
 
 /**
@@ -37,14 +38,7 @@ final class MarkRichTextHeadings
             if (!$field instanceof TextFieldType || !$field->isRichText()) {
                 continue;
             }
-            $event->setProperty($name, self::mark($value, $source, $name));
+            $event->setProperty($name, HeadingMark::inHtml($value, $source, $name));
         }
-    }
-
-    private static function mark(string $html, string $source, string $field): string
-    {
-        $attributes = ' data-headliner-record="' . htmlspecialchars($source) . '" data-headliner-field="' . htmlspecialchars($field) . '"';
-
-        return (string) preg_replace('/<(h[1-6])(?=[\s>])/i', '<$1' . $attributes, $html);
     }
 }
