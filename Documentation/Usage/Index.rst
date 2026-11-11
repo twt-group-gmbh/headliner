@@ -70,8 +70,9 @@ The fields of a content element
 
 :guilabel:`Subheader tag` (`subheader_tag`)
     Like :guilabel:`Tag`, for the subheader. The default is :guilabel:`One level below the header`: an H1 header
-    has an `h2` subheader, H2 an `h3`, and so on; below H6 and under a `div` it is a `div`. `fluid_styled_content` always
-    renders the subheader as `h3`, so choose :guilabel:`H3` if a subheader has to stay as it was.
+    has an `h2` subheader, H2 an `h3`, and so on; below H6 and under a `div` it is a `div`. For content without a tag of
+    its own this is what `fluid_styled_content` does with the layout; choose a tag in :guilabel:`Subheader tag` if a
+    subheader is to stay as it is while the tag of its header is changed.
 
 The subheader has no layout of its own: it has the layout class of its header, and the layout "Hidden" of the header
 hides both.

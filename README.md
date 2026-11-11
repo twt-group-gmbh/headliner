@@ -101,9 +101,10 @@ are cached). `fluid_styled_content` is optional:
 > With `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
 > H1-H6), so existing pages do not change until an editor chooses a tag.
 >
-> The subheader is different: `fluid_styled_content` always renders it as `h3`, headliner one level below the header
-> (an `h2` under an H1, a `div` below H6). Check pages with subheaders after the installation, or choose H3 in
-> *Subheader tag*.
+> This holds for the tags of the headers and of the subheaders: for content without a tag they are the same as with
+> `fluid_styled_content` (a subheader is one level below its header). The one difference is a subheader under the layout 6,
+> which `fluid_styled_content` makes an `h3` and headliner a `div` (nothing is below H6). The markup gets the class
+> `ce-headline-layout-N` in addition.
 
 ### Site settings
 

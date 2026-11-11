@@ -55,10 +55,14 @@ headers of `fluid_styled_content` as if they came from the text of the element (
     means H1 to H6), so existing pages do not change until an editor chooses a tag. The database column has an empty
     default for this, so adding it changes nothing in the existing content.
 
-    The subheader is the exception. `fluid_styled_content` renders it as an `h3` whatever the header is; headliner
-    renders it one level below the header (H1 gives an `h2`, H3 gives an `h4`, below H6 and in a `div` it is a `div`).
-    Only under an H2 the tag stays the same. Check the CSS and the heading structure of pages that have subheaders, or
-    choose :guilabel:`H3` in :guilabel:`Subheader tag` for them.
+    The same holds for the subheader: for content without a tag it is one level below its header, as in
+    `fluid_styled_content` (layout 1 gives an `h2`, layout 3 an `h4`). The one difference is a subheader under the layout 6,
+    which `fluid_styled_content` makes an `h3` and headliner a `div`, because nothing is below H6. The markup of every
+    header gets the class `ce-headline-layout-N` in addition, which changes nothing unless your CSS uses it (it was
+    compared for the layouts 0 to 6).
+
+    Once an editor chooses a tag, the subheader follows it: under an `h1` it is an `h2`, under an `h3` an `h4`, unless
+    :guilabel:`Subheader tag` says otherwise.
 
 ..  note::
 
