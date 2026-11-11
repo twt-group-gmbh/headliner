@@ -35,7 +35,7 @@ final class ValuesViewHelper extends AbstractHeadlineViewHelper
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. With "subheader" it is the tag of the subheader');
         $this->registerArgument('layout', 'string', 'The layout of the header (header_layout, 1-6): adds the CSS class ce-headline-layout-N and, for content without a tag, decides the tag');
         $this->registerArgument('default', 'string', 'Used if there is no tag and no layout 1-6: a number from 1 to 6. Without it the setting defaultHeaderType of the content element, else h2');
-        $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else "offset" levels below the header of "parent"', false, false);
+        $this->registerArgument('subheader', 'bool', 'A switch, subheader="1": the heading is the subheader of an element, not its header. Its tag is "tag", else "offset" levels below the header of "parent", which is then needed', false, false);
         $this->registerArgument('edit', 'string', 'Where the tag can be edited, "table:uid:field"; only rendered for the page module');
         $this->registerArgument('parent', RecordInterface::class . '|array', 'The content element, a record object or its array, whose header is the reference: a subheader, or a heading without a tag, is "offset" levels below it');
         $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" (negative: above)', false, 1);

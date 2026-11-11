@@ -28,7 +28,7 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
     {
         parent::initializeArguments();
         $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it', true);
-        $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else the field subheader_tag, else "offset" levels below the header of the parent or of the record', false, false);
+        $this->registerArgument('subheader', 'bool', 'A switch, subheader="1": the heading is the subheader of the record, not its header. The text is the field subheader, the tag is "tag", else the field subheader_tag, else "offset" levels below the header', false, false);
         $this->registerArgument('textField', 'string', 'The field of "record" with the text of the heading, output with f:render.text (so visual_editor can edit it), when there is no content between the tags. Without it the label field of the table (the title of a card, the header of a content element), or "subheader" with "subheader"');
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. It wins over the record. With "subheader" it is the tag of the subheader');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader". Without it the field header_tag if the record has it, else the one field of its table that is a select of tags');

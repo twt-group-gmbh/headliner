@@ -121,9 +121,9 @@ second column.
             `subheader`; content between the tags wins
     *   -   `subheader`
         -   no
-        -   For the subheader of the element. Its tag is `tag`, else the field `subheader_tag` of the record, else
-            `offset` levels below the header of `parent` (of the `record` if there is no `parent`). It has the layout of
-            its header.
+        -   A switch, written `subheader="1"` (or `subheader="true"`): the heading is the **subheader** of the element
+            and not its header. You write nothing else for it, the text, the tag and the layout follow (see the example
+            below).
         -   The header
     *   -   `tag`
         -   no
@@ -151,6 +151,26 @@ second column.
 
 The default tag, for content without a tag and without a layout, is the setting `defaultHeaderType` of the content
 element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if there is none.
+
+**The subheader.** `subheader="1"` makes the heading the subheader of the same record. The text comes from the field
+`subheader`, the layout class is that of the header, and the tag is, in this order:
+
+#.  the tag you give with `tag`,
+#.  else the field `subheader_tag` of the record (the choice of the editor),
+#.  else one level below the header (`offset` levels): below its tag `h2` an `h3`, below `h6` or a `div` a `div`.
+
+..  code-block:: html
+
+    <header>
+        <headliner:headline record="{record}" />
+        <headliner:headline record="{record}" subheader="1" />
+    </header>
+
+    <headliner:headline record="{record}" subheader="1" tag="h4" />
+
+The first pair is the header and its subheader, the tag of the subheader following that of the header unless the editor
+chose one. The last line forces `h4`. A subheader the record has no text for (the field `subheader` is empty) gives no
+heading.
 
 ..  _integration-headline-values:
 
@@ -242,7 +262,8 @@ which is written as it is (`class="ce-headline-left"`):
         -   The setting `defaultHeaderType` of the content element, else `h2`
     *   -   `subheader`
         -   no
-        -   For the subheader of an element. Its tag is `tag`, else `offset` levels below the header of `parent`. It has the
+        -   A switch, written `subheader="1"`: the heading is the **subheader** of an element. Its tag is `tag`, else
+            `offset` levels below the header of `parent`, which must then be given (see the example above). It has the
             layout of that header.
         -   The header
     *   -   `parent`
