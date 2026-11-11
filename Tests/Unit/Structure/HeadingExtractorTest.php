@@ -232,16 +232,17 @@ final class HeadingExtractorTest extends TestCase
     }
 
     #[Test]
-    public function aHeadingInAMarkedRecordKnowsTheRecordAndTheElement(): void
+    public function aHeadingInARecordKnowsItsMarkItsRecordAndItsElement(): void
     {
-        // a card of a Content Block: the wrapper names the record, and the element it belongs to
-        $html = '<body><section><article data-headliner-record="cards:3" data-headliner-element="82">'
-            . '<h3>Title</h3><p>x</p><h4>In the text</h4></article><h2>Not in the card</h2></section></body>';
+        // a card of a Content Block: the title has the mark of its tag field and its element, the heading in the text
+        // names the record and the field
+        $html = '<body><section><h3 data-headliner-edit="cards:3:tag" data-headliner-element="82">Title</h3><p>x</p>'
+            . '<h4 data-headliner-record="cards:3" data-headliner-field="text">In the text</h4><h2>Not in the card</h2></section></body>';
 
         self::assertEquals(
             [
-                new Heading(3, 'Title', null, 82, false, 'cards:3'),
-                new Heading(4, 'In the text', null, 82, false, 'cards:3'),
+                new Heading(3, 'Title', 'cards:3:tag', 82),
+                new Heading(4, 'In the text', null, null, false, 'cards:3'),
                 new Heading(2, 'Not in the card'),
             ],
             (new HeadingExtractor())->extract($html)
@@ -257,17 +258,6 @@ final class HeadingExtractorTest extends TestCase
     }
 
     #[Test]
-    public function aHeadingWithAMarkOfItsOwnKeepsItAndTheRecordAround(): void
-    {
-        $html = '<body><div data-headliner-record="cards:3"><h2 data-headliner-edit="cards:3:tag">Own</h2></div></body>';
-
-        self::assertEquals(
-            [new Heading(2, 'Own', 'cards:3:tag', null, false, 'cards:3')],
-            (new HeadingExtractor())->extract($html)
-        );
-    }
-
-    #[Test]
     public function aHeadingInARichTextNamesItsRecordItself(): void
     {
         $html = '<body><h3 data-headliner-record="cards:3" data-headliner-field="text">In the text</h3></body>';
@@ -276,10 +266,11 @@ final class HeadingExtractorTest extends TestCase
     }
 
     #[Test]
-    public function theRecordOfTheHeadingItselfWinsOverTheOneAroundIt(): void
+    public function aRecordMarkOnAnElementAroundAHeadingIsNotRead(): void
     {
-        $html = '<body><div data-headliner-record="cards:3"><h3 data-headliner-record="cards:4" data-headliner-field="text">Inner</h3></div></body>';
+        // only the heading says where it is written: nothing that wraps it can (an editor can write to the page)
+        $html = '<body><div data-headliner-record="cards:3"><h3>Inner</h3></div></body>';
 
-        self::assertSame('cards:4', (new HeadingExtractor())->extract($html)[0]->record);
+        self::assertNull((new HeadingExtractor())->extract($html)[0]->record);
     }
 }

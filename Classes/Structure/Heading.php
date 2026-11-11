@@ -11,7 +11,8 @@ namespace Twtgroup\Headliner\Structure;
  * RTE content or a plugin): what the heading says itself (data-headliner-element), else the frame around it.
  * $outside says the heading is not in the content of the page (see HeadingExtractor): in the header, the menu, the footer.
  * It is shown, but not checked.
- * $record says the record the heading is rendered for ("table:uid"), if the template marked it: a card of a Content Block.
+ * $record says the record a heading in a rich text is written in ("table:uid"), if the heading itself names it: a card of
+ * a Content Block.
  */
 final readonly class Heading
 {

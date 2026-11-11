@@ -10,7 +10,7 @@ use TYPO3\CMS\Core\Localization\LanguageServiceFactory;
 
 /**
  * Headings in the records of a collection (the cards of a content element), as the box finds their fields: from the
- * marks `headliner:headline.children` puts around a record. The table of the cards is a fixture extension; the page
+ * marks the ViewHelpers and the listener for the rich text put on the headings of a record. The table of the cards is a fixture extension; the page
  * html is what the ViewHelpers would have put on the page.
  */
 final class StructureBoxRecordsTest extends AbstractFrontendTestCase
@@ -24,15 +24,17 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
 
     /**
      * Element 21 of page 8 with three cards: a title in the tag field, a heading in the rich text, a heading that is
-     * neither, two cards whose tag fields cannot be told apart, and two equal headings in one text.
+     * in no field, and two equal headings in one text.
      */
     private const PAGE = '<html><body><main>'
         . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">Intro</h2>'
-        . '<div data-headliner-record="tx_headlinertestcards_card:1" data-headliner-element="21">'
-        . '<h3>First card</h3><h3>Card text heading</h3><h5>Nowhere</h5></div>'
-        . '<div data-headliner-record="tx_headlinertestcards_card:2" data-headliner-element="21"><h3>Second card</h3></div>'
-        . '<div data-headliner-record="tx_headlinertestcards_card:3" data-headliner-element="21">'
-        . '<h2>Third card</h2><h3>Same</h3><h3>Same</h3></div>'
+        . '<h3 data-headliner-edit="tx_headlinertestcards_card:1:tag" data-headliner-element="21">First card</h3>'
+        . '<h3 data-headliner-record="tx_headlinertestcards_card:1" data-headliner-field="text">Card text heading</h3>'
+        . '<h5 data-headliner-record="tx_headlinertestcards_card:1" data-headliner-field="text">Nowhere</h5>'
+        . '<h3 data-headliner-edit="tx_headlinertestcards_card:2:tag" data-headliner-element="21">Second card</h3>'
+        . '<h2 data-headliner-edit="tx_headlinertestcards_card:3:tag" data-headliner-element="21">Third card</h2>'
+        . '<h3 data-headliner-record="tx_headlinertestcards_card:3" data-headliner-field="text">Same</h3>'
+        . '<h3 data-headliner-record="tx_headlinertestcards_card:3" data-headliner-field="text">Same</h3>'
         . '</main></body></html>';
 
     /** @var array<string, mixed> */
@@ -129,17 +131,6 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
     }
 
     #[Test]
-    public function aHeadingWhoseTagFieldCannotBeToldApartIsOnlyALabel(): void
-    {
-        $this->setUpBackendUser(1);
-
-        // card 2 has h3 in both of its tag fields: which one the heading was rendered with is not known
-        $row = $this->row($this->renderBox(), 'Second card');
-
-        self::assertStringNotContainsString('<select', $row);
-    }
-
-    #[Test]
     public function theHeadingsOfOneElementAndItsCardsAreOneGroup(): void
     {
         $this->setUpBackendUser(1);
@@ -193,7 +184,7 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
         $this->setUpBackendUser(1);
         $html = '<html><body><main>'
             . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">&lt;script&gt;alert(1)&lt;/script&gt; &lt;img src=x onerror=alert(2)&gt;</h2>'
-            . '<div data-headliner-record="tx_headlinertestcards_card:4" data-headliner-element="21"><h3>&lt;b onclick=x&gt;Evil &quot;q&quot; &amp; co</h3></div>'
+            . '<h3 data-headliner-record="tx_headlinertestcards_card:4" data-headliner-field="text">&lt;b onclick=x&gt;Evil &quot;q&quot; &amp; co</h3>'
             . '</main></body></html>';
 
         $box = $this->structureBox($html)->render($this->backendRequest(), 8, [0], '');
@@ -217,7 +208,7 @@ final class StructureBoxRecordsTest extends AbstractFrontendTestCase
         $this->setUpBackendUser(1);
         $html = '<html><body><main>'
             . '<h2 data-headliner-edit="tt_content:21:header_tag" data-headliner-element="21">Innocent</h2>'
-            . '<div data-headliner-record="tx_headlinertestcards_card:1" data-headliner-element="21"><h3>First card</h3></div>'
+            . '<h3 data-headliner-edit="tx_headlinertestcards_card:1:tag" data-headliner-element="21">First card</h3>'
             . '</main></body></html>';
 
         // elements 21 and card 1 are on page 8; this is page 1

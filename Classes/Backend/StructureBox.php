@@ -164,13 +164,10 @@ final readonly class StructureBox
             if ($target !== null && !$this->tagField->is($target['table'], $target['field'])) {
                 $target = null;
             }
-            // A heading in a record the template marked (a card) has no mark of its own: the field is found from the
-            // record, in its rich texts or in the field with its tag
-            $textTarget = null;
+            // A heading in the rich text of a record (a card) names the record; the field is found from the record, in its
+            // rich texts
             $recordTarget = $heading->recordTarget();
-            if ($target === null && $recordTarget !== null) {
-                ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord, $pageId);
-            }
+            $textTarget = $target === null && $recordTarget !== null ? $this->richTextOf($recordTarget, $heading, $usedInRecord, $pageId) : null;
             // A heading in a record whose mark names no element (the rich text of a card marks itself): the element
             // the record is linked to
             // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
@@ -319,27 +316,24 @@ final readonly class StructureBox
     }
 
     /**
-     * The field behind a heading in a record that a template marked (a card of a Content Block): the rich text the
-     * heading is written in (the first heading of a text that has its level and text and is not taken yet), or else
-     * the one field with its tag (a select of tags whose value is the tag the heading was rendered with). None if it
-     * is neither, or the tag fields cannot be told apart.
+     * The rich text of a record a heading is written in (the first not yet used heading of a rich text field with the same
+     * level and text), and its place in that text. None if it is in no field of the record.
      *
      * @param array{table: string, uid: int} $recordTarget
      * @param array<string, array<string, array<int, true>>> $used
-     * @return array{tag: array{table: string, uid: int, field: string}|null, text: array{table: string, uid: int, field: string, ordinal: int}|null}
+     * @return array{table: string, uid: int, field: string, ordinal: int}|null
      */
-    private function resolveInRecord(array $recordTarget, Heading $heading, array &$used, int $pageId): array
+    private function richTextOf(array $recordTarget, Heading $heading, array &$used, int $pageId): ?array
     {
-        $none = ['tag' => null, 'text' => null];
         ['table' => $table, 'uid' => $uid] = $recordTarget;
         $record = $this->tcaSchemaFactory->has($table) ? BackendUtility::getRecordWSOL($table, $uid) : null;
         if ($record === null || !$this->isOnPage($record, $pageId)) {
-            return $none;
+            return null;
         }
-        $fields = array_map(static fn($field): string => $field->getName(), iterator_to_array($this->tcaSchemaFactory->get($table)->getFields(), false));
 
         $key = $table . ':' . $uid;
-        foreach ($fields as $field) {
+        foreach ($this->tcaSchemaFactory->get($table)->getFields() as $schemaField) {
+            $field = $schemaField->getName();
             if (!$this->rteEditor->isRichTextField($table, $field, $record)) {
                 continue;
             }
@@ -347,18 +341,12 @@ final readonly class StructureBox
                 if (!isset($used[$key][$field][$ordinal]) && $inText['level'] === $heading->level && $inText['text'] === $heading->text) {
                     $used[$key][$field][$ordinal] = true;
 
-                    return ['tag' => null, 'text' => ['table' => $table, 'uid' => $uid, 'field' => $field, 'ordinal' => $ordinal]];
+                    return ['table' => $table, 'uid' => $uid, 'field' => $field, 'ordinal' => $ordinal];
                 }
             }
         }
 
-        $rendered = $heading->level === 0 ? 'div' : 'h' . $heading->level;
-        $matches = array_values(array_filter(
-            $fields,
-            fn(string $field): bool => $this->tagField->is($table, $field) && ($record[$field] ?? null) === $rendered
-        ));
-
-        return count($matches) === 1 ? ['tag' => ['table' => $table, 'uid' => $uid, 'field' => $matches[0]], 'text' => null] : $none;
+        return null;
     }
 
     /**

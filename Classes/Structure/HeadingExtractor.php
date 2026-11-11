@@ -74,18 +74,13 @@ final class HeadingExtractor
     }
 
     /**
-     * The record of a heading, from the mark (`data-headliner-record`) on the heading itself (a heading in a rich text,
-     * see `MarkRichTextHeadings`) or else on the element a template put around it.
+     * The record a heading in a rich text is written in, from the mark (`data-headliner-record`) on the heading itself
+     * (see `MarkRichTextHeadings` and `TextViewHelper`). Only the heading says it: the page is written by editors, and
+     * an element around the heading could be theirs.
      */
     private function findRecord(\DOMElement $node): ?string
     {
-        for ($current = $node; $current instanceof \DOMElement; $current = $current->parentNode) {
-            if ($current->hasAttribute('data-headliner-record')) {
-                return $current->getAttribute('data-headliner-record');
-            }
-        }
-
-        return null;
+        return $node->hasAttribute('data-headliner-record') ? $node->getAttribute('data-headliner-record') : null;
     }
 
     /**
