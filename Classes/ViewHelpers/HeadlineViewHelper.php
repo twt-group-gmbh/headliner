@@ -34,6 +34,7 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
         parent::initializeArguments();
         $this->registerArgument('record', RecordInterface::class, 'The record object the heading belongs to: the tag, the layout and the record for the page module are taken from it', true);
         $this->registerArgument('subheader', 'bool', 'Render a subheader instead of the header: its tag is "tag", else the field subheader_tag, else "offset" levels below the header of the parent or of the record', false, false);
+        $this->registerArgument('field', 'string', 'The field of "record" with the text of the heading, output with f:render.text (so visual_editor can edit it); without content between the tags. "header", or "subheader" with "subheader", if you do not name one');
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. It wins over the record. With "subheader" it is the tag of the subheader');
         $this->registerArgument('tagField', 'string', 'The field of "record" that holds the tag; "header_tag", or "subheader_tag" with "subheader". Without it the field header_tag if the record has it, else the one field of its table that is a select of tags');
         $this->registerArgument('parent', RecordInterface::class . '|array', 'The record whose header is the reference, the record of the content element (a record object, or its array); without it the variable "data" for a record of another table than tt_content: a heading without a tag of its own is rendered "offset" levels below that header; for a subheader without a parent it is its own record');
@@ -64,7 +65,37 @@ final class HeadlineViewHelper extends AbstractHeadlineViewHelper
             $tag = HeaderTag::forContent($own, $layout, $default);
         }
 
-        return $this->output($tag, $layout, EditMark::forRecord($record, $tagField), EditMark::elementUid($data) ?? EditMark::elementUid($record));
+        // the text: what is between the tags, else the field of the record
+        $content = (string) $this->renderChildren();
+        if (trim($content) === '') {
+            $content = $this->textOf($record, (string) ($this->arguments['field'] ?? '') !== '' ? (string) $this->arguments['field'] : ($subheader ? 'subheader' : 'header'));
+            if ($content === '') {
+                // nothing to say: no empty heading
+                return '';
+            }
+        }
+
+        return $this->output($tag, $layout, EditMark::forRecord($record, $tagField), EditMark::elementUid($data) ?? EditMark::elementUid($record), $content);
+    }
+
+    /**
+     * The text of a field of the record as `f:render.text` gives it. The ViewHelper is the one the namespace `f` has for
+     * the template (`visual_editor` replaces it, to mark what an editor can change), so it is looked up and not called
+     * by its class. Empty if the record has no such field.
+     */
+    private function textOf(RecordInterface $record, string $field): string
+    {
+        $context = $this->renderingContext;
+        if ($context === null || !$record->has($field)) {
+            return '';
+        }
+        $text = $context->getViewHelperInvoker()->invoke(
+            $context->getViewHelperResolver()->createViewHelperInstance('f', 'render.text'),
+            ['record' => $record, 'field' => $field],
+            $context
+        );
+
+        return (string) $text;
     }
 
     /**

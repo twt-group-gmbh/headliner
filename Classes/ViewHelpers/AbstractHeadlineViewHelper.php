@@ -66,8 +66,9 @@ abstract class AbstractHeadlineViewHelper extends AbstractTagBasedViewHelper
     /**
      * @param string|null $edit Where the tag is edited, "table:uid:field"; only rendered for the page module
      * @param int|null $element The content element the heading is rendered in; only rendered for the page module
+     * @param string|null $content The text of the heading; the content of the tag if there is none
      */
-    protected function output(string $tagName, mixed $layout, ?string $edit, ?int $element): string
+    protected function output(string $tagName, mixed $layout, ?string $edit, ?int $element, ?string $content = null): string
     {
         $this->tag->setTagName($tagName);
         $classes = array_filter([
@@ -85,7 +86,7 @@ abstract class AbstractHeadlineViewHelper extends AbstractTagBasedViewHelper
             }
         }
         $this->tag->ignoreEmptyAttributes(true);
-        $this->tag->setContent((string) $this->renderChildren());
+        $this->tag->setContent($content ?? (string) $this->renderChildren());
 
         return $this->tag->render();
     }
