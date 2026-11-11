@@ -112,6 +112,9 @@ First release.
   or the one named with `textField`: it is output with the `f:render.text` that the
   namespace `f` has in the template, so `visual_editor` still marks it (checked in its edit mode); a field the record does
   not have gives no heading.
+- Argument `default` of the ViewHelpers for a heading: a tag (`h1`-`h6`, `div`) or a layout number from 1 to 6, for a heading that
+  has neither a tag nor a layout of its own. It is an argument of `headliner:headline` and `headliner:headline.row` too
+  now. The tag of the record and its layout win over it.
 - ViewHelper `headliner:headline.values` for values (a partial without a record, a fixed heading): `tag`, `layout`,
   `default`, `subheader`, `parent` and `offset`. It marks nothing for the page module unless `edit` ("table:uid:field")
   says where the tag is edited, and never takes a mark from the variable `data`, so the title of a card cannot get the

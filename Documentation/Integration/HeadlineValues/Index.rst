@@ -52,7 +52,8 @@ which is written as it is (`class="ce-headline-left"`):
         -   No class of the layout
     *   -   `default`
         -   no
-        -   Only to change the tag of content that has neither a tag nor a layout from 1 to 6: a number from 1 to 6.
+        -   Only to say the tag of content that has neither a tag nor a layout from 1 to 6: a tag (`default="h2"`,
+            `default="div"`) or a layout number from 1 to 6.
         -   The setting `defaultHeaderType` of the content element, else `h2`
     *   -   `subheader`
         -   no

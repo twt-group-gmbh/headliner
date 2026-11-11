@@ -109,6 +109,12 @@ second column.
             `data`, or for a subheader that is to be counted from another header. A record object or the array of one;
             any other type is refused.
         -   The variable `data` of the template, for a record of another table than `tt_content`
+    *   -   `default`
+        -   no
+        -   Only to say the tag of a heading that has **no tag and no layout** (an editor chose none, the record has no layout
+            from 1 to 6): a tag (`default="h2"`, `default="div"`) or a layout number from 1 to 6. The tag of the record and
+            its layout win over it.
+        -   The setting `defaultHeaderType` of the content element, else `h2`
     *   -   `offset`
         -   no
         -   Only for another distance than one level below the header of the parent. A negative number goes up (never
@@ -116,7 +122,12 @@ second column.
         -   1
 
 The default tag, for content without a tag and without a layout, is the setting `defaultHeaderType` of the content
-element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if there is none.
+element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if there is none. Name another one with
+`default`, for example when a component has a standard tag that applies unless the editor chose one:
+
+..  code-block:: html
+
+    <headliner:headline record="{data}" default="{headlineTag}">{headline}</headliner:headline>
 
 **The subheader.** `subheader="1"` makes the heading the subheader of the same record. The text comes from the field
 `subheader`, the layout class is that of the header, and the tag is, in this order:

@@ -77,6 +77,12 @@ Only `row` is required:
         -   no
         -   Only if the content element is **not** the variable `data`. A record object or the array of one.
         -   The variable `data`
+    *   -   `default`
+        -   no
+        -   Only to say the tag of a heading that has **no tag and no layout** (an editor chose none, the record has no layout
+            from 1 to 6): a tag (`default="h2"`, `default="div"`) or a layout number from 1 to 6. The tag of the record and
+            its layout win over it.
+        -   The setting `defaultHeaderType` of the content element, else `h2`
     *   -   `offset`
         -   no
         -   Only for another distance than one level below the header of the parent.
