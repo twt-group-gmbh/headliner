@@ -113,29 +113,51 @@ translation the uid of the translation) and the field. A card without a tag of i
 the content element, which is the variable `data`. The headings in the rich text of a record are marked when the record
 is created, so they need nothing in the template.
 
-`record`
-    The record object (required). It takes record objects only (type `RecordInterface`): an array, such as `{data}` in a
-    template of `fluid_styled_content`, is refused with an error. Use `{record}` there, or `headliner:headline.values`.
+Only `record` is required. Everything else has a value that is right in most cases; pass it only for the case in the
+second column.
 
-`subheader`
-    Render a subheader. Its tag is `tag`, else the field `subheader_tag` of the record, else `offset` levels below the
-    header of `parent`, or of the `record` if there is no `parent`. It has the layout of its header.
+..  list-table::
+    :header-rows: 1
+    :widths: 14 10 40 36
 
-`tag`
-    A tag that is given wins over the record: `h1` to `h6` or `div`, anything else becomes a `div`. With `subheader` it is
-    the tag of the subheader.
-
-`tagField`
-    The field of the record that holds the tag. Optional: it is `header_tag` (`subheader_tag` with `subheader`) if the
-    record has that field, otherwise the one field of its table that is a select with tags and nothing else. Pass it if
-    the table has several such fields. If there is none, or several and no `tagField`, the heading gets the default tag
-    and no mark, so the page module cannot change it.
-
-`parent`, `offset`
-    For a heading in a record of another table, a card for example. `parent` is the record of the content element (a
-    record object or its array, any other type is refused). Optional: it is the variable `data` of the template for a
-    record of another table than `tt_content`. A heading without a tag of its own is `offset` levels below the header of
-    the parent, one by default (`h3` under an `h2`, a `div` below `h6`, a `div` stays a `div`, never above `h1`).
+    *   -   Argument
+        -   Required
+        -   When you need it
+        -   Without it
+    *   -   `record`
+        -   yes
+        -   Always. It takes record objects only (`RecordInterface`): an array, such as `{data}` in a template of
+            `fluid_styled_content`, is refused with an error. Use `{record}` there, or `headliner:headline.values`.
+        -   (required)
+    *   -   `subheader`
+        -   no
+        -   For the subheader of the element. Its tag is `tag`, else the field `subheader_tag` of the record, else
+            `offset` levels below the header of `parent` (of the `record` if there is no `parent`). It has the layout of
+            its header.
+        -   The header
+    *   -   `tag`
+        -   no
+        -   Only to force a tag that the record does not say: `h1` to `h6` or `div` (anything else becomes a `div`). It wins
+            over the record. With `subheader` it is the tag of the subheader.
+        -   The tag from the field of the record
+    *   -   `tagField`
+        -   no
+        -   Only if the table has **several** fields that are a select of tags, or none of the usual name. Name the one
+            that is meant: `tagField="tag"`.
+        -   `header_tag` (`subheader_tag` with `subheader`) if the record has that field, else the one field of the table
+            that is a select with tags and nothing else. If there is none, or several, the heading gets the default tag
+            and no mark, so the page module cannot change it.
+    *   -   `parent`
+        -   no
+        -   Only for a heading in a record of another table (a card) if the content element is **not** the variable
+            `data`, or for a subheader that is to be counted from another header. A record object or the array of one;
+            any other type is refused.
+        -   The variable `data` of the template, for a record of another table than `tt_content`
+    *   -   `offset`
+        -   no
+        -   Only for another distance than one level below the header of the parent. A negative number goes up (never
+            above `h1`; below `h6` and below a `div` it is a `div`).
+        -   1
 
 The default tag, for content without a tag and without a layout, is the setting `defaultHeaderType` of the content
 element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if there is none.
@@ -166,35 +188,52 @@ change the tag only where you say where it is edited, with `edit`:
 
     <headliner:headline.values tag="{item.data.tag}" edit="tx_myext_item:{item.data.uid}:tag">{item.data.title}</headliner:headline.values>
 
-`tag`
-    The tag: `h1` to `h6` or `div`, anything else becomes a `div`. With `subheader` the tag of the subheader.
+None of the arguments is required, and you give what you know. Together with `class`, which every tag ViewHelper has and
+which is written as it is (`class="ce-headline-left"`):
 
-`layout`
-    The layout of the header (`header_layout`, 1 to 6): how it should look, not what it is. It adds the CSS class
-    `ce-headline-layout-N`, and for content without a tag of its own (from before the extension was installed) it decides
-    the tag, as `fluid_styled_content` does: layout 3 gives an `h3`. A tag that is given always wins, the layout then only
-    gives the class.
+..  list-table::
+    :header-rows: 1
+    :widths: 14 10 40 36
 
-`class`
-    Classes of your own, as on any tag ViewHelper (the alignment `ce-headline-left`, say). They are written as they are;
-    the class of the layout is added: `class="ce-headline-left"` and `layout="3"` give `class="ce-headline-left
-    ce-headline-layout-3"`.
-
-`default`
-    Used if there is no tag and no layout from 1 to 6: a number from 1 to 6. Optional: without it the setting
-    `defaultHeaderType` of the content element is used, and `h2` if there is none.
-
-`subheader`
-    Render a subheader. Its tag is `tag`, else `offset` levels (one by default) below the header of `parent`. It has the
-    layout of that header.
-
-`parent`, `offset`
-    The content element as a record object or an array (`{data}`): a subheader, or a heading without a tag, is `offset`
-    levels below its header.
-
-`edit`
-    `table:uid:field`: where the tag of this heading is edited. Only rendered for the request of the page module. Without
-    it the heading has no mark.
+    *   -   Argument
+        -   Required
+        -   When you need it
+        -   Without it
+    *   -   `tag`
+        -   no
+        -   Whenever you know the tag: `h1` to `h6` or `div` (anything else becomes a `div`). With `subheader` it is the tag of
+            the subheader.
+        -   The layout decides, then the default
+    *   -   `layout`
+        -   no
+        -   If the heading is to carry the class of the layout of its element (`ce-headline-layout-N`, N is 1 to 6), or if
+            content from before the extension, which has no tag, is to keep its tag: layout 3 gives an `h3`, as in
+            `fluid_styled_content`. A tag that is given always wins, the layout then only gives the class. With
+            `class="ce-headline-left"` and `layout="3"` the class is `ce-headline-left ce-headline-layout-3`.
+        -   No class of the layout
+    *   -   `default`
+        -   no
+        -   Only to change the tag of content that has neither a tag nor a layout from 1 to 6: a number from 1 to 6.
+        -   The setting `defaultHeaderType` of the content element, else `h2`
+    *   -   `subheader`
+        -   no
+        -   For the subheader of an element. Its tag is `tag`, else `offset` levels below the header of `parent`. It has the
+            layout of that header.
+        -   The header
+    *   -   `parent`
+        -   no
+        -   With `subheader` and no `tag` (the header it is counted from must be known), or for a heading that is to be
+            below the header of an element. The content element as a record object or an array (`{data}`).
+        -   Nothing to count from: the default tag
+    *   -   `offset`
+        -   no
+        -   Only for another distance than one level below the header of the parent.
+        -   1
+    *   -   `edit`
+        -   no
+        -   Only if the page module is to **change the tag** of this heading: `table:uid:field`. Only rendered for the
+            request of the page module.
+        -   No mark: the heading is rendered, and the box shows it as a label
 
 ..  _integration-text:
 
@@ -213,17 +252,30 @@ field. `headliner:text` names them around the text, so the page module can find 
         </headliner:text>
     </f:for>
 
-`row`
-    The row as an array (required). Its uid (in a translation `_LOCALIZED_UID`) names the record.
+Only `row` is required:
 
-`table`
-    The table of the row. Optional: it is found from the content element, which has an inline field for the table (the
-    field with this table as `foreign_table`), to which the row points with its `foreign_field`. Pass it if the element has
-    no such field, or if two of its fields would give different tables.
+..  list-table::
+    :header-rows: 1
+    :widths: 14 10 40 36
 
-`field`
-    The field of the row with the rich text. Optional: it is the one rich text field of the table. Pass it if the table has
-    several.
+    *   -   Argument
+        -   Required
+        -   When you need it
+        -   Without it
+    *   -   `row`
+        -   yes
+        -   Always: the row as an array. Its uid (in a translation `_LOCALIZED_UID`) names the record.
+        -   (required)
+    *   -   `table`
+        -   no
+        -   Only if the content element has **no** inline field for the table, or two of its fields would give different
+            tables.
+        -   The table of the inline field of the content element (the field with this table as `foreign_table`), to which
+            the row points with its `foreign_field`
+    *   -   `field`
+        -   no
+        -   Only if the table has **several** rich text fields.
+        -   The one rich text field of the table
 
 For a visitor the content comes out as it is; for the request of the page module every heading in it names the record and
 the field. Without a table or a field that can be found, or without a uid, there is no mark.
