@@ -122,7 +122,8 @@ there are three ViewHelpers, by what you have:
 | You have | Use |
 |----------|-----|
 | A record object (`{record}` in `fluid_styled_content`, `{data}` in a Content Block, a card) | `headliner:headline record="{record}"` |
-| Values: an array, a partial without a record, a fixed heading | `headliner:headline.values tag="..." layout="..." edit="table:uid:field"` |
+| A row as an array (from `database-query`) | `headliner:headline.values row="{item.data}"` |
+| Values: a partial without a record, a fixed heading | `headliner:headline.values tag="..." layout="..." edit="table:uid:field"` |
 | The rich text of a row as an array (from a data processor) | `headliner:text row="{item.data}"` |
 
 With the record the ViewHelper reads the tag and the layout, and names the record for the page module:

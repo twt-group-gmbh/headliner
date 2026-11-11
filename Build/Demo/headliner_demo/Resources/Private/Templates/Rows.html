@@ -4,16 +4,17 @@
 <f:layout name="Default" />
 
 <f:comment>
-    The rows of `database-query` are arrays: each entry of {items} has its row in `data`. An array knows nothing of its table,
-    so the title says where its tag is edited (edit="table:uid:field"), and headliner:text names the record and the field in
-    the headings of the rich text (the table is found from the inline field of the content element, the field is the one
-    rich text field of the table). With `record-transformation` the rows would be records and neither would be needed.
+    The rows of `database-query` are arrays: each entry of {items} has its row in `data`. headliner:headline.values with the
+    row makes a record of it (the table is found from the inline field of the content element), so the title is the one of a
+    record: the text from the label field, the tag from the tag field, the mark for the page module from the table and the
+    uid. headliner:text names the record and the field in the headings of the rich text. With `record-transformation` the
+    rows would be records and headliner:headline would do.
 </f:comment>
 <f:section name="Main">
     <div class="teasers">
         <f:for each="{items}" as="item">
             <article class="teaser">
-                <headliner:headline.values tag="{item.data.tag}" edit="tx_headlinerdemo_item:{item.data.uid}:tag">{item.data.title}</headliner:headline.values>
+                <headliner:headline.values row="{item.data}" />
                 <headliner:text row="{item.data}"><f:format.html>{item.data.text}</f:format.html></headliner:text>
             </article>
         </f:for>

@@ -157,8 +157,25 @@ element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if 
 headliner:headline.values, for values
 -------------------------------------
 
-For an array, a partial that gets no record or a fixed heading, where there is no record to read from. It sets the tag and
-the class from what it is given:
+For a row as an array (from a data processor), a partial that gets no record or a fixed heading, where there is no record
+to read from. There are two ways to use it.
+
+**With a row.** A data processor such as `database-query` gives each row as an array, in `data` of each entry. Give the row,
+and a record is made of it: the heading is then the one of `headliner:headline`, with nothing written by hand.
+
+..  code-block:: html
+
+    <f:for each="{items}" as="item">
+        <headliner:headline.values row="{item.data}" />
+    </f:for>
+
+The text comes from the label field of the table, the tag from its tag field, and the page module gets the table, the uid
+and the field (see :ref:`integration-headline`). The table is found from the content element, which has an inline field
+for it (the field with the table as `foreign_table`, to which the row points with its `foreign_field`); name it with
+`table` if it has none. The row must have all the columns of its table (`database-query` gives them, a select of a few
+columns does not): the core says which one is missing. A row whose table is not known gives no heading.
+
+**With values.** For everything without a row, it sets the tag and the class from what it is given:
 
 ..  code-block:: html
 
@@ -171,8 +188,8 @@ the class from what it is given:
 If you have the record, as in `{record -> f:render.text(field: 'header')}`, use `headliner:headline record="{record}"`
 instead: it needs none of this.
 
-It marks nothing for the page module on its own, and never looks at the variable `data` for a mark: the page module can
-change the tag only where you say where it is edited, with `edit`:
+With values it marks nothing for the page module on its own, and never looks at the variable `data` for a mark: the page
+module can change the tag only where you say where it is edited, with `edit`:
 
 ..  code-block:: html
 
@@ -189,6 +206,24 @@ which is written as it is (`class="ce-headline-left"`):
         -   Required
         -   When you need it
         -   Without it
+    *   -   `row`
+        -   no
+        -   For a row as an array, instead of values. It takes `tag`, `subheader`, `parent`, `offset`, `table`, `textField` and
+            `tagField`; `layout`, `default` and `edit` do not apply, they come from the record.
+        -   The values below
+    *   -   `table`
+        -   no
+        -   With `row`, only if the content element has **no** inline field for the table, or two of its fields would give
+            different tables.
+        -   The table of the inline field of the content element
+    *   -   `textField`
+        -   no
+        -   With `row`, only if the text is **not** in the label field of the table.
+        -   The label field of the table
+    *   -   `tagField`
+        -   no
+        -   With `row`, only if the table has **several** fields that are a select of tags.
+        -   The one such field of the table
     *   -   `tag`
         -   no
         -   Whenever you know the tag: `h1` to `h6` or `div` (anything else becomes a `div`). With `subheader` it is the tag of
@@ -236,7 +271,7 @@ field. `headliner:text` names them around the text, so the page module can find 
 ..  code-block:: html
 
     <f:for each="{items}" as="item">
-        <headliner:headline.values tag="{item.data.tag}" edit="tx_myext_item:{item.data.uid}:tag">{item.data.title}</headliner:headline.values>
+        <headliner:headline.values row="{item.data}" />
         <headliner:text row="{item.data}">
             <f:format.html>{item.data.text}</f:format.html>
         </headliner:text>
