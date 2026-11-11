@@ -71,6 +71,7 @@ What is left to do by hand:
     `twtgroup/headliner` of headliner, then clear the caches (see :ref:`installation`).
 #.  Change the templates that use `<semantilizer:headline>` to `<headliner:headline>` (see :ref:`integration-own-templates`).
     The simplest is `record="{record}"` (`record="{record}" subheader="1"` for the subheader): the tag, the layout and the
-    mark for the page module come from the record. With the values it is `tag="{data.header_tag}"` instead of
-    `type="{data.header_type}"`; the mark `edit` is not needed any more.
+    mark for the page module come from the record. With the values it is `<headliner:headline.values
+    tag="{data.header_tag}">` instead of `type="{data.header_type}"`, and `edit="tt_content:{data.uid}:header_tag"` if the
+    page module is to change the tag.
 #.  Check the CSS: headliner puts the class `ce-headline-layout-N` on a header, the Semantilizer `ce__header--N`.

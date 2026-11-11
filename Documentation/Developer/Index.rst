@@ -41,10 +41,11 @@ How the structure is checked
 #.  The marks for a record that is not the content element come from two places. `MarkRichTextHeadings`, a listener on the
     core's `RecordCreationEvent`, writes `data-headliner-record="table:uid"` and `data-headliner-field` into every heading
     of the rich text fields of a record object, when the record is created for a request with `headliner.inspect`: it
-    does not matter how a template renders the text, and no wrapper is needed. `headliner:headline.children` puts the
-    mark around the content of a record instead (`record`, or `row` and `table` for a row as an array, see `RowTable`).
+    does not matter how a template renders the text. For a row as an array there is no record to create, so
+    `headliner:text` puts the same mark into the headings of the text (`HeadingMark`), with the table from the row or from
+    the inline field of the content element (`RowTable`) and the one rich text field of the table.
     `StructureBox` then finds the field of each heading in the record (`resolveInRecord()`: the rich text, or the one
-    field with its tag) and, for a record without a wrapper that names its element, the content element it is linked to
+    field with its tag) and, for a record whose heading names no element, the content element it is linked to
     from the inline field of `tt_content` (`elementOfRecord()`). The box only believes a mark for a field that
     `Schema\TagField` says is a select of tags, on its own page, and for a table the user may edit.
 #.  `EditAccess` decides what the backend user may do with each element, and the Fluid template

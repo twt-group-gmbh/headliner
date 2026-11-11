@@ -98,46 +98,35 @@ First release.
   of `header_layout`), and the layout "Hidden" hides the header and the subheader.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the
   backend of that site and the subheader follows the tag of the header (one level below).
-- ViewHelper `headliner:headline`, the arguments `record` and `tagField`: with the record object (`{record}` in a template of
-  `fluid_styled_content`, `{data}` or a card in a Content Block) the ViewHelper reads the tag (`header_tag`, with
-  `subheader` `subheader_tag`, or the field `tagField` of any table) and the layout itself and names the record for the
-  page module (table, uid, in a translation the uid of the translation, and the field), so a template needs no `tag`,
-  `layout` or `edit`. A record without the field gives no mark. An argument that is given still wins over the record. `record` takes a record object (`RecordInterface`) and `parent` a record object or an array; Fluid refuses any other type.
-  `tagField` is optional (the one field of the record's table that is a select of tags), so is `parent` for a record of
-  another table than `tt_content` (the variable `data`), and so is `default` (the setting `defaultHeaderType` of the content
-  element): `record="{card}"` is all a card needs.
-  With `subheader` the argument `tag` is the tag of the subheader (there is no `subheaderTag`); without one it is
-  `offset` levels below the header of `parent`, or of the `record`.
-  The header partial of the extension hands the record on instead of an `edit` of its own, so the headings of the core's
-  content elements get the element too. `edit` still works and wins.
-  With the record no wrapper is needed (see the next entry); `headliner:headline.children` is the wrapper for the values.
-- Headings in the rich text of a record object: for the request of the page module only, the record names itself in
-  every heading of its rich text fields (`data-headliner-record`, `data-headliner-field`, put into the field value when the
+- ViewHelper `headliner:headline` for a record object (`{record}` in a template of `fluid_styled_content`, `{data}` or a
+  card in a Content Block): it reads the tag (`header_tag`, `subheader_tag`, the field `tagField`, or the one field of the
+  table that is a select of tags), the layout and the default tag (`settings.defaultHeaderType`) itself, and names the record
+  for the page module (table, uid, in a translation the uid of the translation, and the field). A card without a tag of its
+  own is `offset` levels (one by default) below the header of `parent` (the variable `data`). A record without a tag field
+  gives no mark. It takes a record object only (`RecordInterface`); `parent` a record object or an array. `tag` wins over
+  the record, and `subheader` renders the subheader.
+- ViewHelper `headliner:headline.values` for values (an array, a partial without a record, a fixed heading): `tag`, `layout`,
+  `default`, `subheader`, `parent` and `offset`. It marks nothing for the page module unless `edit` ("table:uid:field")
+  says where the tag is edited, and never takes a mark from the variable `data`, so the title of a card cannot get the
+  mark of the element's header.
+- ViewHelper `headliner:text` for the rich text of a row as an array (from a data processor): for the request of the page
+  module only, every heading in it names the record and the field. `table` is found from the inline field of the content
+  element, and `field` is the one rich text field of the table, if they are not given.
+- Headings in the rich text of a record object: for the request of the page module only, the record names itself in every
+  heading of its rich text fields (`data-headliner-record`, `data-headliner-field`, put into the field value when the
   record is created, so it does not matter how the template renders the text), and the page module takes the content
-  element of the record from the inline field that links it. So `headliner:headline.children` is not needed with
-  `record="{card}"`; it stays for the values (`tag="{card.tag}"`). Rows as arrays (a data processor): turn them into
-  records with the core's `record-transformation`, or keep them and pass each row as `row` instead of `record`: the wrapper finds the table of a row from the inline field of the content element that links it (`table="tx_myext_item"` if that is not clear). `record` takes record objects only.
-- ViewHelper `headliner:headline`, the arguments `parent` and `offset`: for a heading in a record that is not the content
-  element (a card), `parent="{data}"` makes a heading without a tag of its own `offset` levels (default one) below the
-  header of the content element instead of the default tag (`h3` under an `h2`; a `div` below `h6`, a `div` stays a
-  `div`, never above `h1`). The tag an editor chose wins; a subheader ignores `parent`.
-- ViewHelper `headliner:headline`: the argument `edit` is optional now. Without it the ViewHelper names the record behind
-  the header itself, for the page module only, from the variable `data` of the content element, an array or a record object as a Content Block has it (in a translation the uid of
-  the translation). Own templates need nothing but `tag` and `layout`.
-- Content Blocks and other records in a content element: the headings of a Content Block get the group and the badges
-  like other elements, and the heading of a record in a collection (a card) has a select too. The ViewHelper gives every
-  heading the attribute `data-headliner-element` with the uid of its content element (also where there is no frame with an
-  id around the element), and `edit` can name the record of another table (`{card.mainType}:{card.uid}:tag`). The badge of
-  such a heading is the title of the table. The tag is saved in the field of that record with the rights of the backend
-  user for the table, and the select offers the values of the field. The box only accepts a field that is a select with tags
-  and nothing else (h1 to h6, div): the mark is part of the rendered page, which an editor can write to, so it never
-  trusts a mark for another field or table.
-- Content Blocks, `headliner:headline.children`: wrapping the content of a record of a collection (a card) in this
-  ViewHelper is all a template needs. The page module finds the field of every heading in the record itself: the rich text
-  it is written in (badge "RTE", and a select if `headliner.editRteHeadings` is on), or the field with its tag. So no `edit`
-  is needed, and the rich text of a card is grouped and can be changed like the text of a content element. The rich text can
-  be a field of any table, if it is a rich text for the type of its record. A text is changed through the DataHandler
-  with the rights of the backend user for that table and field.
+  element of the record from the inline field that links it. A template needs no wrapper and no `edit` for it. For rows as
+  arrays use `headliner:text`, or turn them into records with the core's `record-transformation` data processor.
+- Content Blocks and other records in a content element: the headings of a Content Block get the group and the badges like
+  other elements, and the heading of a record in a collection (a card) has a select too, with the title of its table as
+  badge. The tag is saved in the field of that record with the rights of the backend user for the table, and the select
+  offers the values of the field. The box only accepts a field that is a select with tags and nothing else (h1 to h6, div):
+  the mark is part of the rendered page, which an editor can write to, so it never trusts a mark for another field or table.
+  The rich text of a card is grouped and can be changed like the text of a content element (badge "RTE", and a select if
+  `headliner.editRteHeadings` is on); it can be a field of any table, if it is a rich text for the type of its record, and is
+  changed through the DataHandler with the rights of the backend user for that table and field.
+- Documentation: the chapter "Child records without Content Blocks" shows a content element made with the means of the core
+  (TCA of the field and of the child table, Fluid template with `{record}`).
 - Content Blocks: the Basics `Twtgroup/Headline` (`header`, `header_tag`, `header_layout`) and `Twtgroup/Subheadline`
   (`subheader`, `subheader_tag`) in `ContentBlocks/Basics/`. A block names them with `type: Basic` and needs nothing else for
   the tag fields (Content Blocks does not know the fields that an extension adds in its TCA overrides, so a block that uses
@@ -146,9 +135,6 @@ First release.
   (0 to 6), into the tag of the header (`header_tag`). It keeps tags that were chosen already, leaves the layout and the
   subheader alone (the Semantilizer has no field for it), and can run again. See the chapter "Migration" of the
   documentation.
-- Documentation: the chapter "Child records without Content Blocks" shows the wrapper `headliner:headline.children` with a
-  content element made with the means of the core (TCA of the field and of the child table, Fluid template with
-  `{record}`).
 - Composer conflict with `zeroseven/z7-semantilizer`: both override the header partial and the Semantilizer's wins, so they
   must not run side by side. The documentation says in which order to switch (backup, remove, install, run the wizard,
   only then delete the unused column) and warns that a destructive schema update deletes the column `header_type` before

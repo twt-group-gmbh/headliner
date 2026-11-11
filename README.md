@@ -112,18 +112,23 @@ are cached). `fluid_styled_content` is optional:
 
 ## In your own templates
 
-The content elements of the core need nothing: the site set changes their header partial. For a template of your own use
-the ViewHelper `headliner:headline`. Give it the record and it reads the tag and the layout, and names the record for the
-page module:
+The content elements of the core need nothing: the site set changes their header partial. For a template of your own
+there are three ViewHelpers, by what you have:
+
+| You have | Use |
+|----------|-----|
+| A record object (`{record}` in `fluid_styled_content`, `{data}` in a Content Block, a card) | `headliner:headline record="{record}"` |
+| Values: an array, a partial without a record, a fixed heading | `headliner:headline.values tag="..." layout="..." edit="table:uid:field"` |
+| The rich text of a row as an array (from a data processor) | `headliner:text row="{item.data}"` |
+
+With the record the ViewHelper reads the tag and the layout, and names the record for the page module:
 
 ```html
 <headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
 <headliner:headline record="{record}" subheader="1">{record -> f:render.text(field: 'subheader')}</headliner:headline>
 ```
 
-`{record}` is the record object of a template of `fluid_styled_content`, `{data}` in a Content Block. Without a record
-(an array, a fixed heading) pass the values: `tag`, `layout` and, for the page module, `edit`. The documentation
-(Integration) says which arguments you need when, and how child records (cards) work.
+The documentation (Integration) lists the arguments of each ViewHelper and how child records (cards) work.
 
 ## Extending with your own rules
 
@@ -178,21 +183,9 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 </f:for>
 ```
 
-Or pass the values and wrap each record in `headliner:headline.children`, which names the record for the page module:
-
-```html
-<f:for each="{data.cards}" as="card">
-    <headliner:headline.children record="{card}">
-        <headliner:headline tag="{card.tag}">{card -> f:render.text(field: 'title')}</headliner:headline>
-        {card -> f:render.text(field: 'text')}
-    </headliner:headline.children>
-</f:for>
-```
-
-With the record there is no wrapper; with the values there is. Both need a record object, which a Content Block gives.
-Rows as arrays (from `database-query`, say) are no records: turn them into records with the core's `record-transformation`
-data processor, or pass each row as `row` to the wrapper (`<headliner:headline.children row="{item.data}">`). The
-documentation (Integration) shows the differences.
+A record needs no wrapper and no `edit`. A row as an array (from `database-query`, say) is no record: turn it into one with
+the core's `record-transformation` data processor, or use `headliner:headline.values` for the title and `headliner:text`
+for the rich text. The documentation (Integration) shows both.
 
 ![The box with the headings of a Content Block and of its cards](Documentation/Images/content-blocks-cards.png)
 
@@ -203,8 +196,7 @@ The same works for child records made with the means of the core. See the docume
 The header partial keeps the `f:render.text` calls of the partial of `fluid_styled_content`, which is how
 [`visual_editor`](https://github.com/FriendsOfTYPO3/visual_editor) finds editable texts, so both extensions can be used
 together. For the content elements of the core headliner needs no ViewHelper in your templates; the ViewHelpers
-`headliner:headline` (with `record="{record}"`, or with the values `tag` and `layout`) and `headliner:headline.children`
-(only for the values) are for your own templates.
+`headliner:headline`, `headliner:headline.values` and `headliner:text` are for your own templates.
 
 ### Themes with their own header
 
