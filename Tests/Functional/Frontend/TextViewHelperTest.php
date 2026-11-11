@@ -26,7 +26,7 @@ final class TextViewHelperTest extends FunctionalTestCase
      * @param array<string, mixed> $row
      * @param array<string, mixed>|null $data
      */
-    private function render(bool $forThePageModule, array $row, string $table, ?array $data = null): string
+    private function render(bool $forThePageModule, array $row, string $table, ?array $data = null, string $template = 'Text'): string
     {
         $request = new ServerRequest('https://website.local/', 'GET');
         $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
@@ -36,7 +36,7 @@ final class TextViewHelperTest extends FunctionalTestCase
         ));
         $view->assignMultiple(array_filter(['row' => $row, 'table' => $table, 'data' => $data], static fn(mixed $value): bool => $value !== null));
 
-        return trim($view->render('Text'));
+        return trim($view->render($template));
     }
 
     #[Test]
@@ -79,5 +79,20 @@ final class TextViewHelperTest extends FunctionalTestCase
     {
         self::assertStringNotContainsString('data-headliner', $this->render(true, ['uid' => 7], ''));
         self::assertStringNotContainsString('data-headliner', $this->render(true, ['title' => 'No uid'], 'tx_headlinertestcards_card'));
+    }
+
+    #[Test]
+    public function theFieldIsTheOneRichTextFieldOfTheTableIfNoneIsGiven(): void
+    {
+        $html = $this->render(true, ['uid' => 7], 'tx_headlinertestcards_card', template: 'TextAuto');
+
+        self::assertStringContainsString('<h3 data-headliner-record="tx_headlinertestcards_card:7" data-headliner-field="text">In the text</h3>', $html);
+    }
+
+    #[Test]
+    public function aTableWithoutARichTextFieldGivesNoField(): void
+    {
+        // the table has a title and a select only: nothing to name
+        self::assertStringNotContainsString('data-headliner', $this->render(true, ['uid' => 7], 'tx_headlinertestcards_single', template: 'TextAuto'));
     }
 }
