@@ -127,17 +127,19 @@ element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if 
 headliner:headline.values, for values
 -------------------------------------
 
-For an array, a partial that gets no record or a fixed heading. It sets the tag and the class from what it is given:
+For an array, a partial that gets no record or a fixed heading, where there is no record to read from. It sets the tag and
+the class from what it is given:
 
 ..  code-block:: html
 
-    <headliner:headline.values tag="{data.header_tag}" layout="{data.header_layout}">
-        {record -> f:render.text(field: 'header')}
-    </headliner:headline.values>
+    <headliner:headline.values tag="{data.header_tag}" layout="{data.header_layout}">{data.header}</headliner:headline.values>
 
     <headliner:headline.values subheader="1" tag="{data.subheader_tag}" parent="{data}" layout="{data.header_layout}">
-        {record -> f:render.text(field: 'subheader')}
+        {data.subheader}
     </headliner:headline.values>
+
+If you have the record, as in `{record -> f:render.text(field: 'header')}`, use `headliner:headline record="{record}"`
+instead: it needs none of this.
 
 It marks nothing for the page module on its own, and never looks at the variable `data` for a mark: the page module can
 change the tag only where you say where it is edited, with `edit`:
