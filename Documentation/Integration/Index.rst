@@ -343,7 +343,7 @@ field. `headliner:text` names them around the text, so the page module can find 
 ..  code-block:: html
 
     <f:for each="{items}" as="item">
-        <headliner:headline.values row="{item.data}" />
+        <headliner:headline.row row="{item.data}" />
         <headliner:text row="{item.data}">
             <f:format.html>{item.data.text}</f:format.html>
         </headliner:text>
