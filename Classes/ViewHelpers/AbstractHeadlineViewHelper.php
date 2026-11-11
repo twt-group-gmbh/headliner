@@ -100,7 +100,8 @@ abstract class AbstractHeadlineViewHelper extends AbstractTagBasedViewHelper
 
     /**
      * The heading of a record: the tag, the layout, the text and the marks for the page module come from it. The arguments
-     * it reads are the same in both ViewHelpers: subheader, tag, tagField, textField, parent and offset.
+     * it reads are the same in the ViewHelpers for a record and for a row: subheader, tag, tagField, textField, default, parent
+     * and offset.
      */
     protected function renderRecord(RecordInterface $record): string
     {
@@ -110,7 +111,7 @@ abstract class AbstractHeadlineViewHelper extends AbstractTagBasedViewHelper
         $own = $this->arguments['tag'] ?? self::valueOf($record, $tagField);
         // a record of another table (a card) is counted from the header of the content element, if the template has it
         $parent = $this->arguments['parent'] ?? (!$subheader && $record->getMainType() !== 'tt_content' && self::isRecord($data) ? $data : null);
-        $default = $this->defaultTag();
+        $default = $this->arguments['default'] ?? $this->defaultTag();
         // the header the level is counted from: the parent, or for a subheader its own record
         $reference = self::isRecord($parent) ? $parent : ($subheader ? $record : null);
         // a subheader has the layout of its header

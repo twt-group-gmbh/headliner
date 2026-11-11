@@ -33,13 +33,15 @@ final class HeaderTag
 
     /**
      * The tag to render. Content that was created before the field existed has no tag yet and keeps
-     * the behaviour of fluid_styled_content: layout 1-6 mean h1-h6, otherwise the configured default.
+     * the behaviour of fluid_styled_content: layout 1-6 mean h1-h6, otherwise the configured default, which is a number
+     * from 1 to 6 (a layout) or a tag (h1-h6, div).
      */
     public static function forContent(mixed $tag, mixed $layout, mixed $default): string
     {
         return self::resolve($tag)
             ?? self::fromLayout($layout)
             ?? self::fromLayout($default)
+            ?? self::resolve($default)
             ?? self::FALLBACK;
     }
 

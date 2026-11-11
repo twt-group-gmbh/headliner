@@ -33,6 +33,7 @@ final class RowViewHelper extends AbstractHeadlineViewHelper
         $this->registerArgument('textField', 'string', 'The field with the text of the heading, if it is not the label field of the table, when there is no content between the tags');
         $this->registerArgument('tag', 'string', 'The tag chosen by the editor: h1 to h6 or div. It wins over the record. With "subheader" it is the tag of the subheader');
         $this->registerArgument('tagField', 'string', 'The field that holds the tag, if the table has several that are a select of tags');
+        $this->registerArgument('default', 'string', 'Used if the record has no tag and no layout 1-6: a tag (h1-h6, div) or a layout number from 1 to 6. Without it the setting defaultHeaderType of the content element, else h2');
         $this->registerArgument('parent', RecordInterface::class . '|array', 'The content element, a record object or its array, whose header the heading is counted from; without it the variable "data"');
         $this->registerArgument('offset', 'int', 'How many levels below the header of "parent" a heading without a tag of its own is (negative: above)', false, 1);
     }

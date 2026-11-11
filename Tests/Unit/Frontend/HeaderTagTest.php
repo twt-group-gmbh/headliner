@@ -44,6 +44,11 @@ final class HeaderTagTest extends TestCase
         yield 'the chosen tag wins over the layout' => ['h4', '1', '2', 'h4'];
         yield 'div is kept' => ['div', '3', '2', 'div'];
         yield 'no tag yet: legacy content follows the layout' => ['', '3', '2', 'h3'];
+        yield 'the default can be a tag' => ['', '', 'h3', 'h3'];
+        yield 'the default can be a div' => ['', '', 'div', 'div'];
+        yield 'a default that is no tag is ignored' => ['', '', 'span', 'h2'];
+        yield 'the layout wins over a default that is a tag' => ['', '4', 'h3', 'h4'];
+        yield 'the chosen tag wins over a default that is a tag' => ['h5', '', 'h3', 'h5'];
         yield 'no tag, default layout: configured default' => ['', '0', '2', 'h2'];
         yield 'no tag, hidden layout is no heading level' => ['', '100', '4', 'h4'];
         yield 'nothing usable at all' => [null, null, null, 'h2'];
