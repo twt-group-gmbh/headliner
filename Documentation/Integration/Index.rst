@@ -189,6 +189,23 @@ and a record is made of it: the heading is then the one of `headliner:headline`,
         <headliner:headline.values row="{item.data}" />
     </f:for>
 
+Everything is found by itself in the usual case. Name what is not:
+
+..  code-block:: html
+
+    <!-- the content element has no inline field for the table of the row -->
+    <headliner:headline.values row="{item.data}" table="tx_myext_item" />
+
+    <!-- the text is not in the label field of the table, but in "name" -->
+    <headliner:headline.values row="{item.data}" textField="name" />
+
+    <!-- the table has two fields that are a select of tags: the tag is in "level" -->
+    <headliner:headline.values row="{item.data}" tagField="level" />
+
+    <!-- all together, and the subheader of the same row -->
+    <headliner:headline.values row="{item.data}" table="tx_myext_item" textField="name" tagField="level" />
+    <headliner:headline.values row="{item.data}" subheader="1" textField="teaser" />
+
 The text comes from the label field of the table, the tag from its tag field, and the page module gets the table, the uid
 and the field (see :ref:`integration-headline`). The table is found from the content element, which has an inline field
 for it (the field with the table as `foreign_table`, to which the row points with its `foreign_field`); name it with
@@ -297,6 +314,15 @@ field. `headliner:text` names them around the text, so the page module can find 
             <f:format.html>{item.data.text}</f:format.html>
         </headliner:text>
     </f:for>
+
+Name the table and the field when they are not found by themselves:
+
+..  code-block:: html
+
+    <!-- the content element has no inline field for the table, and the table has two rich text fields -->
+    <headliner:text row="{item.data}" table="tx_myext_item" field="bodytext">
+        <f:format.html>{item.data.bodytext}</f:format.html>
+    </headliner:text>
 
 Only `row` is required:
 
