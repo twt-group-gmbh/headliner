@@ -197,8 +197,8 @@ demo_has_table() {
     [ -n "$(demo_sql -N -e "SHOW TABLES LIKE '$1'")" ]
 }
 
-# A content element with child records (IRRE) made with the means of the core, no Content Blocks: the wrapper
-# headliner:headline.children, the tag field of a record, the heading in a rich text of a record. Package
+# A content element with child records (IRRE) made with the means of the core, no Content Blocks:
+# headliner:headline with the record, the tag field of a record, the heading in a rich text of a record. Package
 # twtgroup/headliner-demo (Build/Demo/headliner_demo).
 if demo_has_table tx_headlinerdemo_item; then
     echo "› creating the demo of child records (core)"

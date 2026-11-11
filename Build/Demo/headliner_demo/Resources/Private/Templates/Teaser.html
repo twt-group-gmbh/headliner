@@ -6,12 +6,10 @@
 <f:section name="Main">
     <div class="teasers">
         <f:for each="{record.headlinerdemo_items}" as="item">
-            <headliner:headline.children record="{item}">
-                <article class="teaser">
-                    <headliner:headline tag="{item.tag}">{item -> f:render.text(field: 'title')}</headliner:headline>
-                    {item -> f:render.text(field: 'text')}
-                </article>
-            </headliner:headline.children>
+            <article class="teaser">
+                <headliner:headline record="{item}">{item -> f:render.text(field: 'title')}</headliner:headline>
+                {item -> f:render.text(field: 'text')}
+            </article>
         </f:for>
     </div>
 </f:section>

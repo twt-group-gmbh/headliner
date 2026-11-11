@@ -1,18 +1,21 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
       xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
       data-namespace-typo3-fluid="true">
+<f:comment>
+    The way with values: headliner:headline.values gets the tag and says where it is edited (edit="table:uid:field").
+    The block "recordcards" does the same with the record, which needs none of this. The headings in the rich text of a
+    card are found either way: the record names them itself when it is created for the page module.
+</f:comment>
 <section class="cards">
     <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
     <f:if condition="{header}">
-        <headliner:headline tag="{data.header_tag}" layout="{data.header_layout}" default="2">{header}</headliner:headline>
+        <headliner:headline.values tag="{data.header_tag}" layout="{data.header_layout}" edit="tt_content:{data.uid}:header_tag">{header}</headliner:headline.values>
     </f:if>
     <f:for each="{data.cards}" as="card">
-        <headliner:headline.children record="{card}">
-            <article class="card">
-                <headliner:headline tag="{card.tag}">{card -> f:render.text(field: 'title')}</headliner:headline>
-                {card -> f:render.text(field: 'text')}
-            </article>
-        </headliner:headline.children>
+        <article class="card">
+            <headliner:headline.values tag="{card.tag}" edit="cards:{card.uid}:tag">{card -> f:render.text(field: 'title')}</headliner:headline.values>
+            {card -> f:render.text(field: 'text')}
+        </article>
     </f:for>
 </section>
 </html>
