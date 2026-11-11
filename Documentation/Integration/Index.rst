@@ -40,7 +40,8 @@ without `fluid_styled_content`. There are three, and which one you need depends 
 headliner:headline, for a record
 --------------------------------
 
-Give it the record object and it does the rest:
+Give it the record object and it does the rest. The text comes from the field of the record, so the record is written
+once:
 
 ..  code-block:: html
 
@@ -48,25 +49,32 @@ Give it the record object and it does the rest:
           xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
           data-namespace-typo3-fluid="true">
 
-    <headliner:headline record="{record}">
-        {record -> f:render.text(field: 'header')}
-    </headliner:headline>
-
-    <headliner:headline record="{record}" subheader="1">
-        {record -> f:render.text(field: 'subheader')}
-    </headliner:headline>
+    <headliner:headline record="{record}" />
+    <headliner:headline record="{record}" subheader="1" />
 
     <f:for each="{data.cards}" as="card">
-        <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
+        <headliner:headline record="{card}" field="title" />
     </f:for>
 
+Or put the text between the tags, which wins over the field. That is the way if you need something around the text (a
+link) or want to output it yourself:
+
+..  code-block:: html
+
+    <headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+
+The text from a field is output with `f:render.text`, the one the namespace `f` has in your template: with
+`visual_editor` that is its own ViewHelper, so what an editor can change in the frontend is marked as it is with
+`{record -> f:render.text(...)}` in the template (checked with `visual_editor` in the edit mode: the same
+`ve-editable-text` with the table, the uid and the field). A field the record does not have gives no heading, not an
+empty one.
 With a header and a rich text field, a template of your own looks like this. The heading is the ViewHelper, the rich text is
 output as it is, with `f:render.text` (or `f:format.html`), and needs nothing else:
 
 ..  code-block:: html
 
     <article>
-        <headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+        <headliner:headline record="{record}" />
         {record -> f:render.text(field: 'bodytext')}
     </article>
 
@@ -98,6 +106,11 @@ second column.
         -   Always. It takes record objects only (`RecordInterface`): an array, such as `{data}` in a template of
             `fluid_styled_content`, is refused with an error. Use `{record}` there, or `headliner:headline.values`.
         -   (required)
+    *   -   `field`
+        -   no
+        -   For the text of the heading from a field of the record, when there is no content between the tags: the field of a
+            card (`field="title"`). The text is output with `f:render.text`, so `visual_editor` still marks it.
+        -   `header` (`subheader` with `subheader`); content between the tags wins
     *   -   `subheader`
         -   no
         -   For the subheader of the element. Its tag is `tag`, else the field `subheader_tag` of the record, else
@@ -285,14 +298,11 @@ records of tables of their own. Give each record to `headliner:headline`:
 
 ..  code-block:: html
 
-    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
-    <f:if condition="{header}">
-        <headliner:headline record="{data}">{header}</headliner:headline>
-    </f:if>
+    <headliner:headline record="{data}" />
 
     <f:for each="{data.cards}" as="card">
         <article class="card">
-            <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
+            <headliner:headline record="{card}" field="title" />
             {card -> f:render.text(field: 'text')}
         </article>
     </f:for>

@@ -3,19 +3,17 @@
       data-namespace-typo3-fluid="true">
 <f:comment>
     The same as the block "cards", but the ViewHelper gets the record and reads the tag, the layout and the mark for
-    the page module from it: no tag="...", layout="...", tagField="...", parent="..." or edit="..." anywhere. The card
+    the page module from it: no tag="...", layout="...", tagField="...", parent="..." or edit="..." anywhere, and the text
+    comes from the field (field="title"), so the record is written once. The card
     has one field for a tag, so that is found; a card without a tag is one level below the header of the element
     ({data}), not an h2 under whatever the header is. The records tell the page module themselves which record a
     heading in a rich text is in.
 </f:comment>
 <section class="cards">
-    <f:variable name="header">{data -> f:render.text(field: 'header')}</f:variable>
-    <f:if condition="{header}">
-        <headliner:headline record="{data}">{header}</headliner:headline>
-    </f:if>
+    <headliner:headline record="{data}" />
     <f:for each="{data.recordcards}" as="card">
         <article class="card">
-            <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
+            <headliner:headline record="{card}" field="title" />
             {card -> f:render.text(field: 'text')}
         </article>
     </f:for>

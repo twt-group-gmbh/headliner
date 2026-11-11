@@ -107,7 +107,10 @@ First release.
   for the page module (table, uid, in a translation the uid of the translation, and the field). A card without a tag of its
   own is `offset` levels (one by default) below the header of `parent` (the variable `data`). A record without a tag field
   gives no mark. It takes a record object only (`RecordInterface`); `parent` a record object or an array. `tag` wins over
-  the record, and `subheader` renders the subheader.
+  the record, and `subheader` renders the subheader. The text can come from a field of the record (`field`, `header` or
+  `subheader` by default) instead of the content between the tags: it is output with the `f:render.text` that the
+  namespace `f` has in the template, so `visual_editor` still marks it (checked in its edit mode); a field the record does
+  not have gives no heading.
 - ViewHelper `headliner:headline.values` for values (an array, a partial without a record, a fixed heading): `tag`, `layout`,
   `default`, `subheader`, `parent` and `offset`. It marks nothing for the page module unless `edit` ("table:uid:field")
   says where the tag is edited, and never takes a mark from the variable `data`, so the title of a card cannot get the

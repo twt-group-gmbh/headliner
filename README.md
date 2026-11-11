@@ -128,14 +128,17 @@ there are three ViewHelpers, by what you have:
 With the record the ViewHelper reads the tag and the layout, and names the record for the page module:
 
 ```html
-<headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
-<headliner:headline record="{record}" subheader="1">{record -> f:render.text(field: 'subheader')}</headliner:headline>
+<headliner:headline record="{record}" />
+<headliner:headline record="{record}" subheader="1" />
+<headliner:headline record="{card}" field="title" />
 ```
 
-A rich text field next to it needs nothing: the headings the editor wrote in it are found by the page module on their own.
+The text comes from the field (`header`, `subheader`, or the one you name with `field`), output with `f:render.text`, so
+`visual_editor` still marks it. Text between the tags wins, for a link around it, say. A rich text field next to it needs
+nothing: the headings the editor wrote in it are found by the page module on their own.
 
 ```html
-<headliner:headline record="{record}">{record -> f:render.text(field: 'header')}</headliner:headline>
+<headliner:headline record="{record}" />
 {record -> f:render.text(field: 'bodytext')}
 ```
 
@@ -189,7 +192,7 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 
 ```html
 <f:for each="{data.cards}" as="card">
-    <headliner:headline record="{card}">{card -> f:render.text(field: 'title')}</headliner:headline>
+    <headliner:headline record="{card}" field="title" />
     {card -> f:render.text(field: 'text')}
 </f:for>
 ```
