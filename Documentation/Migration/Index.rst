@@ -75,3 +75,26 @@ What is left to do by hand:
     tag="{data.header_tag}">` instead of `type="{data.header_type}"`, and `edit="tt_content:{data.uid}:header_tag"` if the
     page module is to change the tag.
 #.  Check the CSS: headliner puts the class `ce-headline-layout-N` on a header, the Semantilizer `ce__header--N`.
+
+Finding the headings in your templates
+======================================
+
+The command `headliner:scan-templates` lists the headings (`h1` to `h6`) in the Fluid templates of a project and says
+which of them `headliner:headline` can replace. It only reads: no template is changed.
+
+..  code-block:: bash
+
+    vendor/bin/typo3 headliner:scan-templates               # the whole project
+    vendor/bin/typo3 headliner:scan-templates packages/site # one directory
+    vendor/bin/typo3 headliner:scan-templates --with-static # also the headings with a fixed text
+
+Every heading is listed with its file and line. A heading whose text is a field of a record
+(`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
+(`<headliner:headline record="{record}" />`, with `textField` for another field and `subheader="1"` for the subheader).
+The attributes of the heading are listed too: a class has to be moved into the template around it or into the CSS,
+because the ViewHelper puts the layout class only. A heading with another dynamic text (a translation, a formatted
+value, several variables) is listed as needing a decision: there is no record the scanner could name.
+
+The scanner skips comments, HTML files without Fluid, and the directories `vendor`, `node_modules`, `var`, `.Build`,
+`typo3temp`, `sysext` and `_assets`. The suggestion assumes the variable is a record object; in a template where it is an
+array, see :ref:`integration-headline-row` and :ref:`integration-headline-values`.

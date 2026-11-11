@@ -239,6 +239,13 @@ vendor/bin/typo3 upgrade:run headlinerMigrateSemantilizerFields
 
 See the documentation for what is left to do by hand.
 
+To find the headings in your own Fluid templates and which of them `headliner:headline` can replace, run the scanner (it
+only reads, nothing is changed):
+
+```bash
+vendor/bin/typo3 headliner:scan-templates
+```
+
 ## Requirements
 
 - PHP **8.3+**

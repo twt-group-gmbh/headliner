@@ -162,6 +162,9 @@ First release.
   the page shown makes a label and no select, and the route that loads the box checks the languages it is asked for. Both
   routes need the request token of the core.
 - Extension icon (`Resources/Public/Icons/Extension.svg`) for the Extension Manager and the TER.
+- Command `headliner:scan-templates`: lists the headings (h1-h6) in the Fluid templates of a project and the
+  `headliner:headline` call that replaces each one whose text is a field of a record; headings with another dynamic text are
+  listed as needing a decision. It only reads. `--with-static` also lists fixed headings.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer), with
   screenshots of the box (language comparison, the select of a heading, a Content Block with its cards).
 
