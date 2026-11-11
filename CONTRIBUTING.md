@@ -44,6 +44,7 @@ Keep a commit to one change. Do not mix a fix and a refactoring.
 ```bash
 ddev test unit         # pure PHP, no TYPO3 bootstrap, fast
 ddev test functional   # boots TYPO3 and a database
+ddev test js           # the Vitest tests of headlines.js
 ddev test all
 ```
 

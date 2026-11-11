@@ -98,6 +98,9 @@ First release.
   of `header_layout`), and the layout "Hidden" hides the header and the subheader.
 - Site setting `headliner.subheader.enabled` (default on): if switched off, the subheader tag is hidden in the
   backend of that site and the subheader follows the tag of the header (one level below).
+- The header partial of the extension hands the record of the element to `headliner:headline` (and, for a content element
+  without a record, the values to `headliner:headline.values`), so the headings of the core's content elements get the mark
+  for the page module and their content element.
 - ViewHelper `headliner:headline` for a record object (`{record}` in a template of `fluid_styled_content`, `{data}` or a
   card in a Content Block): it reads the tag (`header_tag`, `subheader_tag`, the field `tagField`, or the one field of the
   table that is a select of tags), the layout and the default tag (`settings.defaultHeaderType`) itself, and names the record
@@ -115,7 +118,7 @@ First release.
 - Headings in the rich text of a record object: for the request of the page module only, the record names itself in every
   heading of its rich text fields (`data-headliner-record`, `data-headliner-field`, put into the field value when the
   record is created, so it does not matter how the template renders the text), and the page module takes the content
-  element of the record from the inline field that links it. A template needs no wrapper and no `edit` for it. For rows as
+  element of the record from the inline field that links it. A template needs nothing for it. For rows as
   arrays use `headliner:text`, or turn them into records with the core's `record-transformation` data processor.
 - Content Blocks and other records in a content element: the headings of a Content Block get the group and the badges like
   other elements, and the heading of a record in a collection (a card) has a select too, with the title of its table as

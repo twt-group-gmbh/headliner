@@ -36,7 +36,7 @@ site:
     so the tags and CSS classes of the content elements of the core come from the fields of Headliner. The set loads
     `fluid_styled_content` before itself, whatever the order in the site.
 *   **Without it** (only Content Blocks, say, or templates of your own) the set has the site settings and the page
-    TSconfig and changes no template: the tags in the frontend come from the ViewHelper `headliner:headline` in your
+    TSconfig and changes no template: the tags in the frontend come from the ViewHelpers `headliner:headline` and `headliner:headline.values` in your
     own templates (see :ref:`integration-own-templates`). Nothing is reported or logged. The box in the page module
     works the same.
 

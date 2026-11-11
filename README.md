@@ -92,7 +92,7 @@ are cached). `fluid_styled_content` is optional:
   `fluid_styled_content`, so its content elements use the fields *Tag* and *Subheader tag*. The set loads
   `fluid_styled_content` before itself.
 - **Without it** the set has the site settings and the page TSconfig only, and nothing is reported or logged. The tags
-  in the frontend come from the ViewHelper in your own templates. The box in the page module works the same.
+  in the frontend come from the ViewHelpers in your own templates. The box in the page module works the same.
 
 > [!NOTE]
 > With `fluid_styled_content`: content without a tag (the field is empty by default, also in the database) keeps the old behaviour (layout 1-6 =
@@ -172,7 +172,7 @@ module is opened, so keep it quick. More in the documentation (Developer).
 
 The Basics `Twtgroup/Headline` and `Twtgroup/Subheadline` give a block the header and subheader with their tags. The
 headings of a block are grouped, and the headings of its collection records (cards) get a select for their tag and for
-the headings in their rich text. Give the ViewHelper the record: it reads the tag and names the record for the page
+the headings in their rich text. Give `headliner:headline` the record: it reads the tag and names the record for the page
 module itself. It finds the one tag field of the card, and a card without a tag is one level below the header of the
 element. Nothing else is needed, the headings in the rich text of the card are found by themselves:
 
@@ -183,7 +183,7 @@ element. Nothing else is needed, the headings in the rich text of the card are f
 </f:for>
 ```
 
-A record needs no wrapper and no `edit`. A row as an array (from `database-query`, say) is no record: turn it into one with
+A record needs nothing else. A row as an array (from `database-query`, say) is no record: turn it into one with
 the core's `record-transformation` data processor, or use `headliner:headline.values` for the title and `headliner:text`
 for the rich text. The documentation (Integration) shows both.
 

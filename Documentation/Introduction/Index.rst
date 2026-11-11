@@ -41,4 +41,4 @@ Requirements
 *   PHP 8.3 or newer
 *   TYPO3 14.3 LTS
 *   Optional: `fluid_styled_content`. With it the site set changes the headers of its content elements. Without it
-    use the ViewHelper in your own templates (see :ref:`installation-site-set` and :ref:`integration`).
+    use the ViewHelpers in your own templates (see :ref:`installation-site-set` and :ref:`integration`).

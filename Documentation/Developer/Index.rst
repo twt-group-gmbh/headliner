@@ -19,15 +19,18 @@ How the structure is checked
     process. The frontend middleware changes `BE_USER`, `TYPO3_REQUEST`, `LANG`, the Context aspects and the
     `PageRenderer`; the fetcher puts them back.
 #.  The request carries the request attribute `headliner.inspect`. The frontend middleware `InspectRequest` then switches
-    the page cache off for it includes hidden pages in the visibility of the request and, with the attribute `headliner.inspect.time`, renders it at that
-    time (the date aspect and `SIM_ACCESS_TIME`, as the preview of the core does), and, with `headliner.inspect.groups`, as a member of those
-    frontend user groups (the aspect `frontend.user`, so it has to run after the frontend user is authenticated), or in a workspace (`headliner.inspect.workspace`, the aspect `workspace`, which the repositories of the frontend read to overlay
-    versions) (it has to run before the page is
-    resolved, which is where a hidden page is turned down), and the ViewHelper adds `data-headliner-edit="table:uid:field"` to the headers. The
-    attribute exists only inside the process, so a request from outside cannot set it.
+    the page cache off for it, includes hidden pages in the visibility of the request (it has to run before the page is
+    resolved, which is where a hidden page is turned down) and, with the attribute `headliner.inspect.time`, renders it at
+    that time (the date aspect and `SIM_ACCESS_TIME`, as the preview of the core does). With `headliner.inspect.groups` it
+    renders the page as a member of those frontend user groups (the aspect `frontend.user`, so it has to run after the
+    frontend user is authenticated), and with `headliner.inspect.workspace` in a workspace (the aspect `workspace`, which
+    the repositories of the frontend read to overlay versions). The ViewHelpers then add the marks to the headings:
+    `data-headliner-edit="table:uid:field"` (`headliner:headline` from the record, `headliner:headline.values` from `edit`)
+    and `data-headliner-element`. The attribute exists only inside the process, so a request from outside cannot set it.
 #.  `HeadingExtractor` reads the headings (`h1` to `h6`) and the marked headers from the HTML, and the content element
     each is rendered in: what the heading says itself (`data-headliner-element`), else the frame `id="c12"`. It reads the
-    record a heading is in from `data-headliner-record`, on the heading itself or on the element around it. It marks the headings that are not in the elements of the site setting
+    record a heading in a rich text is written in from `data-headliner-record` on the heading itself, never from an element
+    around it (the page is written by editors). It marks the headings that are not in the elements of the site setting
     `headliner.contentSelector` as outside; `symfony/css-selector` turns the CSS selector into the XPath the DOM needs.
 #.  `HeadingValidator` finds the problems. Then the event `ModifyHeadingIssuesEvent` is dispatched, so a project can add
     rules of its own or take built-in ones away (see :ref:`developer-rules`).

@@ -4,9 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-TYPO3 extension **`twtgroup/headliner`** (TER key `headliner`, PHP namespace `Twtgroup\Headliner\`). The
-extension is at the start: scaffolding (DDEV, CI, release workflow, tooling) is in place, the extension code is not.
-Release notes: `CHANGELOG.md` (keep it updated with every user-visible change).
+TYPO3 extension **`twtgroup/headliner`** (TER key `headliner`, PHP namespace `Twtgroup\Headliner\`): the heading
+structure of a page in the page module, with the tag of a header changed in place, and the ViewHelpers
+`headliner:headline`, `headliner:headline.values` and `headliner:text` for templates. Release notes: `CHANGELOG.md` (keep
+it updated with every user-visible change).
 
 ## How to work in this repo
 

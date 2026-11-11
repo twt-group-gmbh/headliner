@@ -10,11 +10,13 @@ fluid_styled_content
 ====================
 
 This is for sites that use `fluid_styled_content`: the site set `twtgroup/headliner` then overrides its header partial.
-Without `fluid_styled_content` skip this section and use the ViewHelper in your own templates (below).
+Without `fluid_styled_content` skip this section and use the ViewHelpers in your own templates (below).
 
 The site set adds a partial path (`lib.contentElement.partialRootPaths.200`) with an override of the partial
 :file:`Header/All.fluid.html`. It is a copy of the partial of `fluid_styled_content`: the texts are still output with
-`f:render.text`, only the tag and the CSS classes of the header and subheader differ.
+`f:render.text`, only the tag and the CSS classes of the header and subheader differ. It hands the record of the element
+(`{record}`) to `headliner:headline`, which reads the tag, the layout and the mark for the page module from it; for a
+content element without a `{record}` it falls back to `headliner:headline.values` with the values.
 
 Rendered, a header looks like this:
 
@@ -360,17 +362,19 @@ visual_editor
 
 Headliner is meant to be used together with
 `visual_editor <https://github.com/FriendsOfTYPO3/visual_editor>`__. `visual_editor` finds editable texts by the
-`f:render.text` ViewHelper; the header partial of Headliner keeps those calls. Headliner needs no further ViewHelper in
-your templates.
+`f:render.text` ViewHelper; the header partial of Headliner keeps those calls, so the content elements of the core need no
+ViewHelper of Headliner in your templates. In a template of your own keep `{record -> f:render.text(field: ...)}` for the
+text and give the record to `headliner:headline` (see :ref:`integration-own-templates`).
 
 ..  _integration-other-sets:
 
 Other themes
 ============
 
-For a theme that does not use the header partial of `fluid_styled_content`, use the ViewHelper as shown above. The page
-module finds the headings in the rendered page whatever template produced them; only headers rendered with the
-ViewHelper carry the `data-headliner-edit` mark and so can be changed in the box.
+For a theme that does not use the header partial of `fluid_styled_content`, use the ViewHelpers as shown above. The page
+module finds the headings in the rendered page whatever template produced them; only headers rendered with
+`headliner:headline` (or `headliner:headline.values` with `edit`) carry the `data-headliner-edit` mark and so can be
+changed in the box.
 
 ..  _integration-camino:
 
@@ -384,7 +388,7 @@ renders the subheader as a `p`. For these elements:
 *   the fields :guilabel:`Tag` (`header_tag`) and :guilabel:`Subheader tag` (`subheader_tag`) are in the form, but have no
     effect in the frontend;
 *   the box shows their headings, but only as a label: it cannot change their tag, because nothing in the template names
-    the field (the mark `data-headliner-edit` is written by `headliner:headline`).
+    the field (the mark `data-headliner-edit` is written by the ViewHelpers `headliner:headline` and `headliner:headline.values`).
 
 This was seen with the content element :guilabel:`Regular Text Element` (`text`). The other element types that Camino
 does not override, for example :guilabel:`Header` (`header`) and :guilabel:`Bullet List` (`bullets`), use the partial of
