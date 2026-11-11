@@ -33,7 +33,7 @@ final class RecordsWithoutFluidStyledContentTest extends AbstractFrontendTestCas
         page.10.template.value (
         <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers" xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers" data-namespace-typo3-fluid="true">
         <f:for each="{rows}" as="item"><headliner:headline record="{item.record}" tagField="tag">{item.record.title}</headliner:headline>{item.record -> f:render.text(field: 'text')}</f:for>
-        <f:for each="{rows}" as="item"><headliner:headline.children row="{item.data}" table="tx_headlinertestcards_card"><headliner:headline tag="h5">Row</headliner:headline></headliner:headline.children></f:for>
+        <f:for each="{rows}" as="item"><headliner:text row="{item.data}" table="tx_headlinertestcards_card"><h5>Raw heading</h5></headliner:text></f:for>
         </html>
         )
         page.10.dataProcessing {
@@ -78,9 +78,10 @@ final class RecordsWithoutFluidStyledContentTest extends AbstractFrontendTestCas
     }
 
     #[Test]
-    public function aRowAsAnArrayIsNamedByTheWrapperWithItsTable(): void
+    public function aRowAsAnArrayNamesItsRecordAndFieldWithTheTextViewHelper(): void
     {
-        self::assertStringContainsString('data-headliner-record="' . self::TABLE . ':1" style="display: contents"', $this->inspected());
+        // the row as the data processor gives it, without the record: headliner:text names the record and the field
+        self::assertStringContainsString('<h5 data-headliner-record="' . self::TABLE . ':1" data-headliner-field="text">Raw heading</h5>', $this->inspected());
     }
 
     #[Test]

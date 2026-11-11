@@ -18,8 +18,8 @@ final class StructureBoxWithoutFluidStyledContentTest extends AbstractFrontendTe
 
     private const PAGE = "page = PAGE\npage.10 = FLUIDTEMPLATE\npage.10.template = TEXT\npage.10.template.value (\n"
         . '<html xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers" data-namespace-typo3-fluid="true">'
-        . '<headliner:headline tag="h1" edit="tt_content:1:header_tag">The page</headliner:headline>'
-        . '<headliner:headline tag="h4">Skips two levels</headliner:headline></html>'
+        . '<headliner:headline.values tag="h1" edit="tt_content:1:header_tag">The page</headliner:headline.values>'
+        . '<headliner:headline.values tag="h4">Skips two levels</headliner:headline.values></html>'
         . "\n)\n";
 
     protected function setUp(): void

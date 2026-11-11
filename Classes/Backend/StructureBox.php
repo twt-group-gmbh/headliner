@@ -171,7 +171,7 @@ final readonly class StructureBox
             if ($target === null && $recordTarget !== null) {
                 ['tag' => $target, 'text' => $textTarget] = $this->resolveInRecord($recordTarget, $heading, $usedInRecord, $pageId);
             }
-            // A heading in a record that no wrapper names the element of (the rich text of a card marks itself): the element
+            // A heading in a record whose mark names no element (the rich text of a card marks itself): the element
             // the record is linked to
             // @extensionScannerIgnoreLine the element uid of our Heading, not a property of the history classes
             $headingElement = $heading->element ?? ($recordTarget !== null ? $this->elementOfRecord($recordTarget, $pageId) : null);

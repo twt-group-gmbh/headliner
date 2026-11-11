@@ -14,30 +14,20 @@ use TYPO3\CMS\Core\Domain\Record\ComputedProperties;
 final class EditMarkTest extends TestCase
 {
     #[Test]
-    public function namesTheRecordAndTheFieldOfAContentElement(): void
-    {
-        self::assertSame('tt_content:12:header_tag', EditMark::forContent(['uid' => 12, 'CType' => 'text'], 'header_tag'));
-        self::assertSame('tt_content:12:subheader_tag', EditMark::forContent(['uid' => '12', 'CType' => 'text'], 'subheader_tag'));
-    }
-
-    #[Test]
-    public function aTranslationIsNamedByItsOwnUid(): void
+    public function aTranslationOfAContentElementIsNamedByItsOwnUid(): void
     {
         // the frontend gives the original with the uid of the translation in _LOCALIZED_UID: that is what is edited
-        self::assertSame(
-            'tt_content:40:header_tag',
-            EditMark::forContent(['uid' => 12, '_LOCALIZED_UID' => 40, 'CType' => 'text'], 'header_tag')
-        );
+        self::assertSame(40, EditMark::elementUid(['uid' => 12, '_LOCALIZED_UID' => 40, 'CType' => 'text']));
     }
 
     #[Test]
     public function nothingIsNamedForDataThatIsNoContentElement(): void
     {
-        self::assertNull(EditMark::forContent(null, 'header_tag'));
-        self::assertNull(EditMark::forContent('text', 'header_tag'));
-        self::assertNull(EditMark::forContent(['uid' => 0, 'CType' => 'text'], 'header_tag'));
-        self::assertNull(EditMark::forContent(['title' => 'a page'], 'header_tag'));
-        self::assertNull(EditMark::forContent(['uid' => 3], 'header_tag'));
+        self::assertNull(EditMark::elementUid(null));
+        self::assertNull(EditMark::elementUid('text'));
+        self::assertNull(EditMark::elementUid(['uid' => 0, 'CType' => 'text']));
+        self::assertNull(EditMark::elementUid(['title' => 'a page']));
+        self::assertNull(EditMark::elementUid(['uid' => 3]));
     }
 
     /**
@@ -48,27 +38,6 @@ final class EditMarkTest extends TestCase
         $raw = new RawRecord($uid, 1, ['CType' => 'text'], new ComputedProperties(localizedUid: $localizedUid), $type);
 
         return new Record($raw, ['CType' => 'text']);
-    }
-
-    #[Test]
-    public function namesTheRecordOfARecordObject(): void
-    {
-        self::assertSame('tt_content:12:header_tag', EditMark::forContent(self::record('tt_content.text', 12), 'header_tag'));
-        self::assertSame('tt_content:12:subheader_tag', EditMark::forContent(self::record('tt_content', 12), 'subheader_tag'));
-    }
-
-    #[Test]
-    public function aTranslatedRecordObjectIsNamedByTheUidOfItsTranslation(): void
-    {
-        self::assertSame('tt_content:40:header_tag', EditMark::forContent(self::record('tt_content.text', 12, 40), 'header_tag'));
-    }
-
-    #[Test]
-    public function aRecordOfAnotherTableIsNotNamed(): void
-    {
-        // the box edits content elements; the record of a collection (a card) lives in a table of its own
-        self::assertNull(EditMark::forContent(self::record('cards', 7), 'header_tag'));
-        self::assertNull(EditMark::forContent(self::record('pages', 1), 'header_tag'));
     }
 
     #[Test]

@@ -49,7 +49,7 @@ final class SiteSetsWithoutFluidStyledContentTest extends FunctionalTestCase
             Environment::getConfigPath() . '/sites/test/setup.typoscript',
             "page = PAGE\npage.10 = FLUIDTEMPLATE\npage.10.template = TEXT\npage.10.template.value (\n"
             . '<html xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers" data-namespace-typo3-fluid="true">'
-            . '<headliner:headline tag="h3" edit="tt_content:7:header_tag">Own template</headliner:headline></html>'
+            . '<headliner:headline.values tag="h3" edit="tt_content:7:header_tag">Own template</headliner:headline.values></html>'
             . "\n)\n"
         );
         GeneralUtility::makeInstance(CacheManager::class)->flushCaches();

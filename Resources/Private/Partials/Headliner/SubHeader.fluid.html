@@ -1,7 +1,15 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
       xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
       data-namespace-typo3-fluid="true">
+<f:comment>With the record of the element the subheader tag and the mark come from it; without one (also when the subheader tag is switched off for the site), from the values, one level below the header of the parent.</f:comment>
 <f:if condition="{subheader}">
-    <headliner:headline subheader="1" tag="{tag}" record="{record}" parent="{parent}" layout="{layout}" default="{default}" class="{positionClass}">{subheader}</headliner:headline>
+    <f:if condition="{record}">
+        <f:then>
+            <headliner:headline record="{record}" subheader="1" class="{positionClass}">{subheader}</headliner:headline>
+        </f:then>
+        <f:else>
+            <headliner:headline.values subheader="1" tag="{tag}" parent="{parent}" layout="{layout}" default="{default}" class="{positionClass}">{subheader}</headliner:headline.values>
+        </f:else>
+    </f:if>
 </f:if>
 </html>

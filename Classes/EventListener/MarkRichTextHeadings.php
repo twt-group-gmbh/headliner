@@ -14,8 +14,8 @@ use Twtgroup\Headliner\Middleware\InspectRequest;
 /**
  * Names the record and the field in every heading of a rich text, for the page module's own request only
  * (`InspectRequest`): `<h3 data-headliner-record="table:uid" data-headliner-field="bodytext">`. The mark is put into the
- * field value when the record is created, so it does not matter how a template renders the text, and it needs no
- * wrapper (`headliner:headline.children`) around it.
+ * field value when the record is created, so it does not matter how a template renders the text, and the template needs
+ * nothing. A row as an array has no record to create: there `headliner:text` marks the headings.
  */
 #[AsEventListener(identifier: 'headliner/mark-rich-text-headings')]
 final class MarkRichTextHeadings

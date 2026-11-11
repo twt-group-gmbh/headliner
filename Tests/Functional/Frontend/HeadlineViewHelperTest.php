@@ -26,180 +26,11 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     ];
 
     /**
-     * @param array<string, mixed>|Record $data
-     */
-    private function render(bool $forThePageModule, array|Record $data): string
-    {
-        $request = new ServerRequest('https://website.local/', 'GET');
-        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
-        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
-            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
-            request: $request,
-        ));
-        $view->assign('data', $data);
-
-        return $view->render('Own');
-    }
-
-    /**
      * @return array<string, mixed>
      */
     private static function content(): array
     {
         return ['uid' => 12, 'CType' => 'text', 'header_tag' => 'h2', 'header_layout' => 2, 'subheader_tag' => 'h3'];
-    }
-
-    #[Test]
-    public function theRecordIsTakenFromTheDataOfTheContentElementForThePageModule(): void
-    {
-        $html = $this->render(true, self::content());
-
-        self::assertStringContainsString('<h2 class="ce-headline-layout-2" data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Header</h2>', $html);
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag" data-headliner-element="12">Subheader</h3>', $html);
-    }
-
-    #[Test]
-    public function aTranslationIsNamedByItsOwnUid(): void
-    {
-        $html = $this->render(true, ['_LOCALIZED_UID' => 40] + self::content());
-
-        self::assertStringContainsString('data-headliner-edit="tt_content:40:header_tag"', $html);
-    }
-
-    #[Test]
-    public function anExplicitEditArgumentWins(): void
-    {
-        $html = $this->render(true, self::content());
-
-        self::assertStringContainsString('<h4 data-headliner-edit="tt_content:99:header_tag" data-headliner-element="12">Explicit</h4>', $html);
-    }
-
-    #[Test]
-    public function aVisitorNeverGetsTheMark(): void
-    {
-        $html = $this->render(false, self::content());
-
-        self::assertStringNotContainsString('data-headliner-edit', $html);
-        self::assertStringContainsString('<h2 class="ce-headline-layout-2">Header</h2>', $html);
-    }
-
-    #[Test]
-    public function withoutDataThereIsNoMark(): void
-    {
-        $html = $this->render(true, []);
-
-        self::assertStringNotContainsString('tt_content:0', $html);
-        // only the explicit one
-        self::assertSame(1, substr_count($html, 'data-headliner-edit'));
-    }
-
-    #[Test]
-    public function aRecordObjectAsADataIsNamedToo(): void
-    {
-        // a Content Block gets the content element as a record object, not as an array
-        $properties = self::content();
-        $record = new Record(new RawRecord(12, 1, $properties, new ComputedProperties(), 'tt_content.text'), $properties);
-
-        $html = $this->render(true, $record);
-
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Header</h2>', $html);
-        self::assertStringContainsString('data-headliner-edit="tt_content:12:subheader_tag" data-headliner-element="12">Subheader</h3>', $html);
-    }
-
-    #[Test]
-    public function everyHeadingNamesItsContentElementForThePageModule(): void
-    {
-        $html = $this->render(true, self::content());
-
-        // also the one with an explicit edit: it can be the record of a collection, the element is still the one of data
-        self::assertSame(3, substr_count($html, 'data-headliner-element="12"'));
-    }
-
-    #[Test]
-    public function aVisitorGetsNoElementMarkEither(): void
-    {
-        self::assertStringNotContainsString('data-headliner-element', $this->render(false, self::content()));
-    }
-
-    #[Test]
-    public function withoutDataThereIsNoElementMark(): void
-    {
-        self::assertStringNotContainsString('data-headliner-element', $this->render(true, []));
-    }
-
-    private static function card(int $uid): Record
-    {
-        return new Record(new RawRecord($uid, 1, ['title' => 'A card'], new ComputedProperties(), 'cards'), ['title' => 'A card']);
-    }
-
-    /**
-     * @param array<string, mixed> $data
-     */
-    private function renderCard(bool $forThePageModule, array $data, mixed $card): string
-    {
-        $request = new ServerRequest('https://website.local/', 'GET');
-        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
-        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
-            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
-            request: $request,
-        ));
-        $view->assignMultiple(['data' => $data, 'card' => $card]);
-
-        return trim($view->render('Card'));
-    }
-
-    #[Test]
-    public function aRecordIsMarkedWithItselfAndItsElementForThePageModule(): void
-    {
-        $html = $this->renderCard(true, self::content(), self::card(7));
-
-        self::assertStringContainsString('data-headliner-record="cards:7"', $html);
-        self::assertStringContainsString('data-headliner-element="12"', $html);
-        // what is inside comes out as it is
-        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $html);
-    }
-
-    #[Test]
-    public function aHeadlineInARecordDoesNotTakeTheTagFieldOfTheElement(): void
-    {
-        $html = $this->renderCard(true, self::content(), self::card(7));
-
-        // outside of the record the heading is the header of the element, as before
-        self::assertStringContainsString('<h2 data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Outside</h2>', $html);
-        // inside it is not: the page module finds the field from the record. Only an explicit edit names a field.
-        self::assertStringContainsString('<h3 data-headliner-element="12">Inside</h3>', $html);
-        self::assertStringContainsString('<h4 data-headliner-edit="cards:7:tag" data-headliner-element="12">Explicit</h4>', $html);
-    }
-
-    #[Test]
-    public function aVisitorGetsTheCardAndNothingElse(): void
-    {
-        self::assertStringNotContainsString('data-headliner', $this->renderCard(false, self::content(), self::card(7)));
-        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $this->renderCard(false, self::content(), self::card(7)));
-    }
-
-    #[Test]
-    public function withoutARecordThereIsNoMark(): void
-    {
-        self::assertStringNotContainsString('data-headliner-record', $this->renderCard(true, self::content(), null));
-        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $this->renderCard(true, self::content(), null));
-    }
-
-    /**
-     * @param array<string, mixed> $card
-     * @param array<string, mixed> $data
-     */
-    private function renderArrayCard(bool $forThePageModule, string $table, array $card, array $data = []): string
-    {
-        $request = new ServerRequest('https://website.local/', 'GET');
-        $request = $forThePageModule ? $request->withAttribute(InspectRequest::ATTRIBUTE, true) : $request;
-        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
-            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
-            request: $request,
-        ));
-        $view->assignMultiple(['card' => $card, 'table' => $table, 'data' => $data]);
-
-        return trim($view->render('ArrayCard'));
     }
 
     private function renderHeaderPartial(mixed $record): string
@@ -215,10 +46,11 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function theHeaderPartialTakesTheMarkFromTheRecordItIsGiven(): void
+    public function theHeaderPartialTakesTagLayoutAndMarkFromTheRecordItIsGiven(): void
     {
+        // the partial is given the tag h3 as a value, and a record that says h2: the record is what it uses
         self::assertStringContainsString(
-            'data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Hi</h3>',
+            '<h2 class="ce-headline-layout-2" data-headliner-edit="tt_content:12:header_tag" data-headliner-element="12">Hi</h2>',
             $this->renderHeaderPartial(self::element())
         );
     }
@@ -228,44 +60,6 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     {
         // no `{record}` in the template (a content element without lib.contentElement): the heading, but no mark
         self::assertSame('<h3>Hi</h3>', $this->renderHeaderPartial(null));
-    }
-
-    #[Test]
-    public function aRowAsAnArrayIsMarkedWithTheTableThatIsGiven(): void
-    {
-        $html = $this->renderArrayCard(true, 'cards', ['uid' => 7, 'title' => 'A card']);
-
-        self::assertStringContainsString('data-headliner-record="cards:7"', $html);
-        self::assertStringContainsString('<h3>Title</h3><p>Hello</p>', $html);
-    }
-
-    #[Test]
-    public function theTableOfARowIsFoundFromTheFieldOfTheElementThatLinksIt(): void
-    {
-        // no `table`: the element has an inline field for that table, and the row points to the element with its foreign_field
-        $html = $this->renderArrayCard(true, '', ['uid' => 7, 'parent' => 21], ['uid' => 21, 'CType' => 'text']);
-
-        self::assertStringContainsString('data-headliner-record="tx_headlinertestcards_card:7"', $html);
-    }
-
-    #[Test]
-    public function theTableOfARowThatPointsToAnotherElementIsNotGuessed(): void
-    {
-        $html = $this->renderArrayCard(true, '', ['uid' => 7, 'parent' => 99], ['uid' => 21, 'CType' => 'text']);
-
-        self::assertStringNotContainsString('data-headliner-record', $html);
-    }
-
-    #[Test]
-    public function aRowAsAnArrayWithoutATableHasNoMark(): void
-    {
-        self::assertStringNotContainsString('data-headliner-record', $this->renderArrayCard(true, '', ['uid' => 7]));
-    }
-
-    #[Test]
-    public function aVisitorGetsTheRowAsAnArrayWithoutMarks(): void
-    {
-        self::assertStringNotContainsString('data-headliner', $this->renderArrayCard(false, 'cards', ['uid' => 7]));
     }
 
     /**
@@ -342,13 +136,12 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function argumentsGivenExplicitlyWinOverTheRecord(): void
+    public function aTagThatIsGivenWinsOverTheRecord(): void
     {
         $html = $this->renderWithRecords(true, self::element(), self::row('cards', 7, ['tag' => 'h4']));
 
-        // tag and subheaderTag given: h5 as the header, so the subheader is the one that was given
+        // tag="h6" with subheader: the tag of the subheader is the one that was given
         self::assertStringContainsString('>Explicit</h6>', $html);
-        self::assertStringContainsString('<h2 class="ce-headline-layout-2" data-headliner-edit="tt_content:99:header_tag" data-headliner-element="12">Edit</h2>', $html);
     }
 
     #[Test]
@@ -384,8 +177,13 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     {
         $this->expectException(InvalidArgumentValueException::class);
 
-        // `record` takes record objects: an array is a row, or the values, and goes elsewhere
-        $this->renderCard(true, self::content(), ['uid' => 7]);
+        // `record` takes record objects; an array is a row or values, and goes to headliner:headline.values
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: new ServerRequest('https://website.local/', 'GET'),
+        ));
+        $view->assignMultiple(['record' => ['uid' => 7], 'card' => self::row('cards', 7, [])]);
+        $view->render('Record');
     }
 
     /**
@@ -480,46 +278,6 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     /**
-     * The template "Subheader": a subheader below `parent`, one with a tag of its own, one with an offset below its record.
-     *
-     * @param array<string, mixed> $parent
-     */
-    private function renderSubheader(array $parent, Record $element): string
-    {
-        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
-            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
-            request: new ServerRequest('https://website.local/', 'GET'),
-        ));
-        $view->assignMultiple(['parent' => $parent, 'element' => $element]);
-
-        return trim($view->render('Subheader'));
-    }
-
-    #[Test]
-    public function aSubheaderWithoutATagIsOneLevelBelowTheHeaderOfItsParent(): void
-    {
-        $html = $this->renderSubheader(['header_tag' => 'h4'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
-
-        self::assertStringContainsString('<h5>Below</h5>', $html);
-    }
-
-    #[Test]
-    public function theTagOfASubheaderIsItsOwnTagAndNotThatOfTheHeader(): void
-    {
-        $html = $this->renderSubheader(['header_tag' => 'h2'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
-
-        self::assertStringContainsString('<h6>Own</h6>', $html);
-    }
-
-    #[Test]
-    public function aSubheaderIsOffsetLevelsBelowItsHeader(): void
-    {
-        $html = $this->renderSubheader(['header_tag' => 'h2'], self::row('tt_content.text', 12, ['CType' => 'text', 'header_tag' => 'h2', 'subheader_tag' => '']));
-
-        self::assertStringContainsString('<h4>Offset</h4>', $html);
-    }
-
-    /**
      * The template "Auto": a record with one tag field, a record with two, and the content element, with no `tagField`,
      * `parent` or `default` anywhere.
      *
@@ -587,8 +345,6 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
         self::assertStringContainsString('>Single</h4>', $html);
         // the content element has no tag and no layout either
         self::assertStringContainsString('>Header</h4>', $html);
-        // a default that is given wins over the setting
-        self::assertStringContainsString('>Own default</h5>', $html);
     }
 
     #[Test]
@@ -601,9 +357,9 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
-    public function aSubheaderIgnoresTheParent(): void
+    public function aSubheaderWithATagOfItsOwnKeepsItWhateverTheParentSays(): void
     {
-        // the subheader is one level below its own header (h2): h3, not three below
+        // the record has the subheader tag h3: it wins over the three levels below the parent
         self::assertStringContainsString('>Subheader</h3>', $this->renderBelow(self::element(), ['tag' => '']));
     }
 

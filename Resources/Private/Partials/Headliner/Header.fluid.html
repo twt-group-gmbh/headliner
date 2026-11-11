@@ -1,7 +1,15 @@
 <html xmlns:f="http://typo3.org/ns/TYPO3/CMS/Fluid/ViewHelpers"
       xmlns:headliner="http://typo3.org/ns/Twtgroup/Headliner/ViewHelpers"
       data-namespace-typo3-fluid="true">
+<f:comment>With the record of the element the ViewHelper reads the tag, the layout and the mark for the page module from it; without one, from the values.</f:comment>
 <f:if condition="{header}">
-    <headliner:headline tag="{tag}" record="{record}" layout="{layout}" default="{default}" class="{positionClass}"><f:link.typolink parameter="{link}">{header}</f:link.typolink></headliner:headline>
+    <f:if condition="{record}">
+        <f:then>
+            <headliner:headline record="{record}" class="{positionClass}"><f:link.typolink parameter="{link}">{header}</f:link.typolink></headliner:headline>
+        </f:then>
+        <f:else>
+            <headliner:headline.values tag="{tag}" layout="{layout}" default="{default}" class="{positionClass}"><f:link.typolink parameter="{link}">{header}</f:link.typolink></headliner:headline.values>
+        </f:else>
+    </f:if>
 </f:if>
 </html>

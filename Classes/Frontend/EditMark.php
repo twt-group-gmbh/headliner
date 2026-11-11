@@ -7,25 +7,12 @@ namespace Twtgroup\Headliner\Frontend;
 use TYPO3\CMS\Core\Domain\RecordInterface;
 
 /**
- * What `data-headliner-edit` names: the record and the field behind a header, "table:uid:field". Taken from the data
- * of a content element, so a template does not have to say it.
+ * What `data-headliner-edit` names: the record and the field behind a heading, "table:uid:field", and the content
+ * element a heading is in. Taken from a record object, so a template does not have to say it.
  */
 final class EditMark
 {
     private const TABLE = 'tt_content';
-
-    /**
-     * @param mixed $data The `data` of a content element: an array, as the templates of fluid_styled_content have it,
-     *     or a record object, as a Content Block has it
-     * @param string $field The field with the tag (`header_tag` or `subheader_tag`)
-     * @return string|null NULL if the data is no content element
-     */
-    public static function forContent(mixed $data, string $field): ?string
-    {
-        $uid = self::elementUid($data);
-
-        return $uid !== null ? self::TABLE . ':' . $uid . ':' . $field : null;
-    }
 
     /**
      * The record of any table, "table:uid": a card of a Content Block, say. The translation is named by its own uid.
@@ -71,7 +58,7 @@ final class EditMark
     /**
      * The uid of the content element the data is of (the translation in a translation), NULL if it is none.
      *
-     * @param mixed $data See forContent()
+     * @param mixed $data The `data` of a content element: an array, as the templates of fluid_styled_content have it, or a record object, as a Content Block has it
      */
     public static function elementUid(mixed $data): ?int
     {
