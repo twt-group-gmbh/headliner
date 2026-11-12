@@ -134,8 +134,9 @@ final class TemplateScanner
         if ($switches[0] === []) {
             return [null, ['no f:switch around these headings: the tag is chosen by something else, set it by hand']];
         }
-        $start = (int) end($switches[0])[1];
-        $expression = (string) end($switches[1])[0];
+        $lastSwitch = array_key_last($switches[0]);
+        $start = $switches[0][$lastSwitch][1];
+        $expression = $switches[1][$lastSwitch][0];
         $end = strpos($source, '</f:switch>', $start);
         if ($end === false || $end < $last) {
             return [null, ['the headings are in different switches: set the tag by hand']];
