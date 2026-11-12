@@ -15,6 +15,8 @@ final readonly class TemplateHeading
         public string $attributes,
         public string $text,
         public HeadingKind $kind,
-        public ?string $suggestion
+        public ?string $suggestion,
+        /** The number of headings of a switch that are reported as one */
+        public int $count = 1
     ) {}
 }

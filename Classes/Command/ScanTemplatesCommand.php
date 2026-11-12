@@ -34,7 +34,8 @@ final class ScanTemplatesCommand extends Command
     {
         $this
             ->addArgument('path', InputArgument::OPTIONAL, 'Directory to scan (default: the project path)')
-            ->addOption('with-static', null, InputOption::VALUE_NONE, 'Also list headings with a fixed text');
+            ->addOption('with-static', null, InputOption::VALUE_NONE, 'Also list headings with a fixed text')
+            ->addOption('with-backend', null, InputOption::VALUE_NONE, 'Also list the headings of backend templates (the preview of a Content Block)');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -48,24 +49,34 @@ final class ScanTemplatesCommand extends Command
         $path = rtrim($path, '/');
 
         $counts = [];
+        $backend = 0;
         foreach ($this->templates($path) as $file) {
             $source = (string) file_get_contents($file);
             if (!$this->scanner->isFluid($source)) {
                 continue;
             }
+            $isBackend = $this->scanner->isBackendTemplate($file);
             foreach ($this->scanner->scan($source) as $heading) {
-                $counts[$heading->kind->value] = ($counts[$heading->kind->value] ?? 0) + 1;
+                if ($isBackend) {
+                    ++$backend;
+                    if (!$input->getOption('with-backend')) {
+                        continue;
+                    }
+                } else {
+                    $counts[$heading->kind->value] = ($counts[$heading->kind->value] ?? 0) + 1;
+                }
                 if ($heading->kind === HeadingKind::Static && !$input->getOption('with-static')) {
                     continue;
                 }
                 // escaped: the markup of a template is no style tag of the console
                 $output->writeln(OutputFormatter::escape(sprintf(
-                    '%s:%d  <%s%s> %s',
+                    '%s:%d  <%s%s> %s%s',
                     substr($file, strlen($path) + 1),
                     $heading->line,
                     $heading->tag,
                     $heading->attributes === '' ? '' : ' ' . $heading->attributes,
-                    mb_strimwidth($heading->text, 0, 100, '...')
+                    mb_strimwidth($heading->text, 0, 100, '...'),
+                    $heading->count > 1 ? ' (' . $heading->count . ' headings)' : ''
                 )));
                 if ($heading->suggestion !== null) {
                     $output->writeln('    -> ' . OutputFormatter::escape($heading->suggestion));
@@ -74,10 +85,13 @@ final class ScanTemplatesCommand extends Command
         }
 
         $output->writeln(sprintf(
-            "\n%d can be replaced, %d needs a decision, %d static",
+            "\n%d can be replaced, %d %s, %d needs a decision, %d static%s",
             $counts[HeadingKind::Migratable->value] ?? 0,
+            $counts[HeadingKind::Component->value] ?? 0,
+            ($counts[HeadingKind::Component->value] ?? 0) === 1 ? 'component' : 'components',
             $counts[HeadingKind::NeedsDecision->value] ?? 0,
-            $counts[HeadingKind::Static->value] ?? 0
+            $counts[HeadingKind::Static->value] ?? 0,
+            $backend > 0 && !$input->getOption('with-backend') ? sprintf(', %d in backend templates (not listed)', $backend) : ''
         ));
 
         return Command::SUCCESS;

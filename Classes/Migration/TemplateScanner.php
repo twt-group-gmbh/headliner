@@ -28,21 +28,90 @@ final class TemplateScanner
         $source = $this->withoutComments($source);
         preg_match_all('/<h([1-6])\b([^>]*)>(.*?)<\/h\1\s*>/is', $source, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
 
-        $headings = [];
+        $groups = [];
+        $previousEnd = null;
         foreach ($matches as $match) {
             $text = trim((string) preg_replace('/\s+/u', ' ', $match[3][0]));
-            $suggestion = $this->suggest($text);
-            $headings[] = new TemplateHeading(
-                substr_count($source, "\n", 0, $match[0][1]) + 1,
-                'h' . $match[1][0],
-                trim($match[2][0]),
-                $text,
-                $this->kindOf($text, $suggestion),
-                $suggestion
-            );
+            $attributes = trim($match[2][0]);
+            $last = $groups === [] ? null : $groups[array_key_last($groups)];
+            if (
+                $last !== null
+                && $previousEnd !== null
+                && $last[0]['text'] === $text
+                && $last[0]['attributes'] === $attributes
+                && $this->onlyFluidBetween(substr($source, $previousEnd, $match[0][1] - $previousEnd))
+            ) {
+                $groups[array_key_last($groups)][] = $this->entry($source, $match, $text, $attributes);
+            } else {
+                $groups[] = [$this->entry($source, $match, $text, $attributes)];
+            }
+            $previousEnd = $match[0][1] + strlen($match[0][0]);
         }
 
-        return $headings;
+        return array_map($this->headingOf(...), $groups);
+    }
+
+    /**
+     * Whether a template is one of the backend (the preview of a Content Block, a backend module): its headings are not
+     * on the page.
+     */
+    public function isBackendTemplate(string $path): bool
+    {
+        return preg_match('#(^|/)backend-preview[^/]*\.html$#', $path) === 1
+            || str_contains($path, '/Resources/Private/Backend/');
+    }
+
+    /**
+     * @param array<int, array{0: string, 1: int}> $match
+     * @return array{line: int, tag: string, attributes: string, text: string}
+     */
+    private function entry(string $source, array $match, string $text, string $attributes): array
+    {
+        return [
+            'line' => substr_count($source, "\n", 0, $match[0][1]) + 1,
+            'tag' => 'h' . $match[1][0],
+            'attributes' => $attributes,
+            'text' => $text,
+        ];
+    }
+
+    /**
+     * One finding for a heading, or for a run of headings with the same text and attributes at different levels, which
+     * is how a component chooses its tag with a switch.
+     *
+     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string}> $group
+     */
+    private function headingOf(array $group): TemplateHeading
+    {
+        $first = $group[0];
+        $tags = array_values(array_unique(array_column($group, 'tag')));
+        sort($tags);
+        if (count($group) >= 3 && count($tags) >= 2 && str_contains($first['text'], '{')) {
+            return new TemplateHeading(
+                $first['line'],
+                implode('/', $tags),
+                $first['attributes'],
+                $first['text'],
+                HeadingKind::Component,
+                '<headliner:headline.values tag="{tag}">' . $first['text'] . '</headliner:headline.values>',
+                count($group)
+            );
+        }
+        $suggestion = $this->suggest($first['text']);
+
+        return new TemplateHeading(
+            $first['line'],
+            $first['tag'],
+            $first['attributes'],
+            $first['text'],
+            $this->kindOf($first['text'], $suggestion),
+            $suggestion
+        );
+    }
+
+    private function onlyFluidBetween(string $between): bool
+    {
+        return trim((string) preg_replace('/<\/?f:[^>]*>/', '', $between)) === '';
     }
 
     private function kindOf(string $text, ?string $suggestion): HeadingKind

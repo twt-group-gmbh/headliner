@@ -12,6 +12,9 @@ enum HeadingKind: string
     /** The text is a field of a record: `headliner:headline` replaces the heading. */
     case Migratable = 'migratable';
 
+    /** The tag is chosen by a switch (one heading per level with the same text): one `headliner:headline.values` replaces it. */
+    case Component = 'component';
+
     /** The text is dynamic in a way the scanner cannot map to a record: a person has to decide. */
     case NeedsDecision = 'decision';
 

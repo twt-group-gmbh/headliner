@@ -113,4 +113,42 @@ final class TemplateScannerTest extends TestCase
     {
         self::assertSame([], $this->scanner->scan('<header>{data.header}</header><hr /><h7>x</h7>'));
     }
+
+    #[Test]
+    public function aSwitchOfTagsForTheSameTextIsOneComponentFinding(): void
+    {
+        $source = "<f:switch expression=\"{level}\">\n"
+            . "<f:case value=\"1\"><h1 class=\"{class}\">{content}</h1></f:case>\n"
+            . "<f:case value=\"2\"><h2 class=\"{class}\">{content}</h2></f:case>\n"
+            . "<f:case value=\"3\"><h3 class=\"{class}\">{content}</h3></f:case>\n"
+            . "</f:switch>\n<h4>{data.header}</h4>";
+        $found = $this->scanner->scan($source);
+
+        self::assertCount(2, $found);
+        self::assertSame(HeadingKind::Component, $found[0]->kind);
+        self::assertSame(2, $found[0]->line);
+        self::assertSame('h1/h2/h3', $found[0]->tag);
+        self::assertSame('class="{class}"', $found[0]->attributes);
+        self::assertSame(3, $found[0]->count);
+        self::assertSame('<headliner:headline.values tag="{tag}">{content}</headliner:headline.values>', $found[0]->suggestion);
+        self::assertSame(HeadingKind::Migratable, $found[1]->kind, 'the heading after the switch is its own finding');
+    }
+
+    #[Test]
+    public function headingsThatOnlyLookAlikeAreNoSwitch(): void
+    {
+        // the same text in two places with the same tag, or in different places of the template: no switch
+        self::assertSame(HeadingKind::Static, $this->scanner->scan('<h2>A</h2><h2>A</h2><h2>A</h2>')[0]->kind);
+        $found = $this->scanner->scan("<h2>{x}</h2><p>text</p><h3>{x}</h3><p>text</p><h4>{x}</h4>");
+        self::assertCount(3, $found);
+    }
+
+    #[Test]
+    public function theTemplatesOfTheBackendAreRecognizedByTheirPath(): void
+    {
+        self::assertTrue($this->scanner->isBackendTemplate('packages/x/ContentBlocks/ContentElements/card/templates/backend-preview.html'));
+        self::assertTrue($this->scanner->isBackendTemplate('ext/Resources/Private/Backend/Templates/List.html'));
+        self::assertFalse($this->scanner->isBackendTemplate('ext/Resources/Private/Templates/Backend.html'));
+        self::assertFalse($this->scanner->isBackendTemplate('ext/ContentBlocks/ContentElements/card/templates/frontend.html'));
+    }
 }

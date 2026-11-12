@@ -87,6 +87,7 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
     vendor/bin/typo3 headliner:scan-templates               # the whole project
     vendor/bin/typo3 headliner:scan-templates packages/site # one directory
     vendor/bin/typo3 headliner:scan-templates --with-static # also the headings with a fixed text
+    vendor/bin/typo3 headliner:scan-templates --with-backend # also the templates of the backend
 
 Every heading is listed with its file and line. A heading whose text is a field of a record
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
@@ -94,6 +95,13 @@ Every heading is listed with its file and line. A heading whose text is a field 
 The attributes of the heading are listed too: a class has to be moved into the template around it or into the CSS,
 because the ViewHelper puts the layout class only. A heading with another dynamic text (a translation, a formatted
 value, several variables) is listed as needing a decision: there is no record the scanner could name.
+
+A component that chooses its tag with a switch (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`
+blocks) is listed once, as a component, with the number of headings. One `headliner:headline.values` with the tag as an
+argument replaces the whole switch (see :ref:`integration-headline-values`).
+
+The templates of the backend (the preview of a Content Block, `backend-preview.html`, and `Resources/Private/Backend/`) are
+not on the page, so they are only counted; `--with-backend` lists them.
 
 The scanner skips comments, HTML files without Fluid, and the directories `vendor`, `node_modules`, `var`, `.Build`,
 `typo3temp`, `sysext` and `_assets`. The suggestion assumes the variable is a record object; in a template where it is an
