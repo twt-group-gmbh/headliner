@@ -63,6 +63,16 @@ translation the uid of the translation) and the field. A card without a tag of i
 the content element, which is the variable `data`. The headings in the rich text of a record are marked when the record
 is created, so they need nothing in the template.
 
+**Attributes.** The ViewHelper is a tag like the others of Fluid: a `class`, an `id`, a `data-…` or `aria-…` attribute goes on
+to the heading as it is. The class of the layout (`ce-headline-layout-N`) is added to yours:
+
+..  code-block:: html
+
+    <headliner:headline record="{record}" class="stage" id="top" data-track="headline" />
+
+This renders `<h2 class="stage ce-headline-layout-2" id="top" data-track="headline">…</h2>`. So the `class` of a heading
+that is migrated stays where it is (see :ref:`migration`).
+
 Only `record` is required. Everything else has a value that is right in most cases; pass it only for the case in the
 second column.
 
@@ -120,6 +130,10 @@ second column.
         -   Only for another distance than one level below the header of the parent. A negative number goes up (never
             above `h1`; below `h6` and below a `div` it is a `div`).
         -   1
+    *   -   `class`, `id`, `data-…`
+        -   no
+        -   For the attributes of the heading (see above).
+        -   None; the layout class if the record has a layout
 
 The default tag, for content without a tag and without a layout, is the setting `defaultHeaderType` of the content
 element (`{settings.defaultHeaderType}` in `fluid_styled_content`), and `h2` if there is none. Name another one with

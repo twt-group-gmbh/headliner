@@ -101,6 +101,24 @@ final class HeadlineViewHelperTest extends FunctionalTestCase
     }
 
     #[Test]
+    public function aClassAnIdAndOtherAttributesGoOnToTheTagAndTheLayoutClassIsAddedToTheClass(): void
+    {
+        $view = $this->get(ViewFactoryInterface::class)->create(new ViewFactoryData(
+            templateRootPaths: [__DIR__ . '/../Fixtures/Templates'],
+            request: new ServerRequest('https://website.local/', 'GET'),
+        ));
+        $view->assign('record', self::element());
+        $html = $view->render('Attributes');
+
+        self::assertMatchesRegularExpression('#<h2 [^>]*class="stage ce-headline-layout-2"[^>]*>Hi</h2>#', $html);
+        self::assertStringContainsString('id="top"', $html);
+        self::assertStringContainsString('data-x="1"', $html);
+        self::assertStringContainsString('aria-label="A"', $html);
+        // a Fluid expression in the class, on the subheader
+        self::assertMatchesRegularExpression('#<h3 [^>]*class="on ce-headline-layout-2"[^>]*>Sub</h3>#', $html);
+    }
+
+    #[Test]
     public function theSubheaderOfARecordTakesItsOwnTagField(): void
     {
         $html = $this->renderWithRecords(true, self::element(), self::row('cards', 7, ['tag' => 'h4']));

@@ -38,6 +38,9 @@ for it (the field with the table as `foreign_table`, to which the row points wit
 `table` if it has none. The row must have all the columns of its table (`database-query` gives them, a select of a few
 columns does not): the core says which one is missing. A row whose table is not known gives no heading.
 
+A `class`, an `id` or a `data-…` attribute goes on to the heading as it is, like with
+:ref:`headliner:headline <integration-headline>`; the class of the layout is added to your class.
+
 Only `row` is required:
 
 ..  list-table::
