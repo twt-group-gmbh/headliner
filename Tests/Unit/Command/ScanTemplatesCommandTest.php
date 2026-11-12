@@ -87,7 +87,7 @@ final class ScanTemplatesCommandTest extends TestCase
     #[Test]
     public function attributesOfTheHeadingAreKeptInTheReplacement(): void
     {
-        file_put_contents($this->directory . '/Templates/Card.html', "<f:render />\n<h3 class=\"card\" id=\"x\">{data.header}</h3>");
+        file_put_contents($this->directory . '/Templates/Card.html', "<f:render />\n<h3 class=\"card\" id=\"x\">{record -> f:render.text(field: 'header')}</h3>");
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
         $tester->execute(['path' => $this->directory]);
 
@@ -97,17 +97,42 @@ final class ScanTemplatesCommandTest extends TestCase
     }
 
     #[Test]
+    public function whatIsTrueForEveryReplacementIsSaidOnceAndNotPerHeading(): void
+    {
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+        $tester->execute(['path' => $this->directory]);
+        $output = $tester->getDisplay();
+
+        self::assertSame(1, substr_count($output, 'For every replacement'));
+        self::assertStringContainsString('header_tag and header_layout of the record', $output);
+        self::assertStringNotContainsString('subheader_tag', $output, 'no subheader in the templates, so nothing about it');
+    }
+
+    #[Test]
+    public function aSubheaderReplacementSaysWhereItsTagComesFrom(): void
+    {
+        file_put_contents($this->directory . '/Templates/Sub.html', "<f:render />\n<h3>{record -> f:render.text(field: 'subheader')}</h3>");
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+        $tester->execute(['path' => $this->directory]);
+
+        self::assertStringContainsString('subheader_tag', $tester->getDisplay());
+        unlink($this->directory . '/Templates/Sub.html');
+    }
+
+    #[Test]
     public function aSwitchOfTagsIsOneLineWithTheNumberOfHeadings(): void
     {
         file_put_contents(
             $this->directory . '/Templates/Component.html',
-            "<f:switch expression=\"{l}\"><f:case value=\"1\"><h1>{c}</h1></f:case><f:case value=\"2\"><h2>{c}</h2></f:case></f:switch><h3>{c}</h3>"
+            "<f:switch expression=\"{l}\"><f:case value=\"1\"><h1>{c}</h1></f:case><f:case value=\"2\"><h2>{c}</h2></f:case><f:case value=\"3\"><h3>{c}</h3></f:case><f:case value=\"9\">x</f:case></f:switch>"
         );
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
         $tester->execute(['path' => $this->directory]);
 
         self::assertStringContainsString('Templates/Component.html:1  (3 headings: h1/h2/h3)', $tester->getDisplay());
         self::assertStringContainsString('1 component', $tester->getDisplay());
+        self::assertStringContainsString('  + <headliner:headline.values tag="h{l}">{c}</headliner:headline.values>', $tester->getDisplay());
+        self::assertStringContainsString('  ? the switch has other cases (9) than these headings', $tester->getDisplay());
         unlink($this->directory . '/Templates/Component.html');
     }
 

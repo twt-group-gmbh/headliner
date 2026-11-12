@@ -81,7 +81,8 @@ final class ScanTemplatesCommand extends Command
                 }
                 $location = substr($file, strlen($path) + 1) . ':' . $heading->line;
                 $lines = [];
-                if ($heading->suggestion === null) {
+                $replaceable = $heading->suggestion !== null || $heading->kind === HeadingKind::Component;
+                if (!$replaceable) {
                     $lines[] = sprintf(
                         '%s  <%s%s> %s',
                         $location,
@@ -92,9 +93,14 @@ final class ScanTemplatesCommand extends Command
                 } else {
                     $lines[] = $location . ($heading->count > 1 ? sprintf('  (%d headings: %s)', $heading->count, $heading->tag) : '');
                     $lines[] = '  - ' . mb_strimwidth($heading->original, 0, 200, '...');
-                    $lines[] = '  + ' . $heading->suggestion;
+                    if ($heading->suggestion !== null) {
+                        $lines[] = '  + ' . $heading->suggestion;
+                    }
+                    foreach ($heading->notes as $note) {
+                        $lines[] = '  ? ' . $note;
+                    }
                 }
-                if ($heading->suggestion !== null) {
+                if ($replaceable) {
                     $replace[] = implode("\n", $lines);
                 } elseif ($heading->kind === HeadingKind::Static) {
                     $static[] = implode("\n", $lines);
@@ -107,6 +113,20 @@ final class ScanTemplatesCommand extends Command
         // escaped: the markup of a template is no style tag of the console
         foreach ($replace as $block) {
             $output->writeln(OutputFormatter::escape($block));
+        }
+        $headers = array_filter($replace, static fn(string $block): bool => str_contains($block, '  + <headliner:headline record=') && !str_contains($block, 'subheader="1"'));
+        $subheaders = array_filter($replace, static fn(string $block): bool => str_contains($block, '  + <headliner:headline record=') && str_contains($block, 'subheader="1"'));
+        if ($headers !== [] || $subheaders !== []) {
+            $output->writeln("\nFor every replacement:");
+        }
+        if ($headers !== []) {
+            $output->writeln('  - The tag comes from header_tag and header_layout of the record when it has one; the tag of the template only applies (as default) without both.');
+        }
+        if ($subheaders !== []) {
+            $output->writeln('  - A subheader gets its tag from subheader_tag of the record, else one level below its header; not from the template.');
+        }
+        if ($headers !== [] || $subheaders !== []) {
+            $output->writeln('  - A record without text gives no heading, where the template would output an empty one.');
         }
         foreach (DecisionReason::cases() as $reason) {
             if (isset($decisions[$reason->value])) {

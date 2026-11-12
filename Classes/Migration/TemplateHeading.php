@@ -7,6 +7,9 @@ namespace Twtgroup\Headliner\Migration;
 /**
  * A heading (h1-h6) found in a Fluid template.
  */
+/**
+ * @phpstan-type Notes list<string>
+ */
 final readonly class TemplateHeading
 {
     public function __construct(
@@ -21,6 +24,9 @@ final readonly class TemplateHeading
         /** The number of headings of a switch that are reported as one */
         public int $count = 1,
         /** Why there is no suggestion; only for a heading that needs a decision */
-        public ?DecisionReason $reason = null
+        public ?DecisionReason $reason = null,
+        /** What the integrator has to know about the suggestion, or why there is none */
+        /** @var list<string> */
+        public array $notes = []
     ) {}
 }

@@ -90,16 +90,23 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
     vendor/bin/typo3 headliner:scan-templates --with-backend # also the templates of the backend
     vendor/bin/typo3 headliner:scan-templates --exclude=app/public/typo3conf/ext --exclude=packages/legacy
 
-Every heading is listed with its file and line. For a heading that can be replaced, the output shows the element as it is
-in the template (`-`) and the call that replaces it (`+`), so you know what to change where. The attributes of the
-heading (a class, an id) go on in the call: the ViewHelper is a tag and adds its own layout class to yours. A heading whose text is a field of a record
-(`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
-(`<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and `subheader="1"` for the
-subheader). The tag of the template becomes the `default`: it is what an element without a tag of its own gets, so the
-page looks the same until an editor chooses another tag. A heading with another dynamic text is listed as needing a decision: there is no record the scanner could name. The
-decisions are grouped by the reason, and every place keeps its file and line:
+Every heading is listed with its file and line. The scanner gives a replacement only where it is sure: a heading whose
+whole text is `{record -> f:render.text(field: 'header')}` (the variable is named, and `f:render.text` takes a record
+object only) gets `<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and
+`subheader="1"` for the subheader. The output shows the element as it is in the template (`-`) and the call that replaces
+it (`+`). The attributes of the heading (a class, an id) go on in the call: the ViewHelper is a tag and adds its own layout
+class to yours. The tag of the template becomes the `default`. Under the list, the output says once what is true for
+every replacement: the tag follows `header_tag` and `header_layout` of the record when it has one, a subheader gets its
+tag from `subheader_tag` or one level below its header, and a record without text gives no heading.
+
+Everything else is listed as needing a decision, with no call, because the scanner would have to guess. The decisions are
+grouped by the reason, and every place keeps its file and line:
 
 *   a translation (`f:translate`),
+*   a field of `data` or `record` read as a plain value (`{data.header}`): only if that variable is a record object (a
+    Content Block, `{record}` in `fluid_styled_content`) can `headliner:headline` replace it, in a template where it is an
+    array (`{data}` in `fluid_styled_content`, in TYPO3 12 also in a Content Block) it cannot, and the scanner cannot see
+    which it is,
 *   a field of the record with its own formatting (`f:format.stripTags`, `raw`, `nl2br`): `headliner:headline` outputs
     the text with `f:render.text`, which is not the same, so check it by hand,
 *   another value with its own formatting,
@@ -108,9 +115,12 @@ decisions are grouped by the reason, and every place keeps its file and line:
 *   a single variable that is no record (the data of a plugin, a setting),
 *   several variables or a text.
 
-A component that chooses its tag with a switch (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`
-blocks) is listed once, as a component, with the number of headings. One `headliner:headline.values` with the tag as an
-argument replaces the whole switch (see :ref:`integration-headline-values`).
+A component that chooses its tag with an `f:switch` (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`
+blocks) is listed once, as a component, with the number of headings. The scanner reads the switch: if the value of every
+`f:case` is the number of its heading, one `headliner:headline.values tag="h{layout}"` (with the variable of the switch)
+replaces the headings. If not (the value 2 gives an `h3`, a case gives a `<p>`), there is no call, and the output names
+the mapping. In both cases it names the other cases of the switch (a `<p>`, a case that hides the header, the default
+case), which the call does not replace.
 
 The templates of the backend (the preview of a Content Block, `backend-preview.html`, and `Resources/Private/Backend/`) are
 not on the page, so they are only counted; `--with-backend` lists them.
@@ -123,12 +133,12 @@ A heading with the text of a page (`{page -> f:render.text(field: 'title')}`) is
 no field for a tag, so there is no `headliner:headline` for it that the page module could change.
 
 The scanner skips comments, HTML files without Fluid, and the directories `vendor`, `node_modules`, `var`, `.Build`,
-`typo3temp`, `sysext` and `_assets`. The suggestion assumes the variable is a record object; in a template where it is an
-array, see :ref:`integration-headline-row` and :ref:`integration-headline-values`.
+`typo3temp`, `sysext` and `_assets`. For a template that has an array, not a record object, see
+:ref:`integration-headline-row` and :ref:`integration-headline-values`.
 
 ..  note::
 
     The scanner is a helper, not a guarantee. It reads the markup with patterns, so it can miss a heading (one that is built
-    by a partial, a ViewHelper or another extension) and it can suggest a call that does not fit (the variable is no
-    record, the heading has markup around the text). Check every suggestion, and the rendered page, before you change a
-    template.
+    by a partial, a ViewHelper or another extension). It gives a call only where the markup leaves no doubt, but it does
+    not see the rest of the project: headliner needs TYPO3 14.3, and the scanner does not look at the version of the project.
+    Check every suggestion, and the rendered page, before you change a template.

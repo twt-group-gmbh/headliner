@@ -15,6 +15,7 @@ enum DecisionReason: string
     case Link = 'link';
     case Condition = 'condition';
     case Partial = 'partial';
+    case RecordValue = 'record-value';
     case Variable = 'variable';
     case Markup = 'markup';
     case Mixed = 'mixed';
@@ -28,6 +29,7 @@ enum DecisionReason: string
             self::Link => 'a link in the heading',
             self::Condition => 'a condition in the heading',
             self::Partial => 'the text comes from a partial',
+            self::RecordValue => 'a field of data or record read as a plain value: only if that variable is a record object (a Content Block, {record} in fluid_styled_content) can headliner:headline replace it, not if it is an array',
             self::Variable => 'a single variable, no record',
             self::Markup => 'other markup in the heading',
             self::Mixed => 'several variables or text',

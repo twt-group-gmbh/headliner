@@ -48,7 +48,7 @@ final class TemplateScanner
             $previousEnd = $match[0][1] + strlen($match[0][0]);
         }
 
-        return array_map($this->headingOf(...), $groups);
+        return array_map(fn(array $group): TemplateHeading => $this->headingOf($group, $source), $groups);
     }
 
     /**
@@ -63,7 +63,7 @@ final class TemplateScanner
 
     /**
      * @param array<int, array{0: string, 1: int}> $match
-     * @return array{line: int, tag: string, attributes: string, text: string, original: string}
+     * @return array{line: int, tag: string, attributes: string, text: string, original: string, offset: int}
      */
     private function entry(string $source, array $match, string $text, string $attributes): array
     {
@@ -73,6 +73,7 @@ final class TemplateScanner
             'attributes' => $attributes,
             'text' => $text,
             'original' => trim((string) preg_replace('/\s+/u', ' ', $match[0][0])),
+            'offset' => $match[0][1],
         ];
     }
 
@@ -80,23 +81,26 @@ final class TemplateScanner
      * One finding for a heading, or for a run of headings with the same text and attributes at different levels, which
      * is how a component chooses its tag with a switch.
      *
-     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string}> $group
+     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string, offset: int}> $group
      */
-    private function headingOf(array $group): TemplateHeading
+    private function headingOf(array $group, string $source): TemplateHeading
     {
         $first = $group[0];
         $tags = array_values(array_unique(array_column($group, 'tag')));
         sort($tags);
         if (count($group) >= 3 && count($tags) >= 2 && str_contains($first['text'], '{')) {
+            [$tagExpression, $notes] = $this->tagOfSwitch($group, $source);
+
             return new TemplateHeading(
                 $first['line'],
                 implode('/', $tags),
                 $first['attributes'],
                 $first['text'],
                 HeadingKind::Component,
-                '<headliner:headline.values tag="{tag}"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
+                $tagExpression === null ? null : '<headliner:headline.values tag="' . $tagExpression . '"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
                 $first['original'],
-                count($group)
+                count($group),
+                notes: $notes
             );
         }
         $suggestion = $this->suggest($first['text'], $first['tag'], $first['attributes']);
@@ -112,6 +116,68 @@ final class TemplateScanner
             $first['original'],
             reason: $kind === HeadingKind::NeedsDecision ? $this->reasonOf($first['text']) : null
         );
+    }
+
+    /**
+     * The tag a component sets with an `f:switch`: `h{level}` if every `f:case` has the number of its heading as the
+     * value, else nothing, and notes for the integrator: the mapping, and the cases of the switch that are no heading of
+     * the group (a `<p>`, a case that hides the header, the default case).
+     *
+     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string, offset: int}> $group
+     * @return array{0: ?string, 1: list<string>}
+     */
+    private function tagOfSwitch(array $group, string $source): array
+    {
+        $first = $group[0]['offset'];
+        $last = $group[array_key_last($group)]['offset'];
+        preg_match_all('/<f:switch\s+expression="([^"]*)"\s*>/', substr($source, 0, $first), $switches, PREG_OFFSET_CAPTURE);
+        if ($switches[0] === []) {
+            return [null, ['no f:switch around these headings: the tag is chosen by something else, set it by hand']];
+        }
+        $start = (int) end($switches[0])[1];
+        $expression = (string) end($switches[1])[0];
+        $end = strpos($source, '</f:switch>', $start);
+        if ($end === false || $end < $last) {
+            return [null, ['the headings are in different switches: set the tag by hand']];
+        }
+        $region = substr($source, $start, $end - $start);
+
+        preg_match_all('/<f:case\s+value="([^"]*)"/', $region, $cases, PREG_OFFSET_CAPTURE);
+        $mapping = [];
+        foreach ($group as $heading) {
+            $value = null;
+            foreach ($cases[1] as $index => [$caseValue]) {
+                if ($start + $cases[0][$index][1] < $heading['offset']) {
+                    $value = $caseValue;
+                }
+            }
+            $mapping[(string) $value] = $heading['tag'];
+        }
+
+        $notes = [];
+        $others = array_values(array_diff(array_column($cases[1], 0), array_keys($mapping)));
+        if (str_contains($region, '<f:defaultCase')) {
+            $others[] = 'default';
+        }
+        $isLevel = true;
+        foreach ($mapping as $value => $tag) {
+            $isLevel = $isLevel && (string) $value === substr($tag, 1);
+        }
+        $names = [];
+        foreach ($mapping as $value => $tag) {
+            $names[] = $value . ' = ' . $tag;
+        }
+        if (!$isLevel) {
+            array_unshift($notes, sprintf('the tag follows %s, but not as its number: %s; so there is no single call, set the tag from the value in the template that calls this one', $expression, implode(', ', $names)));
+        }
+        if ($others !== []) {
+            $notes[] = sprintf('the switch has other cases (%s) than these headings: keep them around the call', implode(', ', $others));
+        }
+        if ($isLevel && preg_match('/^\{([\w.]+)\}$/', $expression, $variable) !== 1) {
+            return [null, array_merge(['the tag is the number of ' . $expression . ' but that is no plain variable: set the tag by hand'], $notes)];
+        }
+
+        return [$isLevel && isset($variable) ? 'h{' . $variable[1] . '}' : null, $notes];
     }
 
     private function onlyFluidBetween(string $between): bool
@@ -139,6 +205,7 @@ final class TemplateScanner
             str_contains($text, '<f:if') || str_contains($text, 'f:if(') => DecisionReason::Condition,
             str_contains($text, 'f:format.') => DecisionReason::Formatted,
             str_contains($text, '<f:render') => DecisionReason::Partial,
+            preg_match('/^\{(?:record|data)\.\w+\}$/', $text) === 1 => DecisionReason::RecordValue,
             preg_match('/^\{[\w.]+\}$/', $text) === 1 => DecisionReason::Variable,
             str_contains($text, '<') => DecisionReason::Markup,
             default => DecisionReason::Mixed,
@@ -155,10 +222,6 @@ final class TemplateScanner
 
             return $this->viewHelper($match[1], $match[2], $tag, $attributes);
         }
-        if (preg_match('/^\{\s*(?:record|data)\.(header|subheader)\s*\}$/', $text, $match) === 1) {
-            return $this->viewHelper('record', $match[1], $tag, $attributes);
-        }
-
         return null;
     }
 
