@@ -97,7 +97,7 @@ final class TemplateScanner
                 count($group)
             );
         }
-        $suggestion = $this->suggest($first['text']);
+        $suggestion = $this->suggest($first['text'], $first['tag']);
 
         return new TemplateHeading(
             $first['line'],
@@ -125,25 +125,32 @@ final class TemplateScanner
             : HeadingKind::Static;
     }
 
-    private function suggest(string $text): ?string
+    private function suggest(string $text, string $tag): ?string
     {
         if (preg_match(self::RENDER_TEXT, $text, $match) === 1) {
-            return $this->viewHelper($match[1], $match[2]);
+            return $this->viewHelper($match[1], $match[2], $tag);
         }
         if (preg_match('/^\{\s*(?:record|data)\.(header|subheader)\s*\}$/', $text, $match) === 1) {
-            return $this->viewHelper('record', $match[1]);
+            return $this->viewHelper('record', $match[1], $tag);
         }
 
         return null;
     }
 
-    private function viewHelper(string $record, string $field): string
+    /**
+     * The tag of the template stays as `default`: it is what an element without a tag of its own gets, so the page looks
+     * the same until an editor chooses another tag. A subheader has none: its tag follows the header.
+     */
+    private function viewHelper(string $record, string $field, string $tag): string
     {
         $extra = match ($field) {
             'header' => '',
             'subheader' => ' subheader="1"',
             default => ' textField="' . $field . '"',
         };
+        if ($field !== 'subheader') {
+            $extra .= ' default="' . $tag . '"';
+        }
 
         return '<headliner:headline record="{' . $record . '}"' . $extra . ' />';
     }

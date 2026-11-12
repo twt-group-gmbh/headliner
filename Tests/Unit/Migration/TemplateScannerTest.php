@@ -36,7 +36,15 @@ final class TemplateScannerTest extends TestCase
         self::assertSame(HeadingKind::Migratable, $found[0]->kind);
         self::assertSame(2, $found[0]->line);
         self::assertSame('h2', $found[0]->tag);
-        self::assertSame('<headliner:headline record="{record}" />', $found[0]->suggestion);
+        self::assertSame('<headliner:headline record="{record}" default="h2" />', $found[0]->suggestion);
+    }
+
+    #[Test]
+    public function theTagOfTheTemplateIsKeptAsTheDefaultSoTheOutputStaysTheSame(): void
+    {
+        $found = $this->scanner->scan("<h1 class=\"stage\">{data -> f:render.text(field: 'header')}</h1>");
+
+        self::assertSame('<headliner:headline record="{data}" default="h1" />', $found[0]->suggestion);
     }
 
     #[Test]
@@ -45,7 +53,7 @@ final class TemplateScannerTest extends TestCase
         $found = $this->scanner->scan("<h3 class=\"card\">{card -> f:render.text(field: 'title')}</h3>");
 
         self::assertSame(HeadingKind::Migratable, $found[0]->kind);
-        self::assertSame('<headliner:headline record="{card}" textField="title" />', $found[0]->suggestion);
+        self::assertSame('<headliner:headline record="{card}" textField="title" default="h3" />', $found[0]->suggestion);
         self::assertSame('class="card"', $found[0]->attributes);
     }
 
@@ -63,7 +71,7 @@ final class TemplateScannerTest extends TestCase
         $found = $this->scanner->scan('<h2>{data.header}</h2>');
 
         self::assertSame(HeadingKind::Migratable, $found[0]->kind);
-        self::assertSame('<headliner:headline record="{record}" />', $found[0]->suggestion);
+        self::assertSame('<headliner:headline record="{record}" default="h2" />', $found[0]->suggestion);
     }
 
     #[Test]

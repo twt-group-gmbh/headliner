@@ -91,7 +91,9 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
 
 Every heading is listed with its file and line. A heading whose text is a field of a record
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
-(`<headliner:headline record="{record}" />`, with `textField` for another field and `subheader="1"` for the subheader).
+(`<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and `subheader="1"` for the
+subheader). The tag of the template becomes the `default`: it is what an element without a tag of its own gets, so the
+page looks the same until an editor chooses another tag.
 The attributes of the heading are listed too: a class has to be moved into the template around it or into the CSS,
 because the ViewHelper puts the layout class only. A heading with another dynamic text (a translation, a formatted
 value, several variables) is listed as needing a decision: there is no record the scanner could name.

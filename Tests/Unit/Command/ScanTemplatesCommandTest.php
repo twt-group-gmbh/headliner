@@ -46,7 +46,7 @@ final class ScanTemplatesCommandTest extends TestCase
 
         self::assertSame(0, $tester->getStatusCode());
         self::assertStringContainsString('Templates/Text.html:2', $output);
-        self::assertStringContainsString('<headliner:headline record="{record}" />', $output);
+        self::assertStringContainsString('<headliner:headline record="{record}" default="h2" />', $output);
         self::assertStringContainsString('Templates/Text.html:3', $output);
         self::assertStringNotContainsString('Templates/Plain.html', $output, 'a file without Fluid is no template');
         self::assertStringNotContainsString('Skipped.html', $output, 'vendor is skipped');
