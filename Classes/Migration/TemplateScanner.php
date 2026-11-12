@@ -63,7 +63,7 @@ final class TemplateScanner
 
     /**
      * @param array<int, array{0: string, 1: int}> $match
-     * @return array{line: int, tag: string, attributes: string, text: string}
+     * @return array{line: int, tag: string, attributes: string, text: string, original: string}
      */
     private function entry(string $source, array $match, string $text, string $attributes): array
     {
@@ -72,6 +72,7 @@ final class TemplateScanner
             'tag' => 'h' . $match[1][0],
             'attributes' => $attributes,
             'text' => $text,
+            'original' => trim((string) preg_replace('/\s+/u', ' ', $match[0][0])),
         ];
     }
 
@@ -79,7 +80,7 @@ final class TemplateScanner
      * One finding for a heading, or for a run of headings with the same text and attributes at different levels, which
      * is how a component chooses its tag with a switch.
      *
-     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string}> $group
+     * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string}> $group
      */
     private function headingOf(array $group): TemplateHeading
     {
@@ -94,6 +95,7 @@ final class TemplateScanner
                 $first['text'],
                 HeadingKind::Component,
                 '<headliner:headline.values tag="{tag}">' . $first['text'] . '</headliner:headline.values>',
+                $first['original'],
                 count($group)
             );
         }
@@ -105,7 +107,8 @@ final class TemplateScanner
             $first['attributes'],
             $first['text'],
             $this->kindOf($first['text'], $suggestion),
-            $suggestion
+            $suggestion,
+            $first['original']
         );
     }
 

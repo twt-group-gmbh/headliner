@@ -16,6 +16,8 @@ final readonly class TemplateHeading
         public string $text,
         public HeadingKind $kind,
         public ?string $suggestion,
+        /** The whole element as it is in the template, on one line */
+        public string $original = '',
         /** The number of headings of a switch that are reported as one */
         public int $count = 1
     ) {}

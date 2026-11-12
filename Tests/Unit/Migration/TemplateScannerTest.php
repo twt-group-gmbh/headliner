@@ -48,6 +48,14 @@ final class TemplateScannerTest extends TestCase
     }
 
     #[Test]
+    public function theWholeElementIsKeptSoItCanBeShownAsTheOldPart(): void
+    {
+        $found = $this->scanner->scan("<h3 class=\"card\">\n    {card -> f:render.text(field: 'title')}\n</h3>");
+
+        self::assertSame("<h3 class=\"card\"> {card -> f:render.text(field: 'title')} </h3>", $found[0]->original);
+    }
+
+    #[Test]
     public function aFieldOtherThanTheHeaderIsNamedAsTextField(): void
     {
         $found = $this->scanner->scan("<h3 class=\"card\">{card -> f:render.text(field: 'title')}</h3>");

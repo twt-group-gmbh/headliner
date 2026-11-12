@@ -73,19 +73,26 @@ final class ScanTemplatesCommand extends Command
                 if ($heading->kind === HeadingKind::Static && !$input->getOption('with-static')) {
                     continue;
                 }
-                // escaped: the markup of a template is no style tag of the console
-                $output->writeln(OutputFormatter::escape(sprintf(
-                    '%s:%d  <%s%s> %s%s',
-                    substr($file, strlen($path) + 1),
-                    $heading->line,
-                    $heading->tag,
-                    $heading->attributes === '' ? '' : ' ' . $heading->attributes,
-                    mb_strimwidth($heading->text, 0, 100, '...'),
-                    $heading->count > 1 ? ' (' . $heading->count . ' headings)' : ''
-                )));
-                if ($heading->suggestion !== null) {
-                    $output->writeln('    -> ' . OutputFormatter::escape($heading->suggestion));
+                $location = substr($file, strlen($path) + 1) . ':' . $heading->line;
+                $lines = [];
+                if ($heading->suggestion === null) {
+                    $lines[] = sprintf(
+                        '%s  <%s%s> %s',
+                        $location,
+                        $heading->tag,
+                        $heading->attributes === '' ? '' : ' ' . $heading->attributes,
+                        mb_strimwidth($heading->text, 0, 100, '...')
+                    );
+                } else {
+                    $lines[] = $location . ($heading->count > 1 ? sprintf('  (%d headings: %s)', $heading->count, $heading->tag) : '');
+                    $lines[] = '  - ' . mb_strimwidth($heading->original, 0, 200, '...');
+                    $lines[] = '  + ' . $heading->suggestion;
+                    if ($heading->attributes !== '' && $heading->kind === HeadingKind::Migratable) {
+                        $lines[] = '  ! ' . $heading->attributes . ' is not passed on by the ViewHelper: keep it in the CSS or an element around it';
+                    }
                 }
+                // escaped: the markup of a template is no style tag of the console
+                $output->writeln(OutputFormatter::escape(implode("\n", $lines)));
             }
         }
 

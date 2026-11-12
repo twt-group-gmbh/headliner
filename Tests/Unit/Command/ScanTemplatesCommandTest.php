@@ -47,6 +47,8 @@ final class ScanTemplatesCommandTest extends TestCase
         self::assertSame(0, $tester->getStatusCode());
         self::assertStringContainsString('Templates/Text.html:2', $output);
         self::assertStringContainsString('<headliner:headline record="{record}" default="h2" />', $output);
+        self::assertStringContainsString("  - <h2>{record -> f:render.text(field: 'header')}</h2>", $output);
+        self::assertStringContainsString('  + <headliner:headline record="{record}" default="h2" />', $output);
         self::assertStringContainsString('Templates/Text.html:3', $output);
         self::assertStringNotContainsString('Templates/Plain.html', $output, 'a file without Fluid is no template');
         self::assertStringNotContainsString('Skipped.html', $output, 'vendor is skipped');
@@ -83,6 +85,18 @@ final class ScanTemplatesCommandTest extends TestCase
     }
 
     #[Test]
+    public function attributesOfTheHeadingAreNamedBecauseTheViewHelperDoesNotKeepThem(): void
+    {
+        file_put_contents($this->directory . '/Templates/Card.html', "<f:render />\n<h3 class=\"card\" id=\"x\">{data.header}</h3>");
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+        $tester->execute(['path' => $this->directory]);
+
+        self::assertStringContainsString('Templates/Card.html:2', $tester->getDisplay());
+        self::assertStringContainsString('  ! class="card" id="x" is not passed on by the ViewHelper', $tester->getDisplay());
+        unlink($this->directory . '/Templates/Card.html');
+    }
+
+    #[Test]
     public function aSwitchOfTagsIsOneLineWithTheNumberOfHeadings(): void
     {
         file_put_contents(
@@ -92,7 +106,7 @@ final class ScanTemplatesCommandTest extends TestCase
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
         $tester->execute(['path' => $this->directory]);
 
-        self::assertStringContainsString('Templates/Component.html:1  <h1/h2/h3> {c} (3 headings)', $tester->getDisplay());
+        self::assertStringContainsString('Templates/Component.html:1  (3 headings: h1/h2/h3)', $tester->getDisplay());
         self::assertStringContainsString('1 component', $tester->getDisplay());
         unlink($this->directory . '/Templates/Component.html');
     }

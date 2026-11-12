@@ -90,7 +90,9 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
     vendor/bin/typo3 headliner:scan-templates --with-backend # also the templates of the backend
     vendor/bin/typo3 headliner:scan-templates --exclude=app/public/typo3conf/ext --exclude=packages/legacy
 
-Every heading is listed with its file and line. A heading whose text is a field of a record
+Every heading is listed with its file and line. For a heading that can be replaced, the output shows the element as it is
+in the template (`-`) and the call that replaces it (`+`), so you know what to change where; a line with `!` names the
+attributes of the heading (a class, an id) that the ViewHelper does not keep. A heading whose text is a field of a record
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
 (`<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and `subheader="1"` for the
 subheader). The tag of the template becomes the `default`: it is what an element without a tag of its own gets, so the
