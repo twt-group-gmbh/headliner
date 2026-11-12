@@ -26,18 +26,19 @@ final class TemplateScanner
     public function scan(string $source): array
     {
         $source = $this->withoutComments($source);
-        preg_match_all('/<h([1-6])\b([^>]*)>(.*?)<\/h\1\s*>/is', $source, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
+        // the attributes end at the first ">" outside of quotes and of {...}: an inline expression of Fluid can contain one
+        preg_match_all('/<h([1-6])\b((?:"[^"]*+"|\'[^\']*+\'|[^>{"\']++|(\{(?:[^{}]++|(?3))*+\}))*+)>(.*?)<\/h\1\s*>/is', $source, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
 
         $groups = [];
         $previousEnd = null;
         foreach ($matches as $match) {
-            $text = trim((string) preg_replace('/\s+/u', ' ', $match[3][0]));
+            $text = trim((string) preg_replace('/\s+/u', ' ', $match[4][0]));
             $attributes = trim($match[2][0]);
             $last = $groups === [] ? null : $groups[array_key_last($groups)];
             if (
                 $last !== null
                 && $previousEnd !== null
-                && $last[0]['text'] === $text
+                && $this->same($last[0]['text'], $text)
                 && $last[0]['attributes'] === $attributes
                 && $this->onlyFluidBetween(substr($source, $previousEnd, $match[0][1] - $previousEnd))
             ) {
@@ -48,7 +49,7 @@ final class TemplateScanner
             $previousEnd = $match[0][1] + strlen($match[0][0]);
         }
 
-        return array_map(fn(array $group): TemplateHeading => $this->headingOf($group, $source), $groups);
+        return array_merge(...array_map(fn(array $group): array => $this->headingsOf($group, $source), $groups));
     }
 
     /**
@@ -78,44 +79,70 @@ final class TemplateScanner
     }
 
     /**
-     * One finding for a heading, or for a run of headings with the same text and attributes at different levels, which
-     * is how a component chooses its tag with a switch.
+     * One finding for a run of headings with the same dynamic text and attributes at different levels, which is how a
+     * component chooses its tag with a switch; else one finding for every heading of the run: none is left out.
      *
      * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string, offset: int}> $group
+     * @return list<TemplateHeading>
      */
-    private function headingOf(array $group, string $source): TemplateHeading
+    private function headingsOf(array $group, string $source): array
     {
         $first = $group[0];
         $tags = array_values(array_unique(array_column($group, 'tag')));
         sort($tags);
-        if (count($group) >= 3 && count($tags) >= 2 && str_contains($first['text'], '{')) {
-            [$tagExpression, $notes] = $this->tagOfSwitch($group, $source);
-
-            return new TemplateHeading(
-                $first['line'],
-                implode('/', $tags),
-                $first['attributes'],
-                $first['text'],
-                HeadingKind::Component,
-                $tagExpression === null ? null : '<headliner:headline.values tag="' . $tagExpression . '"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
-                $first['original'],
-                count($group),
-                notes: $notes
-            );
+        if (count($group) < 3 || count($tags) < 2 || !str_contains($first['text'], '{')) {
+            return array_map($this->headingOf(...), $group);
         }
-        $suggestion = $this->suggest($first['text'], $first['tag'], $first['attributes']);
-        $kind = $this->kindOf($first['text'], $suggestion);
 
-        return new TemplateHeading(
+        [$tagExpression, $notes] = $this->tagOfSwitch($group, $source);
+        if ($tagExpression !== null && !$this->hasPlainAttributes($first['attributes'])) {
+            $tagExpression = null;
+            $notes[] = 'the attributes are no name="value" pairs (' . $first['attributes'] . '): they cannot go into the call, set them by hand';
+        }
+
+        return [new TemplateHeading(
             $first['line'],
-            $first['tag'],
+            implode('/', $tags),
             $first['attributes'],
             $first['text'],
+            HeadingKind::Component,
+            $tagExpression === null ? null : '<headliner:headline.values tag="' . $tagExpression . '"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
+            $first['original'],
+            count($group),
+            notes: $notes
+        )];
+    }
+
+    /**
+     * @param array{line: int, tag: string, attributes: string, text: string, original: string, offset: int} $heading
+     */
+    private function headingOf(array $heading): TemplateHeading
+    {
+        $suggestion = $this->suggest($heading['text'], $heading['tag'], $heading['attributes']);
+        $kind = $this->kindOf($heading['text'], $suggestion);
+        $reason = $kind === HeadingKind::NeedsDecision ? $this->reasonOf($heading['text']) : null;
+        if ($suggestion !== null && !$this->hasPlainAttributes($heading['attributes'])) {
+            // attributes that are no name="value" pairs (an inline condition, an attribute without a value) cannot go into the call
+            $suggestion = null;
+            $kind = HeadingKind::NeedsDecision;
+            $reason = DecisionReason::Attributes;
+        }
+
+        return new TemplateHeading(
+            $heading['line'],
+            $heading['tag'],
+            $heading['attributes'],
+            $heading['text'],
             $kind,
             $suggestion,
-            $first['original'],
-            reason: $kind === HeadingKind::NeedsDecision ? $this->reasonOf($first['text']) : null
+            $heading['original'],
+            reason: $reason
         );
+    }
+
+    private function hasPlainAttributes(string $attributes): bool
+    {
+        return preg_match('/^(?:\s*[\w:.-]+\s*=\s*(?:"[^"]*"|\'[^\']*\'))*\s*$/', $attributes) === 1;
     }
 
     /**
@@ -143,12 +170,17 @@ final class TemplateScanner
         }
         $region = substr($source, $start, $end - $start);
 
-        preg_match_all('/<f:case\s+value="([^"]*)"/', $region, $cases, PREG_OFFSET_CAPTURE);
+        // every case of the switch, the default case too: a heading belongs to the nearest one before it
+        preg_match_all('/<f:case\s+value="([^"]*)"|<f:(defaultCase)\b/', $region, $cases, PREG_OFFSET_CAPTURE | PREG_SET_ORDER);
+        $caseValues = [];
+        foreach ($cases as $case) {
+            $caseValues[] = [isset($case[2]) && $case[2][0] !== '' ? 'default' : ($case[1][0] ?? ''), $start + $case[0][1]];
+        }
         $mapping = [];
         foreach ($group as $heading) {
             $value = null;
-            foreach ($cases[1] as $index => [$caseValue]) {
-                if ($start + $cases[0][$index][1] < $heading['offset']) {
+            foreach ($caseValues as [$caseValue, $caseOffset]) {
+                if ($caseOffset < $heading['offset']) {
                     $value = $caseValue;
                 }
             }
@@ -156,29 +188,41 @@ final class TemplateScanner
         }
 
         $notes = [];
-        $others = array_values(array_diff(array_column($cases[1], 0), array_keys($mapping)));
-        if (str_contains($region, '<f:defaultCase')) {
-            $others[] = 'default';
-        }
+        $others = array_values(array_unique(array_diff(array_column($caseValues, 0), array_keys($mapping))));
         $isLevel = true;
+        $isTag = true;
         foreach ($mapping as $value => $tag) {
             $isLevel = $isLevel && (string) $value === substr($tag, 1);
+            $isTag = $isTag && (string) $value === $tag;
         }
         $names = [];
         foreach ($mapping as $value => $tag) {
             $names[] = $value . ' = ' . $tag;
         }
-        if (!$isLevel) {
-            array_unshift($notes, sprintf('the tag follows %s, but not as its number: %s; so there is no single call, set the tag from the value in the template that calls this one', $expression, implode(', ', $names)));
+        if (!$isLevel && !$isTag) {
+            $notes[] = sprintf('the tag follows %s, but neither as its number nor as the tag itself: %s; so there is no single call, set the tag from the value in the template that calls this one', $expression, implode(', ', $names));
         }
         if ($others !== []) {
             $notes[] = sprintf('the switch has other cases (%s) than these headings: keep them around the call', implode(', ', $others));
         }
-        if ($isLevel && preg_match('/^\{([\w.]+)\}$/', $expression, $variable) !== 1) {
-            return [null, array_merge(['the tag is the number of ' . $expression . ' but that is no plain variable: set the tag by hand'], $notes)];
+        if (!$isLevel && !$isTag) {
+            return [null, $notes];
+        }
+        if (preg_match('/^\{([\w.]+)\}$/', $expression, $variable) !== 1) {
+            return [null, array_merge(['the tag is the value of ' . $expression . ' but that is no plain variable: set the tag by hand'], $notes)];
         }
 
-        return [$isLevel && isset($variable) ? 'h{' . $variable[1] . '}' : null, $notes];
+        return [$isLevel ? 'h{' . $variable[1] . '}' : '{' . $variable[1] . '}', $notes];
+    }
+
+    /**
+     * Whether two texts are the same but for the white space before the end of a tag (`" >` and `">`).
+     */
+    private function same(string $a, string $b): bool
+    {
+        $normalize = static fn(string $text): string => (string) preg_replace('/\s+(\/?>)/', '$1', $text);
+
+        return $normalize($a) === $normalize($b);
     }
 
     private function onlyFluidBetween(string $between): bool

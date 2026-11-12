@@ -172,7 +172,7 @@ final class TemplateScannerTest extends TestCase
         self::assertNull($found[0]->suggestion);
         self::assertSame(
             [
-                'the tag follows {layout}, but not as its number: 2 = h3, 3 = h4, 4 = h5; so there is no single call, set the tag from the value in the template that calls this one',
+                'the tag follows {layout}, but neither as its number nor as the tag itself: 2 = h3, 3 = h4, 4 = h5; so there is no single call, set the tag from the value in the template that calls this one',
                 'the switch has other cases (1, default) than these headings: keep them around the call',
             ],
             $found[0]->notes
@@ -262,5 +262,121 @@ final class TemplateScannerTest extends TestCase
 
         self::assertNull($found[0]->reason);
         self::assertNull($found[1]->reason);
+    }
+
+    #[Test]
+    public function everyHeadingIsReportedEvenIfSeveralInARowLookAlike(): void
+    {
+        $source = '';
+        foreach ([1, 2, 3, 4, 5, 6] as $level) {
+            $source .= "<h$level>Lorem ipsum</h$level>\n";
+        }
+        $found = $this->scanner->scan($source);
+
+        self::assertCount(6, $found);
+        self::assertSame([1, 2, 3, 4, 5, 6], array_column($found, 'line'));
+        self::assertSame(['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], array_column($found, 'tag'));
+    }
+
+    #[Test]
+    public function twoHeadingsWithTheSameTextAndAttributesAreTwoFindings(): void
+    {
+        $found = $this->scanner->scan("<h6 class=\"a\">{x}</h6>\n<h4 class=\"a\">{x}</h4>");
+
+        self::assertCount(2, $found);
+        self::assertSame(['h6', 'h4'], array_column($found, 'tag'));
+        self::assertSame([1, 2], array_column($found, 'line'));
+    }
+
+    #[Test]
+    public function aGreaterThanSignInsideAnInlineExpressionOfTheTagDoesNotEndTheTag(): void
+    {
+        $found = $this->scanner->scan("<f:render />\n<h4{f:if(condition: '{n} > 1', then: ' class=\"x\"')}>{record -> f:render.text(field: 'header')}</h4>");
+
+        self::assertCount(1, $found);
+        self::assertSame(2, $found[0]->line);
+        self::assertSame("{f:if(condition: '{n} > 1', then: ' class=\"x\"')}", $found[0]->attributes);
+        self::assertSame("{record -> f:render.text(field: 'header')}", $found[0]->text);
+        // attributes that are no name="value" pairs cannot go into the call: no suggestion
+        self::assertSame(HeadingKind::NeedsDecision, $found[0]->kind);
+        self::assertSame(DecisionReason::Attributes, $found[0]->reason);
+        self::assertNull($found[0]->suggestion);
+    }
+
+    #[Test]
+    public function anAttributeWithoutAValueIsNoSuggestionEither(): void
+    {
+        $found = $this->scanner->scan("<h2 hidden>{record -> f:render.text(field: 'header')}</h2>");
+
+        self::assertSame(DecisionReason::Attributes, $found[0]->reason);
+        self::assertNull($found[0]->suggestion);
+    }
+
+    #[Test]
+    public function aValueWithAFluidExpressionInsideQuotesIsAPlainAttribute(): void
+    {
+        $found = $this->scanner->scan("<h2 class=\"a {f:if(condition: '{b}', then: 'c')}\">{record -> f:render.text(field: 'header')}</h2>");
+
+        self::assertSame(HeadingKind::Migratable, $found[0]->kind);
+        self::assertSame('<headliner:headline record="{record}" default="h2" class="a {f:if(condition: \'{b}\', then: \'c\')}" />', $found[0]->suggestion);
+    }
+
+    #[Test]
+    public function aSwitchWhoseValuesAreTheTagsItselfGivesTheVariableAsTheTag(): void
+    {
+        $source = "<f:switch expression=\"{tag}\">\n"
+            . "<f:case value=\"h1\"><h1 class=\"{class}\">{content}</h1></f:case>\n"
+            . "<f:case value=\"h2\"><h2 class=\"{class}\">{content}</h2></f:case>\n"
+            . "<f:case value=\"h3\"><h3 class=\"{class}\">{content}</h3></f:case>\n"
+            . "</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertSame('<headliner:headline.values tag="{tag}" class="{class}">{content}</headliner:headline.values>', $found[0]->suggestion);
+        self::assertSame([], $found[0]->notes);
+    }
+
+    #[Test]
+    public function aHeadingInTheDefaultCaseIsNotTakenForTheCaseBeforeIt(): void
+    {
+        $source = "<f:switch expression=\"{level}\">\n"
+            . "<f:case value=\"1\"><h1>{header}</h1></f:case>\n"
+            . "<f:case value=\"2\"><h2>{header}</h2></f:case>\n"
+            . "<f:case value=\"3\"><h3>{header}</h3></f:case>\n"
+            . "<f:defaultCase><h4>{header}</h4></f:defaultCase>\n</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertNull($found[0]->suggestion, 'the default case is a heading too: the tag is not only the level');
+        self::assertStringContainsString('1 = h1, 2 = h2, 3 = h3, default = h4', $found[0]->notes[0]);
+        self::assertCount(1, $found[0]->notes, 'the default case is part of the group, not another case');
+    }
+
+    #[Test]
+    public function attributesThatAreNoPairsKeepTheComponentWithoutACall(): void
+    {
+        $source = "<f:switch expression=\"{tag}\">\n"
+            . "<f:case value=\"h1\"><h1 {f:if(condition: '{a}', then: 'id=\"x\"')}>{content}</h1></f:case>\n"
+            . "<f:case value=\"h2\"><h2 {f:if(condition: '{a}', then: 'id=\"x\"')}>{content}</h2></f:case>\n"
+            . "<f:case value=\"h3\"><h3 {f:if(condition: '{a}', then: 'id=\"x\"')}>{content}</h3></f:case>\n"
+            . "</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertSame(HeadingKind::Component, $found[0]->kind);
+        self::assertNull($found[0]->suggestion);
+        self::assertStringContainsString('no name="value" pairs', $found[0]->notes[0]);
+    }
+
+    #[Test]
+    public function aSpaceBeforeTheEndOfAnInnerTagDoesNotSplitASwitch(): void
+    {
+        $source = "<f:switch expression=\"{tag}\">\n"
+            . "<f:case value=\"h1\"><h1><f:format.stripTags allowedTags=\"<span>\" >{content}</f:format.stripTags></h1></f:case>\n"
+            . "<f:case value=\"h2\"><h2><f:format.stripTags allowedTags=\"<span>\">{content}</f:format.stripTags></h2></f:case>\n"
+            . "<f:case value=\"h3\"><h3><f:format.stripTags allowedTags=\"<span>\">{content}</f:format.stripTags></h3></f:case>\n"
+            . "</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertCount(1, $found);
+        self::assertSame(3, $found[0]->count);
+        self::assertSame([], $found[0]->notes);
     }
 }

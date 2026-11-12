@@ -113,14 +113,17 @@ grouped by the reason, and every place keeps its file and line:
 *   a link, a condition or another markup in the heading,
 *   a text from a partial,
 *   a single variable that is no record (the data of a plugin, a setting),
+*   a heading whose attributes are no `name="value"` pairs (an inline condition in the tag, an attribute without a value):
+    they cannot go into the call, so there is none,
 *   several variables or a text.
 
 A component that chooses its tag with an `f:switch` (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`
-blocks) is listed once, as a component, with the number of headings. The scanner reads the switch: if the value of every
-`f:case` is the number of its heading, one `headliner:headline.values tag="h{layout}"` (with the variable of the switch)
-replaces the headings. If not (the value 2 gives an `h3`, a case gives a `<p>`), there is no call, and the output names
-the mapping. In both cases it names the other cases of the switch (a `<p>`, a case that hides the header, the default
-case), which the call does not replace.
+blocks) is listed once, as a component, with the number of headings. The scanner reads the switch and the heading in each
+case, the default case included. If the value of every `f:case` is the number of its heading (`1` for `h1`), one
+`headliner:headline.values tag="h{layout}"` (with the variable of the switch) replaces the headings; if it is the tag itself
+(`h1`), it is `tag="{tag}"`. If it is neither (the value 2 gives an `h3`, a default case gives an `h4`), there is no call, and the
+output names the mapping. In every case it names the other cases of the switch (a `<p>`, a case that hides the header, the
+default case), which the call does not replace, and it gives no call if the headings are in different or nested switches.
 
 The templates of the backend (the preview of a Content Block, `backend-preview.html`, and `Resources/Private/Backend/`) are
 not on the page, so they are only counted; `--with-backend` lists them.

@@ -9,6 +9,7 @@ namespace Twtgroup\Headliner\Migration;
  */
 enum DecisionReason: string
 {
+    case Attributes = 'attributes';
     case Translation = 'translation';
     case FormattedRecordField = 'formatted-record-field';
     case Formatted = 'formatted';
@@ -23,6 +24,7 @@ enum DecisionReason: string
     public function label(): string
     {
         return match ($this) {
+            self::Attributes => 'the attributes of the heading are no name="value" pairs (an inline condition, an attribute without a value): they cannot go into the call, set them by hand',
             self::Translation => 'translation',
             self::FormattedRecordField => 'a field of the record with its own formatting (stripTags, raw, nl2br): headliner:headline outputs it differently, check by hand',
             self::Formatted => 'a value with its own formatting (f:format.*)',
