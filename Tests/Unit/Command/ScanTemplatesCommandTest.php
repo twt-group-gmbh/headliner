@@ -98,6 +98,30 @@ final class ScanTemplatesCommandTest extends TestCase
     }
 
     #[Test]
+    public function excludedPathsAreSkipped(): void
+    {
+        mkdir($this->directory . '/app/typo3conf/ext/news', 0o777, true);
+        file_put_contents($this->directory . '/app/typo3conf/ext/news/List.html', '<f:render /><h3>{newsItem.title}</h3>');
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+
+        $tester->execute(['path' => $this->directory]);
+        self::assertStringContainsString('app/typo3conf/ext/news/List.html:1', $tester->getDisplay());
+
+        $tester->execute(['path' => $this->directory, '--exclude' => ['app/typo3conf/ext/', 'Templates/Plain.html']]);
+        self::assertStringNotContainsString('typo3conf', $tester->getDisplay());
+        self::assertStringContainsString('Templates/Text.html:2', $tester->getDisplay(), 'what is not excluded is still scanned');
+
+        // a name that only starts like the path is not the path
+        $tester->execute(['path' => $this->directory, '--exclude' => ['app/typo3conf/ext/new']]);
+        self::assertStringContainsString('app/typo3conf/ext/news/List.html:1', $tester->getDisplay());
+
+        unlink($this->directory . '/app/typo3conf/ext/news/List.html');
+        foreach (['/app/typo3conf/ext/news', '/app/typo3conf/ext', '/app/typo3conf', '/app'] as $directory) {
+            rmdir($this->directory . $directory);
+        }
+    }
+
+    #[Test]
     public function aPathThatIsNoDirectoryFails(): void
     {
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));

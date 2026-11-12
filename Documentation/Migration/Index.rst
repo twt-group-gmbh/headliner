@@ -88,6 +88,7 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
     vendor/bin/typo3 headliner:scan-templates packages/site # one directory
     vendor/bin/typo3 headliner:scan-templates --with-static # also the headings with a fixed text
     vendor/bin/typo3 headliner:scan-templates --with-backend # also the templates of the backend
+    vendor/bin/typo3 headliner:scan-templates --exclude=app/public/typo3conf/ext --exclude=packages/legacy
 
 Every heading is listed with its file and line. A heading whose text is a field of a record
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
@@ -104,6 +105,13 @@ argument replaces the whole switch (see :ref:`integration-headline-values`).
 
 The templates of the backend (the preview of a Content Block, `backend-preview.html`, and `Resources/Private/Backend/`) are
 not on the page, so they are only counted; `--with-backend` lists them.
+
+`--exclude` takes a path relative to the scanned directory (a directory or a file) and can be given more than once. Use it
+for code that is not yours: in a project where the extensions are installed into `typo3conf/ext`, the scanner cannot tell
+yours from the installed ones, so it lists them all.
+
+A heading with the text of a page (`{page -> f:render.text(field: 'title')}`) is listed as needing a decision: a page has
+no field for a tag, so there is no `headliner:headline` for it that the page module could change.
 
 The scanner skips comments, HTML files without Fluid, and the directories `vendor`, `node_modules`, `var`, `.Build`,
 `typo3temp`, `sysext` and `_assets`. The suggestion assumes the variable is a record object; in a template where it is an

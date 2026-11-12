@@ -128,6 +128,11 @@ final class TemplateScanner
     private function suggest(string $text, string $tag): ?string
     {
         if (preg_match(self::RENDER_TEXT, $text, $match) === 1) {
+            // a page has no field for a tag, nothing the page module could change: a person decides
+            if ($match[1] === 'page') {
+                return null;
+            }
+
             return $this->viewHelper($match[1], $match[2], $tag);
         }
         if (preg_match('/^\{\s*(?:record|data)\.(header|subheader)\s*\}$/', $text, $match) === 1) {

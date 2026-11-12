@@ -35,6 +35,7 @@ final class ScanTemplatesCommand extends Command
         $this
             ->addArgument('path', InputArgument::OPTIONAL, 'Directory to scan (default: the project path)')
             ->addOption('with-static', null, InputOption::VALUE_NONE, 'Also list headings with a fixed text')
+            ->addOption('exclude', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Path (relative to the scanned directory) to skip, e.g. app/public/typo3conf/ext; can be given more than once')
             ->addOption('with-backend', null, InputOption::VALUE_NONE, 'Also list the headings of backend templates (the preview of a Content Block)');
     }
 
@@ -50,7 +51,11 @@ final class ScanTemplatesCommand extends Command
 
         $counts = [];
         $backend = 0;
-        foreach ($this->templates($path) as $file) {
+        $excluded = array_values(array_filter(array_map(
+            static fn(mixed $exclude): string => trim((string) $exclude, '/'),
+            (array) $input->getOption('exclude')
+        ), static fn(string $exclude): bool => $exclude !== ''));
+        foreach ($this->templates($path, $excluded) as $file) {
             $source = (string) file_get_contents($file);
             if (!$this->scanner->isFluid($source)) {
                 continue;
@@ -98,13 +103,23 @@ final class ScanTemplatesCommand extends Command
     }
 
     /**
+     * @param list<string> $excluded paths relative to $path; a path is a file or a directory, not the start of a name
      * @return \Generator<string>
      */
-    private function templates(string $path): \Generator
+    private function templates(string $path, array $excluded): \Generator
     {
         $files = new \RecursiveIteratorIterator(new \RecursiveCallbackFilterIterator(
             new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
-            static fn(\SplFileInfo $file): bool => !$file->isDir() || !in_array($file->getFilename(), self::SKIPPED, true)
+            static function (\SplFileInfo $file) use ($path, $excluded): bool {
+                $relative = substr($file->getPathname(), strlen($path) + 1);
+                foreach ($excluded as $exclude) {
+                    if ($relative === $exclude || str_starts_with($relative, $exclude . '/')) {
+                        return false;
+                    }
+                }
+
+                return !$file->isDir() || !in_array($file->getFilename(), self::SKIPPED, true);
+            }
         ));
         foreach ($files as $file) {
             if ($file instanceof \SplFileInfo && $file->isFile() && $file->getExtension() === 'html') {

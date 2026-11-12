@@ -75,6 +75,15 @@ final class TemplateScannerTest extends TestCase
     }
 
     #[Test]
+    public function aPageTitleNeedsADecisionBecauseAPageHasNoTag(): void
+    {
+        $found = $this->scanner->scan("<h1>{page -> f:render.text(field: 'title')}</h1>");
+
+        self::assertSame(HeadingKind::NeedsDecision, $found[0]->kind);
+        self::assertNull($found[0]->suggestion);
+    }
+
+    #[Test]
     public function translatedFormattedAndOtherDynamicHeadingsNeedADecision(): void
     {
         $found = $this->scanner->scan(
