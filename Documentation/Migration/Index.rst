@@ -96,8 +96,17 @@ heading (a class, an id) go on in the call: the ViewHelper is a tag and adds its
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
 (`<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and `subheader="1"` for the
 subheader). The tag of the template becomes the `default`: it is what an element without a tag of its own gets, so the
-page looks the same until an editor chooses another tag. A heading with another dynamic text (a translation, a formatted
-value, several variables) is listed as needing a decision: there is no record the scanner could name.
+page looks the same until an editor chooses another tag. A heading with another dynamic text is listed as needing a decision: there is no record the scanner could name. The
+decisions are grouped by the reason, and every place keeps its file and line:
+
+*   a translation (`f:translate`),
+*   a field of the record with its own formatting (`f:format.stripTags`, `raw`, `nl2br`): `headliner:headline` outputs
+    the text with `f:render.text`, which is not the same, so check it by hand,
+*   another value with its own formatting,
+*   a link, a condition or another markup in the heading,
+*   a text from a partial,
+*   a single variable that is no record (the data of a plugin, a setting),
+*   several variables or a text.
 
 A component that chooses its tag with a switch (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`
 blocks) is listed once, as a component, with the number of headings. One `headliner:headline.values` with the tag as an

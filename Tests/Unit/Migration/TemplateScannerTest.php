@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Twtgroup\Headliner\Tests\Unit\Migration;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Twtgroup\Headliner\Migration\DecisionReason;
 use Twtgroup\Headliner\Migration\HeadingKind;
 use Twtgroup\Headliner\Migration\TemplateScanner;
 
@@ -175,5 +177,46 @@ final class TemplateScannerTest extends TestCase
         self::assertTrue($this->scanner->isBackendTemplate('ext/Resources/Private/Backend/Templates/List.html'));
         self::assertFalse($this->scanner->isBackendTemplate('ext/Resources/Private/Templates/Backend.html'));
         self::assertFalse($this->scanner->isBackendTemplate('ext/ContentBlocks/ContentElements/card/templates/frontend.html'));
+    }
+
+    /**
+     * @return iterable<string, array{string, DecisionReason}>
+     */
+    public static function reasons(): iterable
+    {
+        yield 'translate tag' => ['<h2><f:translate key="a" /></h2>', DecisionReason::Translation];
+        yield 'translate inline' => ["<h2>{f:translate(key: 'a')}</h2>", DecisionReason::Translation];
+        yield 'LLL' => ['<h2>LLL:EXT:x/a.xlf:t</h2>', DecisionReason::Translation];
+        yield 'stripTags of a record field' => ["<h2>{data.tx_x_headline -> f:format.stripTags(allowedTags: '<span>')}</h2>", DecisionReason::FormattedRecordField];
+        yield 'raw around a record field' => ['<h2><f:format.raw>{data.header}</f:format.raw></h2>', DecisionReason::FormattedRecordField];
+        yield 'nl2br of a record field' => ['<h2>{record.title -> f:format.nl2br()}</h2>', DecisionReason::FormattedRecordField];
+        yield 'raw around another variable' => ['<h2><f:format.raw>{newsItem.title}</f:format.raw></h2>', DecisionReason::Formatted];
+        yield 'link' => ['<h2><a href="{u}">{t}</a></h2>', DecisionReason::Link];
+        yield 'typolink with format' => ['<h2><f:link.typolink parameter="{l}">{header -> f:format.raw()}</f:link.typolink></h2>', DecisionReason::Link];
+        yield 'condition' => ['<h2><f:if condition="{x}">{y}</f:if></h2>', DecisionReason::Condition];
+        yield 'render.text in a condition' => ["<h2><f:if condition=\"{data.header}\"><f:then>{data -> f:render.text(field: 'header')}</f:then></f:if></h2>", DecisionReason::Condition];
+        yield 'partial' => ['<h2><f:render partial="X" /></h2>', DecisionReason::Partial];
+        yield 'single variable' => ['<h2>{newsItem.title}</h2>', DecisionReason::Variable];
+        yield 'markup' => ['<h2><strong>{x}</strong></h2>', DecisionReason::Markup];
+        yield 'several variables' => ['<h2>{a} {b}</h2>', DecisionReason::Mixed];
+    }
+
+    #[Test]
+    #[DataProvider('reasons')]
+    public function aDecisionSaysWhy(string $template, DecisionReason $expected): void
+    {
+        $found = $this->scanner->scan($template);
+
+        self::assertSame(HeadingKind::NeedsDecision, $found[0]->kind);
+        self::assertSame($expected, $found[0]->reason);
+    }
+
+    #[Test]
+    public function onlyADecisionHasAReason(): void
+    {
+        $found = $this->scanner->scan('<h2>{data.header}</h2><h3>Fixed</h3>');
+
+        self::assertNull($found[0]->reason);
+        self::assertNull($found[1]->reason);
     }
 }

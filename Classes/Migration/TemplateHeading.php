@@ -19,6 +19,8 @@ final readonly class TemplateHeading
         /** The whole element as it is in the template, on one line */
         public string $original = '',
         /** The number of headings of a switch that are reported as one */
-        public int $count = 1
+        public int $count = 1,
+        /** Why there is no suggestion; only for a heading that needs a decision */
+        public ?DecisionReason $reason = null
     ) {}
 }

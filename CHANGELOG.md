@@ -166,7 +166,8 @@ First release.
   `headliner:headline` call that replaces each one whose text is a field of a record; headings with another dynamic text are
   listed as needing a decision. It only reads. `--with-static` also lists fixed headings. A switch of tags for the same text (a component) is one entry,
   and the templates of the backend (`backend-preview.html`) are only counted unless `--with-backend` is given. `--exclude=<path>` skips a path (not the code of the project, such as installed extensions in
-  `typo3conf/ext`); a page title is no suggestion, a page has no tag field. For a heading that can be replaced the output shows the element as it is in the template and the call that replaces it, and
+  `typo3conf/ext`); a page title is no suggestion, a page has no tag field. The headings that need a decision are grouped by the reason (translation, a record field with its own formatting, a link,
+  a condition, a single variable ...), each with its file and line. For a heading that can be replaced the output shows the element as it is in the template and the call that replaces it, and
   names the attributes the ViewHelper does not keep. A helper that works with patterns: it does not find every case.
 - Documentation in `Documentation/` (introduction, installation, usage, configuration, integration, developer), with
   screenshots of the box (language comparison, the select of a heading, a Content Block with its cards).

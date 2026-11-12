@@ -100,15 +100,17 @@ final class TemplateScanner
             );
         }
         $suggestion = $this->suggest($first['text'], $first['tag'], $first['attributes']);
+        $kind = $this->kindOf($first['text'], $suggestion);
 
         return new TemplateHeading(
             $first['line'],
             $first['tag'],
             $first['attributes'],
             $first['text'],
-            $this->kindOf($first['text'], $suggestion),
+            $kind,
             $suggestion,
-            $first['original']
+            $first['original'],
+            reason: $kind === HeadingKind::NeedsDecision ? $this->reasonOf($first['text']) : null
         );
     }
 
@@ -126,6 +128,21 @@ final class TemplateScanner
         return str_contains($text, '{') || str_contains($text, '<f:') || str_contains($text, 'LLL:')
             ? HeadingKind::NeedsDecision
             : HeadingKind::Static;
+    }
+
+    private function reasonOf(string $text): DecisionReason
+    {
+        return match (true) {
+            str_contains($text, 'f:translate') || str_contains($text, 'LLL:') => DecisionReason::Translation,
+            preg_match('/\{\s*(?:record|data)\.\w+\s*->\s*f:format\.|<f:format\.\w+[^>]*>\s*\{\s*(?:record|data)\.\w+\s*\}\s*<\/f:format/', $text) === 1 => DecisionReason::FormattedRecordField,
+            preg_match('/<a[\s>]|<\w+:link/', $text) === 1 => DecisionReason::Link,
+            str_contains($text, '<f:if') || str_contains($text, 'f:if(') => DecisionReason::Condition,
+            str_contains($text, 'f:format.') => DecisionReason::Formatted,
+            str_contains($text, '<f:render') => DecisionReason::Partial,
+            preg_match('/^\{[\w.]+\}$/', $text) === 1 => DecisionReason::Variable,
+            str_contains($text, '<') => DecisionReason::Markup,
+            default => DecisionReason::Mixed,
+        };
     }
 
     private function suggest(string $text, string $tag, string $attributes): ?string

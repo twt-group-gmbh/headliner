@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Twtgroup\Headliner\Migration\DecisionReason;
 use Twtgroup\Headliner\Migration\HeadingKind;
 use Twtgroup\Headliner\Migration\TemplateScanner;
 use TYPO3\CMS\Core\Core\Environment;
@@ -55,7 +56,12 @@ final class ScanTemplatesCommand extends Command
             static fn(mixed $exclude): string => trim((string) $exclude, '/'),
             (array) $input->getOption('exclude')
         ), static fn(string $exclude): bool => $exclude !== ''));
-        foreach ($this->templates($path, $excluded) as $file) {
+        $replace = [];
+        $decisions = [];
+        $static = [];
+        $templates = iterator_to_array($this->templates($path, $excluded), false);
+        sort($templates);
+        foreach ($templates as $file) {
             $source = (string) file_get_contents($file);
             if (!$this->scanner->isFluid($source)) {
                 continue;
@@ -88,9 +94,29 @@ final class ScanTemplatesCommand extends Command
                     $lines[] = '  - ' . mb_strimwidth($heading->original, 0, 200, '...');
                     $lines[] = '  + ' . $heading->suggestion;
                 }
-                // escaped: the markup of a template is no style tag of the console
-                $output->writeln(OutputFormatter::escape(implode("\n", $lines)));
+                if ($heading->suggestion !== null) {
+                    $replace[] = implode("\n", $lines);
+                } elseif ($heading->kind === HeadingKind::Static) {
+                    $static[] = implode("\n", $lines);
+                } else {
+                    $decisions[($heading->reason ?? DecisionReason::Mixed)->value][] = implode("\n", $lines);
+                }
             }
+        }
+
+        // escaped: the markup of a template is no style tag of the console
+        foreach ($replace as $block) {
+            $output->writeln(OutputFormatter::escape($block));
+        }
+        foreach (DecisionReason::cases() as $reason) {
+            if (isset($decisions[$reason->value])) {
+                $output->writeln(OutputFormatter::escape(sprintf("\nNeeds a decision, %s (%d):", $reason->label(), count($decisions[$reason->value]))));
+                $output->writeln(OutputFormatter::escape(implode("\n", $decisions[$reason->value])));
+            }
+        }
+        if ($static !== []) {
+            $output->writeln("\nFixed text:");
+            $output->writeln(OutputFormatter::escape(implode("\n", $static)));
         }
 
         $output->writeln(sprintf(

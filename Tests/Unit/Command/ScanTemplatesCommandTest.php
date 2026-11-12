@@ -136,6 +136,37 @@ final class ScanTemplatesCommandTest extends TestCase
     }
 
     #[Test]
+    public function decisionsAreGroupedByReasonAndEveryPlaceKeepsItsFileAndLine(): void
+    {
+        file_put_contents($this->directory . '/Templates/Reasons.html', "<f:render />\n<h2><f:translate key=\"a\" /></h2>\n<h2>{newsItem.title}</h2>");
+        file_put_contents($this->directory . '/Templates/Other.html', "<f:render />\n<h3><f:translate key=\"b\" /></h3>");
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+        $tester->execute(['path' => $this->directory]);
+        $output = $tester->getDisplay();
+
+        self::assertStringContainsString('Needs a decision, translation (2)', $output);
+        self::assertStringContainsString('Needs a decision, a single variable, no record (1)', $output);
+        self::assertMatchesRegularExpression('#translation \(2\):\n(Templates/\w+\.html:\d+ .*\n){2}#', $output);
+        self::assertStringContainsString('Templates/Other.html:2', $output);
+        self::assertStringContainsString('Templates/Reasons.html:2', $output);
+        self::assertStringContainsString('Templates/Reasons.html:3', $output);
+        unlink($this->directory . '/Templates/Reasons.html');
+        unlink($this->directory . '/Templates/Other.html');
+    }
+
+    #[Test]
+    public function aFormattedRecordFieldIsSaidToBeOutputDifferently(): void
+    {
+        file_put_contents($this->directory . '/Templates/Raw.html', "<f:render />\n<h2><f:format.raw>{data.header}</f:format.raw></h2>");
+        $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
+        $tester->execute(['path' => $this->directory]);
+
+        self::assertStringContainsString('with its own formatting', $tester->getDisplay());
+        self::assertStringContainsString('outputs it differently', $tester->getDisplay());
+        unlink($this->directory . '/Templates/Raw.html');
+    }
+
+    #[Test]
     public function aPathThatIsNoDirectoryFails(): void
     {
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
