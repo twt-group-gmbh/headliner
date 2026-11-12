@@ -91,14 +91,12 @@ which of them `headliner:headline` can replace. It only reads: no template is ch
     vendor/bin/typo3 headliner:scan-templates --exclude=app/public/typo3conf/ext --exclude=packages/legacy
 
 Every heading is listed with its file and line. For a heading that can be replaced, the output shows the element as it is
-in the template (`-`) and the call that replaces it (`+`), so you know what to change where; a line with `!` names the
-attributes of the heading (a class, an id) that the ViewHelper does not keep. A heading whose text is a field of a record
+in the template (`-`) and the call that replaces it (`+`), so you know what to change where. The attributes of the
+heading (a class, an id) go on in the call: the ViewHelper is a tag and adds its own layout class to yours. A heading whose text is a field of a record
 (`{record -> f:render.text(field: 'header')}`, `{data.header}`) gets the ViewHelper that replaces it
 (`<headliner:headline record="{record}" default="h2" />`, with `textField` for another field and `subheader="1"` for the
 subheader). The tag of the template becomes the `default`: it is what an element without a tag of its own gets, so the
-page looks the same until an editor chooses another tag.
-The attributes of the heading are listed too: a class has to be moved into the template around it or into the CSS,
-because the ViewHelper puts the layout class only. A heading with another dynamic text (a translation, a formatted
+page looks the same until an editor chooses another tag. A heading with another dynamic text (a translation, a formatted
 value, several variables) is listed as needing a decision: there is no record the scanner could name.
 
 A component that chooses its tag with a switch (one `<h1>` to `<h6>` with the same text and attributes, in `f:case`

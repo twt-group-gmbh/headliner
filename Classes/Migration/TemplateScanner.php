@@ -94,12 +94,12 @@ final class TemplateScanner
                 $first['attributes'],
                 $first['text'],
                 HeadingKind::Component,
-                '<headliner:headline.values tag="{tag}">' . $first['text'] . '</headliner:headline.values>',
+                '<headliner:headline.values tag="{tag}"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
                 $first['original'],
                 count($group)
             );
         }
-        $suggestion = $this->suggest($first['text'], $first['tag']);
+        $suggestion = $this->suggest($first['text'], $first['tag'], $first['attributes']);
 
         return new TemplateHeading(
             $first['line'],
@@ -128,7 +128,7 @@ final class TemplateScanner
             : HeadingKind::Static;
     }
 
-    private function suggest(string $text, string $tag): ?string
+    private function suggest(string $text, string $tag, string $attributes): ?string
     {
         if (preg_match(self::RENDER_TEXT, $text, $match) === 1) {
             // a page has no field for a tag, nothing the page module could change: a person decides
@@ -136,10 +136,10 @@ final class TemplateScanner
                 return null;
             }
 
-            return $this->viewHelper($match[1], $match[2], $tag);
+            return $this->viewHelper($match[1], $match[2], $tag, $attributes);
         }
         if (preg_match('/^\{\s*(?:record|data)\.(header|subheader)\s*\}$/', $text, $match) === 1) {
-            return $this->viewHelper('record', $match[1], $tag);
+            return $this->viewHelper('record', $match[1], $tag, $attributes);
         }
 
         return null;
@@ -149,7 +149,7 @@ final class TemplateScanner
      * The tag of the template stays as `default`: it is what an element without a tag of its own gets, so the page looks
      * the same until an editor chooses another tag. A subheader has none: its tag follows the header.
      */
-    private function viewHelper(string $record, string $field, string $tag): string
+    private function viewHelper(string $record, string $field, string $tag, string $attributes): string
     {
         $extra = match ($field) {
             'header' => '',
@@ -160,7 +160,8 @@ final class TemplateScanner
             $extra .= ' default="' . $tag . '"';
         }
 
-        return '<headliner:headline record="{' . $record . '}"' . $extra . ' />';
+        // the ViewHelper is a tag, so a class, an id or a data attribute of the heading go on as they are
+        return '<headliner:headline record="{' . $record . '}"' . $extra . ($attributes === '' ? '' : ' ' . $attributes) . ' />';
     }
 
     /**

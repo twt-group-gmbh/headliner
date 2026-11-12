@@ -87,9 +87,6 @@ final class ScanTemplatesCommand extends Command
                     $lines[] = $location . ($heading->count > 1 ? sprintf('  (%d headings: %s)', $heading->count, $heading->tag) : '');
                     $lines[] = '  - ' . mb_strimwidth($heading->original, 0, 200, '...');
                     $lines[] = '  + ' . $heading->suggestion;
-                    if ($heading->attributes !== '' && $heading->kind === HeadingKind::Migratable) {
-                        $lines[] = '  ! ' . $heading->attributes . ' is not passed on by the ViewHelper: keep it in the CSS or an element around it';
-                    }
                 }
                 // escaped: the markup of a template is no style tag of the console
                 $output->writeln(OutputFormatter::escape(implode("\n", $lines)));

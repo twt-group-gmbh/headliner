@@ -85,14 +85,14 @@ final class ScanTemplatesCommandTest extends TestCase
     }
 
     #[Test]
-    public function attributesOfTheHeadingAreNamedBecauseTheViewHelperDoesNotKeepThem(): void
+    public function attributesOfTheHeadingAreKeptInTheReplacement(): void
     {
         file_put_contents($this->directory . '/Templates/Card.html', "<f:render />\n<h3 class=\"card\" id=\"x\">{data.header}</h3>");
         $tester = new CommandTester(new ScanTemplatesCommand(new TemplateScanner()));
         $tester->execute(['path' => $this->directory]);
 
-        self::assertStringContainsString('Templates/Card.html:2', $tester->getDisplay());
-        self::assertStringContainsString('  ! class="card" id="x" is not passed on by the ViewHelper', $tester->getDisplay());
+        self::assertStringContainsString('  + <headliner:headline record="{record}" default="h3" class="card" id="x" />', $tester->getDisplay());
+        self::assertStringNotContainsString('  ! ', $tester->getDisplay());
         unlink($this->directory . '/Templates/Card.html');
     }
 
