@@ -9,3 +9,4 @@
 # Output of the documentation rendering (docker run ghcr.io/typo3-documentation/render-guides)
 /Documentation-GENERATED-temp/
 /node_modules/
+/docs/
