@@ -103,8 +103,8 @@ second column.
         -   The header
     *   -   `tag`
         -   no
-        -   Only to force a tag that the record does not say: `h1` to `h6` or `div` (anything else becomes a `div`). It wins
-            over the record. With `subheader` it is the tag of the subheader.
+        -   Only to force a tag that the record does not say: `h1` to `h6` or `div` (anything else is ignored, as if there
+            were no tag). It wins over the record. With `subheader` it is the tag of the subheader.
         -   The tag from the field of the record
     *   -   `tagField`
         -   no

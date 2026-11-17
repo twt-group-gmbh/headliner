@@ -40,7 +40,8 @@ which is written as it is (`class="ce-headline-left"`):
         -   Without it
     *   -   `tag`
         -   no
-        -   Whenever you know the tag: `h1` to `h6` or `div` (anything else becomes a `div`). With `subheader` it is the tag of
+        -   Whenever you know the tag: `h1` to `h6` or `div` (anything else is ignored, as if there
+            were no tag). With `subheader` it is the tag of
             the subheader.
         -   The layout decides, then the default
     *   -   `layout`
