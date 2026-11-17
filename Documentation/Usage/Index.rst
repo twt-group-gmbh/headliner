@@ -91,6 +91,9 @@ The box follows the page module:
 *   In the language comparison it has one section per column: the default language and the selected translations. Each
     section has the flag and name of its language and its own status; the summary counts all problems. The sections
     stand side by side and have a minimum width, so the box scrolls sideways if they do not fit.
+*   A tag that a translation takes from the original (a tag field with the translation mode "exclude", which a Content
+    Block can set) is shown as a label with a note, and is changed in the heading of the default language. The tag
+    fields of the content elements of the core are not like that: a translation has its own tag.
 
 ..  _usage-rights:
 
