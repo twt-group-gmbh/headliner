@@ -121,9 +121,10 @@ A component that chooses its tag with an `f:switch` (one `<h1>` to `<h6>` with t
 blocks) is listed once, as a component, with the number of headings. The scanner reads the switch and the heading in each
 case, the default case included. If the value of every `f:case` is the number of its heading (`1` for `h1`), one
 `headliner:headline.values tag="h{layout}"` (with the variable of the switch) replaces the headings; if it is the tag itself
-(`h1`), it is `tag="{tag}"`. If it is neither (the value 2 gives an `h3`, a default case gives an `h4`), there is no call, and the
+(`h1`), it is `tag="{tag}"`. A default case that is a `<div>` becomes `default="div"` of the call (a value that is no tag
+gives a div in the switch, and an h2 in the call without it). If it is neither (the value 2 gives an `h3`, a default case gives an `h4`), there is no call, and the
 output names the mapping. In every case it names the other cases of the switch (a `<p>`, a case that hides the header, the
-default case), which the call does not replace, and it gives no call if the headings are in different or nested switches.
+default case that is no `<div>`), which the call does not replace, and it gives no call if the headings are in different or nested switches.
 
 The templates of the backend (the preview of a Content Block, `backend-preview.html`, and `Resources/Private/Backend/`) are
 not on the page, so they are only counted; `--with-backend` lists them.

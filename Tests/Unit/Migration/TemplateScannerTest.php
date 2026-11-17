@@ -157,6 +157,35 @@ final class TemplateScannerTest extends TestCase
     }
 
     #[Test]
+    public function aDivAsDefaultCaseOfTheSwitchBecomesTheDefaultOfTheCall(): void
+    {
+        $source = "<f:switch expression=\"{tag}\">\n"
+            . "<f:case value=\"h1\"><h1 class=\"{class}\">{content}</h1></f:case>\n"
+            . "<f:case value=\"h2\"><h2 class=\"{class}\">{content}</h2></f:case>\n"
+            . "<f:case value=\"h3\"><h3 class=\"{class}\">{content}</h3></f:case>\n"
+            . "<f:defaultCase><div class=\"{class}\">{content}</div></f:defaultCase>\n</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertSame(HeadingKind::Component, $found[0]->kind);
+        self::assertSame('<headliner:headline.values tag="{tag}" default="div" class="{class}">{content}</headliner:headline.values>', $found[0]->suggestion);
+        self::assertSame([], $found[0]->notes, 'the default case is covered by default="div", nothing is left to keep around the call');
+    }
+
+    #[Test]
+    public function aDefaultCaseThatIsNoDivIsStillNamedAndGivesNoDefault(): void
+    {
+        $source = "<f:switch expression=\"{tag}\">\n"
+            . "<f:case value=\"h1\"><h1>{content}</h1></f:case>\n"
+            . "<f:case value=\"h2\"><h2>{content}</h2></f:case>\n"
+            . "<f:case value=\"h3\"><h3>{content}</h3></f:case>\n"
+            . "<f:defaultCase><p>{content}</p></f:defaultCase>\n</f:switch>";
+        $found = $this->scanner->scan($source);
+
+        self::assertSame('<headliner:headline.values tag="{tag}">{content}</headliner:headline.values>', $found[0]->suggestion);
+        self::assertSame(['the switch has other cases (default) than these headings: keep them around the call'], $found[0]->notes);
+    }
+
+    #[Test]
     public function aSwitchWhoseValuesAreNotTheLevelsGetsNoCallAndNamesTheMapping(): void
     {
         $source = "<f:switch expression=\"{layout}\">\n"

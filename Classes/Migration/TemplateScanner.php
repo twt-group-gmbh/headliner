@@ -94,7 +94,7 @@ final class TemplateScanner
             return array_map($this->headingOf(...), $group);
         }
 
-        [$tagExpression, $notes] = $this->tagOfSwitch($group, $source);
+        [$tagExpression, $notes, $divDefault] = $this->tagOfSwitch($group, $source);
         if ($tagExpression !== null && !$this->hasPlainAttributes($first['attributes'])) {
             $tagExpression = null;
             $notes[] = 'the attributes are no name="value" pairs (' . $first['attributes'] . '): they cannot go into the call, set them by hand';
@@ -106,7 +106,7 @@ final class TemplateScanner
             $first['attributes'],
             $first['text'],
             HeadingKind::Component,
-            $tagExpression === null ? null : '<headliner:headline.values tag="' . $tagExpression . '"' . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
+            $tagExpression === null ? null : '<headliner:headline.values tag="' . $tagExpression . '"' . ($divDefault ? ' default="div"' : '') . ($first['attributes'] === '' ? '' : ' ' . $first['attributes']) . '>' . $first['text'] . '</headliner:headline.values>',
             $first['original'],
             count($group),
             notes: $notes
@@ -151,7 +151,8 @@ final class TemplateScanner
      * the group (a `<p>`, a case that hides the header, the default case).
      *
      * @param non-empty-list<array{line: int, tag: string, attributes: string, text: string, original: string, offset: int}> $group
-     * @return array{0: ?string, 1: list<string>}
+     * @return array{0: ?string, 1: list<string>, 2: bool} The third is whether the default case is a `<div>`, which the call
+     *         then gets as `default="div"` (a value that is no tag gives a div in the switch, and h2 in the call)
      */
     private function tagOfSwitch(array $group, string $source): array
     {
@@ -159,14 +160,14 @@ final class TemplateScanner
         $last = $group[array_key_last($group)]['offset'];
         preg_match_all('/<f:switch\s+expression="([^"]*)"\s*>/', substr($source, 0, $first), $switches, PREG_OFFSET_CAPTURE);
         if ($switches[0] === []) {
-            return [null, ['no f:switch around these headings: the tag is chosen by something else, set it by hand']];
+            return [null, ['no f:switch around these headings: the tag is chosen by something else, set it by hand'], false];
         }
         $lastSwitch = array_key_last($switches[0]);
         $start = $switches[0][$lastSwitch][1];
         $expression = $switches[1][$lastSwitch][0];
         $end = strpos($source, '</f:switch>', $start);
         if ($end === false || $end < $last) {
-            return [null, ['the headings are in different switches: set the tag by hand']];
+            return [null, ['the headings are in different switches: set the tag by hand'], false];
         }
         $region = substr($source, $start, $end - $start);
 
@@ -188,7 +189,9 @@ final class TemplateScanner
         }
 
         $notes = [];
-        $others = array_values(array_unique(array_diff(array_column($caseValues, 0), array_keys($mapping))));
+        $divDefault = !isset($mapping['default'])
+            && preg_match('/<f:defaultCase\b[^>]*>\s*<div\b/', $region) === 1;
+        $others = array_values(array_unique(array_diff(array_column($caseValues, 0), array_keys($mapping), $divDefault ? ['default'] : [])));
         $isLevel = true;
         $isTag = true;
         foreach ($mapping as $value => $tag) {
@@ -206,13 +209,13 @@ final class TemplateScanner
             $notes[] = sprintf('the switch has other cases (%s) than these headings: keep them around the call', implode(', ', $others));
         }
         if (!$isLevel && !$isTag) {
-            return [null, $notes];
+            return [null, $notes, false];
         }
         if (preg_match('/^\{([\w.]+)\}$/', $expression, $variable) !== 1) {
-            return [null, array_merge(['the tag is the value of ' . $expression . ' but that is no plain variable: set the tag by hand'], $notes)];
+            return [null, array_merge(['the tag is the value of ' . $expression . ' but that is no plain variable: set the tag by hand'], $notes), false];
         }
 
-        return [$isLevel ? 'h{' . $variable[1] . '}' : '{' . $variable[1] . '}', $notes];
+        return [$isLevel ? 'h{' . $variable[1] . '}' : '{' . $variable[1] . '}', $notes, $divDefault];
     }
 
     /**
