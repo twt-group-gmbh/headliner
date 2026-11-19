@@ -3,6 +3,16 @@
 All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.1] - 2026-11-19
+
+### Fixed
+- TER: the extension had no description and its title was the whole description. Without `ext_emconf.php` the TER takes
+  the title and the description from the `description` of `composer.json`, split at the first dash; it now reads
+  `Headliner - Shows and validates ...`.
+- Documentation: an invalid `tag` of `headliner:headline` and `headliner:headline.values` is ignored (the layout and the
+  default decide), it does not become a `div`. A tag that a translation takes from the original (`l10n_mode: exclude`)
+  is described in the Usage chapter.
+
 ## [1.0.0] - 2026-11-19
 
 First release.

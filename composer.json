@@ -1,7 +1,7 @@
 {
     "name": "twtgroup/headliner",
     "type": "typo3-cms-extension",
-    "description": "Shows and validates the heading structure (H1-H6) of a page in the TYPO3 page module.",
+    "description": "Headliner - Shows and validates the heading structure (H1-H6) of a page in the TYPO3 page module.",
     "keywords": [
         "TYPO3",
         "extension"
@@ -76,7 +76,7 @@
         "typo3/cms": {
             "web-dir": ".Build/public",
             "extension-key": "headliner",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "Package": {
                 "providesPackages": {}
             }
